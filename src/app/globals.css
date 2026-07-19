@@ -1,26 +1,98 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-paper: #F9F9F7;
+  --color-ink: #1C1C1C;
+  --color-accent: #0057FF;
+  --color-lime: #D4FF00;
+  --color-mist: #E8E5DE;
+
+  --font-body: var(--font-dm-sans), sans-serif;
+  --font-editorial: var(--font-newsreader), serif;
+  --font-display: var(--font-space-grotesk), sans-serif;
+
+  --shadow-card: 0 14px 40px rgba(28, 28, 28, 0.08);
+
+  --background-image-noise: radial-gradient(circle at 20% 20%, rgba(0,0,0,0.04) 0, rgba(0,0,0,0.04) 1px, transparent 1px);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  color: var(--color-ink);
+  background: var(--color-paper);
+  font-family: var(--font-body);
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  min-width: 320px;
+  background:
+    radial-gradient(circle at top left, rgba(0, 87, 255, 0.08), transparent 32%),
+    linear-gradient(180deg, rgba(249, 249, 247, 1), rgba(244, 241, 234, 0.55));
+  color: var(--color-ink);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+@utility texture-concrete {
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.18) 0 2px, transparent 2px),
+    radial-gradient(circle at 70% 40%, rgba(0, 0, 0, 0.08) 0 1px, transparent 1px);
+  background-size: 22px 22px, 16px 16px;
+}
+
+@utility texture-lines {
+  background-image: linear-gradient(120deg, rgba(28, 28, 28, 0.06) 0, rgba(28, 28, 28, 0.06) 2px, transparent 2px, transparent 12px);
+  background-size: 18px 18px;
+}
+
+@utility texture-grid {
+  background-image:
+    linear-gradient(rgba(28, 28, 28, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(28, 28, 28, 0.05) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+
+@utility texture-soft {
+  background-image: radial-gradient(circle at top left, rgba(255, 255, 255, 0.5), transparent 45%);
+}
+
+@utility texture-card {
+  background-image:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.32), transparent),
+    radial-gradient(circle at 80% 20%, rgba(255, 122, 0, 0.08), transparent 30%);
+}
+
+@utility collectible-pill {
+  background:
+    linear-gradient(135deg, rgba(255, 224, 162, 1), rgba(255, 247, 226, 1)),
+    linear-gradient(45deg, rgba(28, 28, 28, 0.06), rgba(28, 28, 28, 0));
+  border: 1px solid rgba(28, 28, 28, 0.2);
+}
+
+@utility ticker-track {
+  animation: ticker 22s linear infinite;
+}
+
+@keyframes ticker {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-33.333%);
+  }
+}
+
+@utility scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://bedroomstudios.vercel.app/sitemap.xml
