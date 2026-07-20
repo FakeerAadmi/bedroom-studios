@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from 'framer-motion';
-import { LampDesk } from 'lucide-react';
+import Image from 'next/image';
 
 export default function HomeHeroMotion() {
   return (
@@ -16,8 +16,14 @@ export default function HomeHeroMotion() {
       </div>
       <div className="flex min-h-[28rem] flex-col justify-between bg-[linear-gradient(160deg,rgba(255,255,255,0.55),rgba(0,87,255,0.1))] p-6">
         <div className="flex justify-end">
-          <div className="flex h-32 w-32 items-center justify-center rounded-[2rem] border border-ink/15 bg-paper/70">
-            <LampDesk className="h-16 w-16 text-ink" />
+          <div className="relative h-48 w-48 overflow-hidden rounded-[2rem] border border-ink/15 bg-paper/70">
+            <Image
+              src="/images/brutalist-cement-desk-lamp.png"
+              alt="Brutalist Cement Desk Lamp"
+              fill
+              className="object-cover"
+              priority
+            />
           </div>
         </div>
         <div>
