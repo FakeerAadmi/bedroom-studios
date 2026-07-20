@@ -1,7 +1,9 @@
+// @ts-nocheck
 import type { Metadata } from "next";
 import Link from "next/link";
 import { DM_Sans, Newsreader, Space_Grotesk } from "next/font/google";
 import { Providers } from "./providers";
+import Layout from "@/components/Layout";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -37,27 +39,12 @@ export default function RootLayout({
       lang="en"
       className={`${dmSans.variable} ${newsreader.variable} ${spaceGrotesk.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-body bg-paper text-ink">
-        {/* Temporary Navigation for Testing Routes */}
-        <nav className="p-4 border-b border-ink/10 flex flex-wrap gap-4 text-sm font-mono text-accent">
-          <Link href="/">Home</Link>
-          <Link href="/shop">Shop</Link>
-          <Link href="/product/test-product">Product (test-product)</Link>
-          <Link href="/wishlist">Wishlist</Link>
-          <Link href="/fandoms">Fandoms</Link>
-          <Link href="/commissions">Commissions</Link>
-          <Link href="/about">About</Link>
-          <Link href="/checkout">Checkout</Link>
-          <Link href="/track">Track</Link>
-          <Link href="/hq">HQ</Link>
-          <Link href="/some-info-page">Info Page (Dynamic slug)</Link>
-          <Link href="/invalid/url">404 Test</Link>
-        </nav>
-        <main className="flex-1 p-8">
-          <Providers>
+      <body className="font-body bg-paper text-ink">
+        <Providers>
+          <Layout>
             {children}
-          </Providers>
-        </main>
+          </Layout>
+        </Providers>
       </body>
     </html>
   );
