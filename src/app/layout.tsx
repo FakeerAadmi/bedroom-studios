@@ -1,10 +1,12 @@
 // @ts-nocheck
 import type { Metadata } from "next";
 import Link from "next/link";
+import Script from "next/script";
 import { DM_Sans, Newsreader, Space_Grotesk } from "next/font/google";
 import { Providers } from "./providers";
 import Layout from "@/components/Layout";
 import "./globals.css";
+import "../env.js";
 
 const dmSans = DM_Sans({
   variable: "--font-dm-sans",
@@ -78,6 +80,20 @@ export default function RootLayout({
             {children}
           </Layout>
         </Providers>
+
+        {/* Analytics Placeholders */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=YOUR-GA4-MEASUREMENT-ID"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'YOUR-GA4-MEASUREMENT-ID');
+          `}
+        </Script>
       </body>
     </html>
   );
