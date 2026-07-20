@@ -1,24 +1,17 @@
 // @ts-nocheck
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-"use client";
-
-import { motion } from 'framer-motion';
 
 import PageShell from '@/components/PageShell';
+import AnimatedCard from '@/components/AnimatedCard';
 import { reviews } from '@/data/products';
+
+export const metadata = {
+  title: 'Our Story — Bedroom Studios',
+  description: 'Bedroom Studios is a small Indian studio making desk objects that are tactile, opinionated, and genuinely useful. Here\'s how it started.',
+};
 
 export default function AboutPage() {
   return (
     <PageShell className="mx-auto max-w-7xl px-4 py-10 md:px-8 md:py-16">
-      <>
-
-        
-        <meta name="description" content="Bedroom Studios is a small Indian studio making desk objects that are tactile, opinionated, and genuinely useful. Here's how it started." />
-        <meta property="og:title" content="Our Story — Bedroom Studios" />
-        <meta property="og:description" content="A small Indian studio making desk objects that are tactile, opinionated, and genuinely useful." />
-      
-      </>
       <div className="max-w-3xl">
         <p className="font-display text-sm font-bold uppercase tracking-[0.3em] text-ink/45">
           Our story
@@ -56,10 +49,9 @@ export default function AboutPage() {
       </section>
 
       <section className="mt-8 grid gap-6 lg:grid-cols-2">
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.1 }}
+        <AnimatedCard
+          delay={0.1}
+          xOffset={-20}
           className="rounded-[2.5rem] border border-ink p-8"
         >
           <p className="text-sm uppercase tracking-[0.25em] text-ink/50">3D printing</p>
@@ -67,12 +59,11 @@ export default function AboutPage() {
             Hours of tweaking settings, fighting stringing, and watching hot plastic magically
             become functional gear.
           </p>
-        </motion.div>
+        </AnimatedCard>
 
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.15 }}
+        <AnimatedCard
+          delay={0.15}
+          xOffset={20}
           className="rounded-[2.5rem] border border-ink bg-ink p-8 text-paper"
         >
           <p className="text-sm uppercase tracking-[0.25em] text-paper/55">Cementware</p>
@@ -80,7 +71,7 @@ export default function AboutPage() {
             Mixing concrete in buckets, vibrating bubbles out, and waiting patiently. It&apos;s
             messy, it&apos;s heavy, and it doubles as self-defense.
           </p>
-        </motion.div>
+        </AnimatedCard>
       </section>
 
       <section className="mt-8 rounded-[2.5rem] border border-ink bg-lime p-8">

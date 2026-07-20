@@ -1,15 +1,12 @@
 // @ts-nocheck
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client";
 
-import { motion } from 'framer-motion';
-import { ArrowRight, LampDesk, Loader2 } from 'lucide-react';
-
+import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import PageShell from '@/components/PageShell';
-import { useStoreState } from '@/context/StoreContext';
-import { getCountdownParts } from '@/utils';
+import HomeHeroMotion from '@/components/home/HomeHeroMotion';
+import DropCountdown from '@/components/home/DropCountdown';
+import { productCategories, fandomCollections } from '@/data/products';
 
 const tickerItems = [
   'MADE IN INDIA',
@@ -26,35 +23,21 @@ const tickerItems = [
 ];
 
 export default function HomePage() {
-  const { liveAllProducts, liveCategories, liveFandoms, isStoreLoading } = useStoreState();
-  
-  if (isStoreLoading) {
-    return (
-      <PageShell>
-        <>
-        
-      </>
-        <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 py-40 text-ink/50">
-          <Loader2 className="h-6 w-6 animate-spin text-ink/40" />
-          <span className="font-mono text-xs uppercase tracking-widest">Loading Store...</span>
-        </div>
-      </PageShell>
-    );
-  }
+  const liveCategories = productCategories;
+  const liveFandoms = fandomCollections;
+  const liveAllProducts = productCategories.flatMap(c => c.products);
 
   const upcomingDrops = liveAllProducts.filter((product) => product.limitedDrop).slice(0, 3);
 
   return (
     <PageShell>
       <>
-
-        
         <meta name="description" content="Small-batch 3D printed desk toys, brutalist cementware, cable organizers, and fandom props. Designed and made in India." />
         <meta property="og:title" content="Bedroom Studios — Handmade Desk Objects, Made in India" />
         <meta property="og:description" content="Small-batch 3D printed desk toys, brutalist cementware, cable organizers, and fandom props. Designed and made in India." />
         <meta property="og:type" content="website" />
-      
       </>
+
       {/* Ticker — mobile only, sits right under the header */}
       <div className="overflow-hidden border-b border-ink bg-ink py-3 text-paper md:hidden">
         <div className="ticker-track flex items-center min-w-max gap-6 px-6 text-[0.6rem] uppercase tracking-[0.35em]">
@@ -90,29 +73,7 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <motion.div
-            initial={{ rotate: -4, opacity: 0, scale: 0.95 }}
-            animate={{ rotate: 0, opacity: 1, scale: 1 }}
-            transition={{ delay: 0.15, duration: 0.45 }}
-            className="relative overflow-hidden rounded-[2.5rem] border border-ink/15 bg-[#ece8dd] p-8 shadow-card"
-          >
-            <div className="absolute right-5 top-5 rounded-full border border-ink/15 bg-paper/80 px-3 py-1 text-xs uppercase tracking-[0.2em]">
-              Bedroom made
-            </div>
-            <div className="flex min-h-[28rem] flex-col justify-between bg-[linear-gradient(160deg,rgba(255,255,255,0.55),rgba(0,87,255,0.1))] p-6">
-              <div className="flex justify-end">
-                <div className="flex h-32 w-32 items-center justify-center rounded-[2rem] border border-ink/15 bg-paper/70">
-                  <LampDesk className="h-16 w-16 text-ink" />
-                </div>
-              </div>
-              <div>
-                <p className="text-sm uppercase tracking-[0.25em] text-ink/55">Flagship weirdness</p>
-                <p className="mt-3 max-w-sm font-editorial text-3xl">
-                  The lamp that says, &quot;Yes, I do own a mood board.&quot;
-                </p>
-              </div>
-            </div>
-          </motion.div>
+          <HomeHeroMotion />
         </div>
       </section>
 
@@ -199,29 +160,21 @@ export default function HomePage() {
         </div>
 
         <div className="mt-8 grid gap-6 md:grid-cols-3">
-          {upcomingDrops.map((product) => {
-            const countdown = getCountdownParts(product.releaseDate);
-
-            return (
-              <Link
-                key={product.id}
-                href={`/product/${product.slug}`}
-                className={`block rounded-[2.2rem] border border-ink/15 p-6 transition hover:-translate-y-1 hover:shadow-card ${product.panelClass}`}
-              >
-                <p className="text-sm uppercase tracking-[0.25em] text-ink/45">{product.categoryName}</p>
-                <h3 className="mt-3 font-editorial text-3xl leading-tight">{product.name}</h3>
-                <p className="mt-4 text-ink/70">{product.description}</p>
-                <div className="mt-6 rounded-[1.6rem] border border-ink/10 bg-white/70 p-4">
-                  <p className="text-xs uppercase tracking-[0.25em] text-ink/45">Drop countdown</p>
-                  <p className="mt-2 font-display text-3xl font-bold">
-                    {countdown.isLive
-                      ? 'Live now'
-                      : `${countdown.days}d ${countdown.hours}h ${countdown.minutes}m`}
-                  </p>
-                </div>
-              </Link>
-            );
-          })}
+          {upcomingDrops.map((product) => (
+            <Link
+              key={product.id}
+              href={`/product/${product.slug}`}
+              className={`block rounded-[2.2rem] border border-ink/15 p-6 transition hover:-translate-y-1 hover:shadow-card ${product.panelClass}`}
+            >
+              <p className="text-sm uppercase tracking-[0.25em] text-ink/45">{product.categoryName}</p>
+              <h3 className="mt-3 font-editorial text-3xl leading-tight">{product.name}</h3>
+              <p className="mt-4 text-ink/70">{product.description}</p>
+              <div className="mt-6 rounded-[1.6rem] border border-ink/10 bg-white/70 p-4">
+                <p className="text-xs uppercase tracking-[0.25em] text-ink/45">Drop countdown</p>
+                <DropCountdown releaseDate={product.releaseDate} />
+              </div>
+            </Link>
+          ))}
         </div>
       </section>
 

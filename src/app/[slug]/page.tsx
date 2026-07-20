@@ -1,17 +1,12 @@
 // @ts-nocheck
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client";
-
-import { useMemo } from 'react';
-import { useParams } from 'next/navigation';
 
 import PageShell from '@/components/PageShell';
 import { footerPages } from '@/data/products';
 
-export default function InfoPage() {
-  const { slug } = useParams() as { slug: string };
-  const content = useMemo(() => (footerPages as any)[slug] ?? footerPages.shipping, [slug]);
+export default async function InfoPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const content = (footerPages as any)[slug] ?? footerPages.shipping;
 
   return (
     <PageShell className="mx-auto max-w-5xl px-4 py-10 md:px-8 md:py-16">

@@ -1,6 +1,5 @@
 // @ts-nocheck
-"use client";
-/* eslint-disable react-hooks/exhaustive-deps */
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Link from 'next/link';
 

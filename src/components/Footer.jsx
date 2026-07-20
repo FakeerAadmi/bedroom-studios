@@ -1,9 +1,4 @@
-// @ts-nocheck
-/**
- * SERVER COMPONENT
- * Reason: Footer contains purely static layout and links. It does not require any 
- * client-side state, context, hooks, or framer-motion animations.
- */
+
 import Link from 'next/link';
 
 const quickLinks = [

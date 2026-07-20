@@ -1,25 +1,14 @@
 // @ts-nocheck
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client";
-
-import { useEffect, useMemo, useState } from 'react';
-import { Heart, ShoppingBag, Share2, Loader2 } from 'lucide-react';
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useParams } from 'next/navigation';
 import PageShell from '@/components/PageShell';
 import ProductCard from '@/components/ProductCard';
-import { getCategoryById } from '@/data/products';
-import { useStoreState } from '@/context/StoreContext';
-import { useCart } from '@/context/CartContext';
-import { formatPrice, getCountdownParts } from '@/utils';
+import ProductPurchaseCard from '@/components/product/ProductPurchaseCard';
+import { productCategories, fandomCollections } from '@/data/products';
 
 // ─── Material deep-dive copy ────────────────────────────────────────────────
-// Keyed by the first entry in product.materials[]. Add new keys as new
-// materials are introduced. Each guide renders a full editorial block on the
-// product page, styled to match the rest of the design system.
 const materialGuides = {
   'PLA+': {
     eyebrow: 'Material · PLA+',
@@ -94,47 +83,29 @@ function SpecCard({ body, title }) {
 }
 
 // ─── ProductPage ─────────────────────────────────────────────────────────────
-export default function ProductPage() {
-  const { slug } = useParams() as { slug: string };
-  const { allProductsBySlug, liveCategories, isStoreLoading } = useStoreState();
-  const product = allProductsBySlug?.[slug];
-  const { addItem, addRecentlyViewed, toggleWishlist, wishlistIds } = useCart();
-  const [selectedColor, setSelectedColor] = useState(product?.colors?.[0] ?? '');
-  const [selectedMaterial, setSelectedMaterial] = useState(product?.materialOptions?.[0] ?? '');
-  const [copiedLink, setCopiedLink] = useState(false);
+export default async function ProductPage({ params }) {
+  const { slug } = await params;
+  
+  const allCategories = [...productCategories, ...fandomCollections];
+  const allProducts = allCategories.flatMap(c => c.products);
+  const product = allProducts.find((p) => p.slug === slug);
 
-  const handleShareProduct = async () => {
-    const shareData = {
-      title: `${product.name} — Bedroom Studios`,
-      text: `Check out the ${product.name} at Bedroom Studios:`,
-      url: window.location.href,
-    };
-    if (navigator.share) {
-      try {
-        await navigator.share(shareData);
-      } catch (err) {
-        console.log('Share canceled or failed:', err);
-      }
-    } else {
-      try {
-        await navigator.clipboard.writeText(window.location.href);
-        setCopiedLink(true);
-        setTimeout(() => setCopiedLink(false), 2000);
-      } catch (err) {
-        console.error('Failed to copy link:', err);
-      }
-    }
-  };
+  if (!product) {
+    return (
+      <PageShell className="mx-auto flex min-h-[50vh] max-w-7xl flex-col items-center justify-center px-4">
+        <div className="rounded-[2.5rem] border border-dashed border-ink/20 p-8 text-ink/65">
+          That product wandered off. Head back to the{' '}
+          <Link href="/shop" className="text-accent">shop</Link>.
+        </div>
+      </PageShell>
+    );
+  }
 
-  useEffect(() => {
-    if (product) {
-      addRecentlyViewed(product.id);
-      setSelectedColor('');
-      setSelectedMaterial('');
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [product?.id]);
-
+  const category = allCategories.find(c => c.id === product.categoryId);
+  const relatedProducts = category?.products
+    .filter((item) => item.id !== product.id)
+    .slice(0, 3) ?? [];
+  const materialGuide = getMaterialGuide(product.materials);
 
   const mainMaterial = product?.materials?.[0]?.toLowerCase() || '';
   let materialSustainTitle = 'Built to Outlast';
@@ -156,57 +127,16 @@ export default function ProductPage() {
     materialSustainText = "Tough enough to survive direct Indian summers without warping, meaning you only ever have to buy it once.";
   }
 
-  if (isStoreLoading) {
-    return (
-      <PageShell>
-        <>
-        
-      </>
-        <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 py-40 text-ink/50">
-          <Loader2 className="h-6 w-6 animate-spin text-ink/40" />
-          <span className="font-mono text-xs uppercase tracking-widest">Loading Product...</span>
-        </div>
-      </PageShell>
-    );
-  }
-
-  if (!product) {
-    return (
-      <PageShell className="mx-auto flex min-h-[50vh] max-w-7xl flex-col items-center justify-center px-4">
-        <div className="rounded-[2.5rem] border border-dashed border-ink/20 p-8 text-ink/65">
-          That product wandered off. Head back to the{' '}
-          <Link href="/shop" className="text-accent">shop</Link>.
-        </div>
-      </PageShell>
-    );
-  }
-
-  const category = liveCategories?.find(c => c.id === product.categoryId);
-  const relatedProducts = category?.products
-    .filter((item) => item.id !== product.id)
-    .slice(0, 3) ?? [];
-  const countdown = getCountdownParts(product.releaseDate);
-  const isWishlisted = wishlistIds.includes(product.id);
-  const materialGuide = getMaterialGuide(product.materials);
-
-  // Guard against products that don't yet have optional selector fields
-  const colors = product.colors ?? [];
-  const materialOptions = product.materialOptions ?? [];
-
   return (
     <PageShell className="mx-auto max-w-7xl px-4 py-10 md:px-8 md:py-16">
       <>
-
-        
         <meta name="description" content={`${product.story} ${product.materials?.join(', ')}. Made in India by Bedroom Studios.`} />
         <meta property="og:title" content={`${product.name} — Bedroom Studios`} />
         <meta property="og:description" content={product.story} />
-      
       </>
 
       {/* ── Hero: gallery + product info ── */}
       <section className="flex flex-col gap-6 lg:grid lg:grid-cols-[1.05fr_0.95fr] lg:gap-8">
-
         {/* Left — gallery */}
         <div className="contents lg:block lg:space-y-5">
           <div className="order-1 flex flex-wrap gap-4 lg:order-none">
@@ -292,142 +222,7 @@ export default function ProductPage() {
             <p className="mt-5 text-lg leading-relaxed text-ink/70">{product.story}</p>
           </div>
 
-          {/* Purchase card */}
-          <div className="order-5 lg:order-none rounded-[2rem] border border-ink/15 bg-white/65 p-6 shadow-card">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="font-display text-3xl font-bold">{formatPrice(product.price)}</p>
-                <p className="mt-2 text-sm text-ink/60">{product.description}</p>
-              </div>
-              <div className="flex gap-2 shrink-0">
-                {/* Share Button with Tooltip */}
-                <div className="relative">
-                  <button
-                    type="button"
-                    onClick={handleShareProduct}
-                    aria-label="Share product"
-                    className={`rounded-full border p-3 transition ${
-                      copiedLink 
-                        ? 'border-accent bg-accent/15 text-ink'
-                        : 'border-ink bg-paper text-ink hover:bg-ink/5'
-                    }`}
-                  >
-                    <Share2 className="h-5 w-5" />
-                  </button>
-                  {copiedLink && (
-                    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 rounded-lg bg-ink px-2 py-1 text-[10px] font-bold uppercase tracking-[0.1em] text-paper shadow-sm whitespace-nowrap z-10">
-                      Link Copied ✦
-                    </span>
-                  )}
-                </div>
-
-                {/* Wishlist Button */}
-                <button
-                  type="button"
-                  onClick={() => toggleWishlist(product.id)}
-                  aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
-                  className={`rounded-full border border-ink/20 p-3 transition ${
-                    isWishlisted
-                      ? 'bg-[#ffe5ee] text-[#db2a63]'
-                      : 'bg-paper text-ink hover:bg-[#fff0f5]'
-                  }`}
-                >
-                  <Heart className={`h-5 w-5 ${isWishlisted ? 'fill-current' : ''}`} />
-                </button>
-              </div>
-            </div>
-
-            {/* Limited drop countdown */}
-            {product.limitedDrop ? (
-              <div className="mt-5 rounded-[1.6rem] border border-ink bg-ink px-4 py-4 text-paper">
-                <p className="text-xs uppercase tracking-[0.25em] text-paper/60">Next release window</p>
-                <p className="mt-2 font-display text-3xl font-bold">
-                  {countdown.isLive
-                    ? 'Drop is live'
-                    : `${countdown.days}d ${countdown.hours}h ${countdown.minutes}m`}
-                </p>
-              </div>
-            ) : null}
-
-            {/* Colorway selector */}
-            {colors.length > 0 && (
-              <div className="mt-5">
-                <p className="text-sm font-medium text-ink/60" id="colorway-label">
-                  Colorway — <span className="text-ink">{selectedColor}</span>
-                </p>
-                <div className="mt-2 flex flex-wrap gap-2" role="radiogroup" aria-labelledby="colorway-label">
-                  {colors.map((color) => (
-                    <button
-                      type="button"
-                      key={color}
-                      role="radio"
-                      aria-checked={selectedColor === color}
-                      onClick={() => setSelectedColor(color)}
-                      className={`rounded-full border px-4 py-2 text-sm outline-none transition focus:ring-2 focus:ring-accent ${
-                        selectedColor === color
-                          ? 'border-accent bg-accent text-white'
-                          : 'border-ink/20 hover:border-ink/50'
-                      }`}
-                    >
-                      {color}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Material selector */}
-            {materialOptions.length > 0 && (
-              <div className="mt-4">
-                <p className="text-sm font-medium text-ink/60" id="material-label">
-                  Material — <span className="text-ink">{selectedMaterial}</span>
-                </p>
-                <div className="mt-2 flex flex-wrap gap-2" role="radiogroup" aria-labelledby="material-label">
-                  {materialOptions.map((material) => (
-                    <button
-                      type="button"
-                      key={material}
-                      role="radio"
-                      aria-checked={selectedMaterial === material}
-                      onClick={() => setSelectedMaterial(material)}
-                      className={`rounded-full border px-4 py-2 text-sm outline-none transition focus:ring-2 focus:ring-ink/40 ${
-                        selectedMaterial === material
-                          ? 'border-ink bg-ink text-paper'
-                          : 'border-ink/20 hover:border-ink/50'
-                      }`}
-                    >
-                      {material}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* CTA buttons */}
-            <div className="mt-6 flex flex-wrap gap-3">
-              <button
-                type="button"
-                disabled={(product.price === null || product.price === undefined) || (colors.length > 0 && !selectedColor) || (materialOptions.length > 0 && !selectedMaterial)}
-                onClick={() => addItem({ ...product, selectedColor, selectedMaterial })}
-                className={`inline-flex flex-[1.25] items-center justify-center gap-3 rounded-full px-6 py-4 font-medium transition ${
-                  ((product.price === null || product.price === undefined) || (colors.length > 0 && !selectedColor) || (materialOptions.length > 0 && !selectedMaterial))
-                    ? 'bg-ink/10 text-ink/40 cursor-not-allowed border border-ink/10'
-                    : 'bg-ink text-paper hover:bg-accent'
-                }`}
-              >
-                <ShoppingBag className="h-4 w-4 shrink-0" />
-                <span className="whitespace-nowrap">
-                  {product.price === null || product.price === undefined ? 'Coming soon' : 'Add to cart'}
-                </span>
-              </button>
-              <Link
-                href="/commissions"
-                className="flex-1 whitespace-nowrap rounded-full border border-ink/20 px-6 py-4 text-center font-medium transition hover:border-accent hover:text-accent"
-              >
-                Request custom
-              </Link>
-            </div>
-          </div>
+          <ProductPurchaseCard product={product} />
 
           {/* Spec cards */}
           <div className="order-6 grid gap-4 md:grid-cols-2 lg:order-none">
