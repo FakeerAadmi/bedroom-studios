@@ -2,15 +2,20 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Link from 'next/link';
-
 import PageShell from '@/components/PageShell';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Page Not Found',
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default function NotFoundPage() {
   return (
     <PageShell className="mx-auto flex min-h-[75vh] max-w-7xl items-center px-4 py-10 md:px-8">
-      <>
-        <title>Page Not Found — Bedroom Studios</title>
-      </>
       <div className="w-full">
         <div className="grid gap-8 lg:grid-cols-[0.55fr_0.45fr] lg:items-center">
           <div>

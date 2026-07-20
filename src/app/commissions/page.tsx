@@ -1,9 +1,17 @@
 import PageShell from '@/components/PageShell';
 import CommissionClientFeatures from '@/components/commissions/CommissionClientFeatures';
+import { Metadata } from 'next';
 
-export const metadata = {
-  title: 'Custom Commissions — Bedroom Studios',
+export const metadata: Metadata = {
+  title: 'Custom Commissions',
   description: 'Commission a custom desk object, fandom prop, diorama, or collectible display. We build to your brief — small-batch, made in India.',
+  alternates: {
+    canonical: '/commissions',
+  },
+  openGraph: {
+    title: 'Custom Commissions — Bedroom Studios',
+    description: 'Commission a custom desk object, fandom prop, diorama, or collectible display. We build to your brief — small-batch, made in India.',
+  },
 };
 
 function InfoBlock({ body, title }) {

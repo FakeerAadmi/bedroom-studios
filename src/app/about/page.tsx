@@ -3,10 +3,18 @@
 import PageShell from '@/components/PageShell';
 import AnimatedCard from '@/components/AnimatedCard';
 import { reviews } from '@/data/products';
+import { Metadata } from 'next';
 
-export const metadata = {
-  title: 'Our Story — Bedroom Studios',
-  description: 'Bedroom Studios is a small Indian studio making desk objects that are tactile, opinionated, and genuinely useful. Here\'s how it started.',
+export const metadata: Metadata = {
+  title: 'Our Story',
+  description: 'Small-batch, essentially handmade Indian desk objects. Built for people who care about their setups.',
+  alternates: {
+    canonical: '/about',
+  },
+  openGraph: {
+    title: 'Our Story — Bedroom Studios',
+    description: 'Small-batch, essentially handmade Indian desk objects. Built for people who care about their setups.',
+  },
 };
 
 export default function AboutPage() {

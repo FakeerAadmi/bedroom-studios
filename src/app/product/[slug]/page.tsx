@@ -7,6 +7,35 @@ import PageShell from '@/components/PageShell';
 import ProductCard from '@/components/ProductCard';
 import ProductPurchaseCard from '@/components/product/ProductPurchaseCard';
 import { productCategories, fandomCollections } from '@/data/products';
+import { Metadata } from 'next';
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const allCategories = [...productCategories, ...fandomCollections];
+  const allProducts = allCategories.flatMap(c => c.products);
+  const product = allProducts.find((p) => p.slug === slug);
+
+  if (!product) {
+    return {
+      title: 'Product Not Found',
+    };
+  }
+
+  const description = `${product.story} ${product.materials?.join(', ')}. Made in India by Bedroom Studios.`;
+
+  return {
+    title: product.name,
+    description: description,
+    alternates: {
+      canonical: `/product/${slug}`,
+    },
+    openGraph: {
+      title: `${product.name} — Bedroom Studios`,
+      description: product.story,
+      images: product.image ? [{ url: product.image, alt: product.name }] : undefined,
+    },
+  };
+}
 
 // ─── Material deep-dive copy ────────────────────────────────────────────────
 const materialGuides = {
@@ -129,12 +158,6 @@ export default async function ProductPage({ params }) {
 
   return (
     <PageShell className="mx-auto max-w-7xl px-4 py-10 md:px-8 md:py-16">
-      <>
-        <meta name="description" content={`${product.story} ${product.materials?.join(', ')}. Made in India by Bedroom Studios.`} />
-        <meta property="og:title" content={`${product.name} — Bedroom Studios`} />
-        <meta property="og:description" content={product.story} />
-      </>
-
       {/* ── Hero: gallery + product info ── */}
       <section className="flex flex-col gap-6 lg:grid lg:grid-cols-[1.05fr_0.95fr] lg:gap-8">
         {/* Left — gallery */}

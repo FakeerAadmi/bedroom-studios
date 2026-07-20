@@ -7,6 +7,20 @@ import PageShell from '@/components/PageShell';
 import HomeHeroMotion from '@/components/home/HomeHeroMotion';
 import DropCountdown from '@/components/home/DropCountdown';
 import { productCategories, fandomCollections } from '@/data/products';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Bedroom Studios — Handmade Desk Objects, Made in India',
+  description: 'Small-batch 3D printed desk toys, brutalist cementware, cable organizers, and fandom props. Designed and made in India.',
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    title: 'Bedroom Studios — Handmade Desk Objects, Made in India',
+    description: 'Small-batch 3D printed desk toys, brutalist cementware, cable organizers, and fandom props. Designed and made in India.',
+    type: 'website',
+  },
+};
 
 const tickerItems = [
   'MADE IN INDIA',
@@ -31,12 +45,6 @@ export default function HomePage() {
 
   return (
     <PageShell>
-      <>
-        <meta name="description" content="Small-batch 3D printed desk toys, brutalist cementware, cable organizers, and fandom props. Designed and made in India." />
-        <meta property="og:title" content="Bedroom Studios — Handmade Desk Objects, Made in India" />
-        <meta property="og:description" content="Small-batch 3D printed desk toys, brutalist cementware, cable organizers, and fandom props. Designed and made in India." />
-        <meta property="og:type" content="website" />
-      </>
 
       {/* Ticker — mobile only, sits right under the header */}
       <div className="overflow-hidden border-b border-ink bg-ink py-3 text-paper md:hidden">

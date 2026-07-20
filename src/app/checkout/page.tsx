@@ -1,9 +1,17 @@
 import PageShell from '@/components/PageShell';
 import CheckoutClientFeatures from '@/components/checkout/CheckoutClientFeatures';
+import { Metadata } from 'next';
 
-export const metadata = {
-  title: 'Checkout — Bedroom Studios',
+export const metadata: Metadata = {
+  title: 'Checkout',
   description: 'Clean checkout. No chaos. Mostly.',
+  alternates: {
+    canonical: '/checkout',
+  },
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default function CheckoutPage() {

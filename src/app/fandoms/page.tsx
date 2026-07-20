@@ -5,16 +5,23 @@ import Link from 'next/link';
 import PageShell from '@/components/PageShell';
 import FandomSection from '@/components/fandoms/FandomSection';
 import { fandomCollections } from '@/data/products';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Fandom Lab',
+  description: 'Fan-inspired desk props, dioramas, and collectible objects for gamers, anime fans, and anyone with too much lore and not enough shelf space.',
+  alternates: {
+    canonical: '/fandoms',
+  },
+  openGraph: {
+    title: 'Fandom Lab — Bedroom Studios',
+    description: 'Fan-inspired desk props, dioramas, and collectible objects for gamers and fans with too much lore.',
+  },
+};
 
 export default function FandomPage() {
   return (
     <PageShell className="mx-auto max-w-7xl px-4 py-10 md:px-8 md:py-16">
-      <>
-        <meta name="description" content="Fan-inspired desk props, dioramas, and collectible objects for gamers, anime fans, and anyone with too much lore and not enough shelf space." />
-        <meta property="og:title" content="Fandom Lab — Bedroom Studios" />
-        <meta property="og:description" content="Fan-inspired desk props, dioramas, and collectible objects for gamers and fans with too much lore." />
-      </>
-
       {/* ── Page header ── */}
       <section className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
         <div>
