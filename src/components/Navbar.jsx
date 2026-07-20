@@ -1,4 +1,8 @@
 // @ts-nocheck
+/**
+ * CLIENT COMPONENT
+ * Reason: Uses `framer-motion` for animations, `useState` for mobile menu, `usePathname` for active link state, and `useCart` context.
+ */
 "use client";
 
 import { AnimatePresence, motion } from 'framer-motion';

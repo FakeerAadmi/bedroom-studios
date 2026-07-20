@@ -1,4 +1,9 @@
 // @ts-nocheck
+/**
+ * SERVER COMPONENT
+ * Reason: Footer contains purely static layout and links. It does not require any 
+ * client-side state, context, hooks, or framer-motion animations.
+ */
 import Link from 'next/link';
 
 const quickLinks = [
@@ -53,9 +58,7 @@ export default function Footer() {
                 <li key={link.to}>
                   <Link
                     href={link.to}
-                    className={({ isActive }) =>
-                      `text-sm transition hover:text-ink ${isActive ? 'font-medium text-ink' : 'text-ink/55'}`
-                    }
+                    className="text-sm transition hover:text-ink text-ink/55"
                   >
                     {link.label}
                   </Link>

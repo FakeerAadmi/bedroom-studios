@@ -1,4 +1,8 @@
 // @ts-nocheck
+/**
+ * CLIENT COMPONENT
+ * Reason: Uses `framer-motion`, `useState`, and `useCart` context for interactive drawer management.
+ */
 "use client";
 
 import { AnimatePresence, motion } from 'framer-motion';

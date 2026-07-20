@@ -1,4 +1,8 @@
 // @ts-nocheck
+/**
+ * CLIENT COMPONENT
+ * Reason: Uses `useEffect` and `usePathname` to manipulate the DOM (`window.scrollTo`) on route changes.
+ */
 "use client";
 
 import { useEffect } from 'react';

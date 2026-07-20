@@ -1,4 +1,8 @@
 // @ts-nocheck
+/**
+ * CLIENT COMPONENT
+ * Reason: Uses `useState`, `useEffect`, and `framer-motion` to control the initial application loading sequence.
+ */
 "use client";
 
 import { useEffect, useState } from 'react';

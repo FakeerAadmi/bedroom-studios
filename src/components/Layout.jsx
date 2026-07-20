@@ -1,4 +1,8 @@
 // @ts-nocheck
+/**
+ * CLIENT COMPONENT
+ * Reason: Uses `usePathname` and `useStoreState` to conditionally render UI layers (e.g. hiding Navbar/Footer on specific routes).
+ */
 "use client";
 
 import CartDrawer from './cart/CartDrawer';
