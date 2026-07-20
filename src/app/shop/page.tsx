@@ -1,4 +1,3 @@
-// @ts-nocheck
 import PageShell from '@/components/PageShell';
 import ShopClientFeatures from '@/components/shop/ShopClientFeatures';
 import { productCategories } from '@/data/products';

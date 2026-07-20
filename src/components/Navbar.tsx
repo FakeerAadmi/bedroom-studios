@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * CLIENT COMPONENT
  * Reason: Uses `framer-motion` for animations, `useState` for mobile menu, `usePathname` for active link state, and `useCart` context.
@@ -79,11 +78,9 @@ export default function Navbar() {
               <Link
                 key={link.to}
                 href={link.to}
-                className={({ isActive }) =>
-                  `text-sm uppercase tracking-[0.2em] transition ${
-                    isActive ? 'text-accent' : 'text-ink/60 hover:text-ink'
-                  }`
-                }
+                className={`text-sm uppercase tracking-[0.2em] transition ${
+                  pathname === link.to ? 'text-accent' : 'text-ink/60 hover:text-ink'
+                }`}
               >
                 {link.label}
               </Link>

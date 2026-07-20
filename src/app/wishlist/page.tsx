@@ -1,4 +1,3 @@
-// @ts-nocheck
 import PageShell from '@/components/PageShell';
 import WishlistContent from '@/components/wishlist/WishlistContent';
 import { Metadata } from 'next';

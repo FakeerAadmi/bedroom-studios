@@ -1,4 +1,61 @@
-const categoryDefinitions = [
+export interface CategoryDefinition {
+  id: string;
+  name: string;
+  eyebrow: string;
+  description: string;
+  note: string;
+  panelClass: string;
+  spotlightClass?: string;
+  textureClass?: string;
+  placeholderTone?: string;
+  identity: string;
+  cardColor?: string;
+  fandoms?: string[];
+  products?: Product[];
+}
+
+export interface ProductGallery {
+  label: string;
+  caption: string;
+  className: string;
+  image?: string;
+}
+
+export interface Review {
+  quote: string;
+  author: string;
+}
+
+export interface Product {
+  id: number;
+  slug: string;
+  name: string;
+  price: number | null;
+  image?: string;
+  gallery?: ProductGallery[];
+  label: string;
+  description: string;
+  color?: string;
+  materials: string[];
+  dimensions: string;
+  care: string;
+  goodFor: string[];
+  story: string;
+  comparison: string[][];
+  releaseDate: string;
+  limitedDrop: boolean;
+  colors: string[];
+  materialOptions: string[];
+  textureClass?: string;
+  categoryId?: string;
+  categoryName?: string;
+  categoryIdentity?: string;
+  panelClass?: string;
+  spotlightClass?: string;
+  reviews?: Review[];
+}
+
+const categoryDefinitions: CategoryDefinition[] = [
   {
     id: 'fidget-gears',
     name: 'Fidget Gears',
@@ -79,7 +136,7 @@ const categoryDefinitions = [
   },
 ];
 
-const rawProducts = {
+const rawProducts: Record<string, Partial<Product>[]> = {
   'fidget-gears': [
     {
       id: 1,
@@ -582,11 +639,11 @@ const defaultReviews = [
   },
 ];
 
-function makeGallery(product, category) {
+function makeGallery(product: Partial<Product>, category: CategoryDefinition): ProductGallery[] {
   return [
     {
       label: 'Front view',
-      caption: `${product.name} in ${category.placeholderTone.toLowerCase()}.`,
+      caption: `${product.name} in ${category.placeholderTone?.toLowerCase() || 'studio'}.`,
       className: `${product.color} ${category.textureClass}`,
     },
     {
@@ -602,9 +659,9 @@ function makeGallery(product, category) {
   ];
 }
 
-function makeProduct(product, category) {
+function makeProduct(product: Partial<Product>, category: CategoryDefinition): Product {
   return {
-    ...product,
+    ...(product as Product),
     categoryId: category.id,
     categoryName: category.name,
     categoryIdentity: category.identity,
@@ -613,7 +670,7 @@ function makeProduct(product, category) {
     textureClass: category.textureClass,
     gallery: product.gallery || makeGallery(product, category),
     reviews:
-      product.id % 2 === 0
+      product.id! % 2 === 0
         ? [
             {
               quote: 'Looks expensive, works well, and has no cringe startup energy.',
@@ -631,17 +688,17 @@ function makeProduct(product, category) {
   };
 }
 
-export const productCategories = categoryDefinitions.map((category) => ({
+export const productCategories: CategoryDefinition[] = categoryDefinitions.map((category) => ({
   ...category,
-  products: rawProducts[category.id].map((product) => makeProduct(product, category)),
+  products: (rawProducts[category.id] || []).map((product) => makeProduct(product, category)),
 }));
 
 
-export function getCategoryById(id) {
+export function getCategoryById(id: string): CategoryDefinition | null {
   return productCategories.find((category) => category.id === id) ?? null;
 }
 
-export const fandomCollections = [
+export const fandomCollections: CategoryDefinition[] = [
   {
     id: 'radiant-tactical',
     name: 'Radiant Protocol',
@@ -1013,7 +1070,20 @@ export const reviews = [
   },
 ];
 
-export const footerPages = {
+export interface FooterPageSection {
+  title: string;
+  paragraphs: string[];
+}
+
+export interface FooterPage {
+  note?: string;
+  title: string;
+  eyebrow: string;
+  intro: string;
+  sections: FooterPageSection[];
+}
+
+export const footerPages: Record<string, FooterPage> = {
   shipping: {
     title: 'Shipping',
     eyebrow: 'Dispatch notes',
@@ -1296,7 +1366,7 @@ export const footerPages = {
 };
 
 export const allFandomProducts = fandomCollections.flatMap(collection => 
-  collection.products.map(product => {
+  collection!.products!.map(product => {
     return {
       ...product,
       categoryId: collection.id,
@@ -1320,15 +1390,20 @@ export const allProducts = [
   ...allFandomProducts
 ];
 
-export const allProductsById = Object.fromEntries(allProducts.map((product) => [product.id, product]));
-export const allProductsBySlug = Object.fromEntries(
-  allProducts.map((product) => [product.slug, product]),
-);
-
-export function getProductById(id) {
-  return allProductsById[id] ?? null;
+export const allProductsById = Object.fromEntries(allProducts.map((product) => [product!.id, product]));
+export function getAllProducts(): Product[] {
+  const coreProducts = productCategories.flatMap((c) => c.products || []);
+  const fandomProducts = fandomCollections.flatMap((c) => c.products || []);
+  return [...coreProducts, ...fandomProducts];
 }
 
-export function getProductBySlug(slug) {
-  return allProductsBySlug[slug] ?? null;
+export function getProductById(id: number): Product | null {
+  const allProducts = getAllProducts();
+  return allProducts.find((p) => p!.id === (id as unknown as number)) || null;
+}
+
+export function getProductBySlug(slug: string): Product | null {
+  const allProducts = getAllProducts();
+  const product = allProducts.find((p) => p?.slug === slug);
+  return product || null;
 }

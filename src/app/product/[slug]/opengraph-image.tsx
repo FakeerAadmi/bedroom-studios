@@ -7,7 +7,7 @@ export function generateStaticParams() {
   const allProducts = allCategories.flatMap((c) => c.products);
   
   return allProducts.map((product) => ({
-    slug: product.slug,
+    slug: product!.slug,
   }));
 }
 
@@ -22,7 +22,7 @@ export const contentType = 'image/png';
 
 export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = getProductBySlug(slug)!;
 
   if (!product) {
     return new ImageResponse(
@@ -116,7 +116,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
               marginBottom: 24,
             }}
           >
-            {product.name}
+            {product!.name}
           </div>
           <div
             style={{

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * CLIENT COMPONENT
  * Reason: Uses `framer-motion` and `useCart` context to animate and display dynamic global notifications.

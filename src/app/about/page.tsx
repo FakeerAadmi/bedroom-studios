@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import PageShell from '@/components/PageShell';
 import AnimatedCard from '@/components/AnimatedCard';

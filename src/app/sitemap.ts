@@ -21,7 +21,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   // Standard Product Routes
   const standardProductRoutes = productCategories.flatMap((category) =>
-    category.products.map((product) => ({
+    category.products!.map((product) => ({
       url: `${baseUrl}/product/${product.slug}`,
       lastModified: new Date().toISOString(),
       changeFrequency: 'weekly' as const,
@@ -31,7 +31,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   // Fandom Product Routes
   const fandomProductRoutes = fandomCollections.flatMap((collection) =>
-    collection.products.map((product) => ({
+    collection.products!.map((product) => ({
       url: `${baseUrl}/product/${product.slug}`,
       lastModified: new Date().toISOString(),
       changeFrequency: 'weekly' as const,

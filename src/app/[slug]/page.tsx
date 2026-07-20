@@ -1,5 +1,3 @@
-// @ts-nocheck
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import PageShell from '@/components/PageShell';
 import { footerPages } from '@/data/products';

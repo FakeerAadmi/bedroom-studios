@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * CLIENT COMPONENT
  * Reason: Uses `framer-motion` for hover animations, `useCart` for interactions, and `useRouter` for imperative navigation.

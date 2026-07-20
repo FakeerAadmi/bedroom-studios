@@ -1,5 +1,3 @@
-// @ts-nocheck
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
@@ -41,7 +39,7 @@ export default function HomePage() {
   const liveFandoms = fandomCollections;
   const liveAllProducts = productCategories.flatMap(c => c.products);
 
-  const upcomingDrops = liveAllProducts.filter((product) => product.limitedDrop).slice(0, 3);
+  const upcomingDrops = liveAllProducts.filter((product) => product!.limitedDrop).slice(0, 3);
 
   return (
     <PageShell>
@@ -170,16 +168,16 @@ export default function HomePage() {
         <div className="mt-8 grid gap-6 md:grid-cols-3">
           {upcomingDrops.map((product) => (
             <Link
-              key={product.id}
-              href={`/product/${product.slug}`}
-              className={`block rounded-[2.2rem] border border-ink/15 p-6 transition hover:-translate-y-1 hover:shadow-card ${product.panelClass}`}
+              key={product!.id}
+              href={`/product/${product!.slug}`}
+              className={`block rounded-[2.2rem] border border-ink/15 p-6 transition hover:-translate-y-1 hover:shadow-card ${product!.panelClass}`}
             >
-              <p className="text-sm uppercase tracking-[0.25em] text-ink/45">{product.categoryName}</p>
-              <h3 className="mt-3 font-editorial text-3xl leading-tight">{product.name}</h3>
-              <p className="mt-4 text-ink/70">{product.description}</p>
+              <p className="text-sm uppercase tracking-[0.25em] text-ink/45">{product!.categoryName}</p>
+              <h3 className="mt-3 font-editorial text-3xl leading-tight">{product!.name}</h3>
+              <p className="mt-4 text-ink/70">{product!.description}</p>
               <div className="mt-6 rounded-[1.6rem] border border-ink/10 bg-white/70 p-4">
                 <p className="text-xs uppercase tracking-[0.25em] text-ink/45">Drop countdown</p>
-                <DropCountdown releaseDate={product.releaseDate} />
+                <DropCountdown releaseDate={product!.releaseDate} />
               </div>
             </Link>
           ))}
@@ -286,7 +284,7 @@ export default function HomePage() {
                 <p className="font-display text-sm font-bold uppercase tracking-[0.25em] text-ink/45">
                   {collection.name}
                 </p>
-                <p className="mt-3 text-lg text-ink/70">{collection.fandoms.join(', ')}</p>
+                <p className="mt-3 text-lg text-ink/70">{collection!.fandoms!.join(', ')}</p>
                 <p className="mt-2 text-sm text-ink/55">{collection.note}</p>
               </div>
             ))}

@@ -36,7 +36,7 @@ export default function ProductPurchaseCard({ product }) {
       try {
         await navigator.share(shareData);
       } catch (err) {
-        console.log('Share canceled or failed:', err);
+        // Share canceled or failed
       }
     } else {
       try {

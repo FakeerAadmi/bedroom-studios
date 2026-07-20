@@ -1,5 +1,3 @@
-// @ts-nocheck
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import Link from 'next/link';
 import Image from 'next/image';
@@ -16,7 +14,7 @@ export function generateStaticParams() {
   const allProducts = allCategories.flatMap((c) => c.products);
   
   return allProducts.map((product) => ({
-    slug: product.slug,
+    slug: product!.slug,
   }));
 }
 
@@ -24,7 +22,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const allCategories = [...productCategories, ...fandomCollections];
   const allProducts = allCategories.flatMap(c => c.products);
-  const product = allProducts.find((p) => p.slug === slug);
+  const product = allProducts.find((p) => p!.slug === slug);
 
   if (!product) {
     return {
@@ -35,15 +33,15 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const description = `${product.story} ${product.materials?.join(', ')}. Made in India by Bedroom Studios.`;
 
   return {
-    title: product.name,
+    title: product!.name,
     description: description,
     alternates: {
       canonical: `/product/${slug}`,
     },
     openGraph: {
-      title: `${product.name} — Bedroom Studios`,
+      title: `${product!.name} — Bedroom Studios`,
       description: product.story,
-      images: product.image ? [{ url: product.image, alt: product.name }] : undefined,
+      images: product.image ? [{ url: product.image, alt: product!.name }] : undefined,
     },
   };
 }
@@ -128,7 +126,7 @@ export default async function ProductPage({ params }) {
   
   const allCategories = [...productCategories, ...fandomCollections];
   const allProducts = allCategories.flatMap(c => c.products);
-  const product = allProducts.find((p) => p.slug === slug);
+  const product = allProducts.find((p) => p!.slug === slug);
 
   if (!product) {
     return (
@@ -142,8 +140,7 @@ export default async function ProductPage({ params }) {
   }
 
   const category = allCategories.find(c => c.id === product.categoryId);
-  const relatedProducts = category?.products
-    .filter((item) => item.id !== product.id)
+  const relatedProducts = category?.products!?.filter((item) => item.id !== product.id)
     .slice(0, 3) ?? [];
   const materialGuide = getMaterialGuide(product.materials);
 
@@ -175,7 +172,7 @@ export default async function ProductPage({ params }) {
         <div className="contents lg:block lg:space-y-5">
           <div className="order-1 flex flex-wrap gap-4 lg:order-none">
             <span className="rounded-full border border-ink px-4 py-2 text-xs uppercase tracking-[0.25em]">
-              {product.categoryName}
+              {product!.categoryName}
             </span>
             {product.limitedDrop ? (
               <span className="collectible-pill rounded-full px-4 py-2 text-xs uppercase tracking-[0.25em]">
@@ -190,7 +187,7 @@ export default async function ProductPage({ params }) {
                 {product.image ? (
                   <Image 
                     src={product.image} 
-                    alt={product.name} 
+                    alt={product!.name} 
                     priority
                     fill
                     sizes="(max-width: 1024px) 100vw, 50vw"
@@ -251,7 +248,7 @@ export default async function ProductPage({ params }) {
               Bedroom Studios
             </p>
             <h1 className="mt-3 font-display text-5xl font-bold tracking-tight md:text-7xl">
-              {product.name}
+              {product!.name}
             </h1>
             <p className="mt-5 text-lg leading-relaxed text-ink/70">{product.story}</p>
           </div>

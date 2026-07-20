@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * CLIENT COMPONENT
  * Reason: Uses `framer-motion` to orchestrate page-level enter/exit transition animations.

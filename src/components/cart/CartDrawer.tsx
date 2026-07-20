@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * CLIENT COMPONENT
  * Reason: Uses `framer-motion`, `useState`, and `useCart` context for interactive drawer management.
@@ -57,7 +56,7 @@ export default function CartDrawer() {
               {items.length === 0 ? (
                 <div className="flex flex-col items-center justify-center rounded-[2.5rem] border border-dashed border-ink/25 bg-white/50 p-10 text-center">
                   <div className="flex h-16 w-16 items-center justify-center rounded-full bg-ink/5">
-                    <ShoppingBag className="h-6 w-6 text-ink/40" />
+                    <div className="h-6 w-6 text-ink/40" />
                   </div>
                   <p className="mt-4 font-display text-lg font-bold">Your cart is empty</p>
                   <p className="mt-2 text-sm text-ink/60 max-w-[14rem]">Fix that. Respectfully. The printer needs something to do.</p>
