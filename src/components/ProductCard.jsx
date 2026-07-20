@@ -13,7 +13,7 @@ import { useCart } from '../context/CartContext';
 import { formatPrice } from '../utils';
 
 export default function ProductCard({ product, index }) {
-  const navigate = useRouter();
+  const router = useRouter();
   const { addItem, toggleWishlist, wishlistIds } = useCart();
   const isWishlisted = wishlistIds.includes(product.id);
 
@@ -23,7 +23,7 @@ export default function ProductCard({ product, index }) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05 }}
       whileHover={{ y: -10, rotate: -0.2 }}
-      onClick={() => navigate(`/product/${product.slug}`)}
+      onClick={() => router.push(`/product/${product.slug}`)}
       className={`group relative cursor-pointer overflow-hidden rounded-[2rem] border border-ink/15 bg-paper shadow-card transition ${product.textureClass}`}
     >
       <button
@@ -102,7 +102,7 @@ export default function ProductCard({ product, index }) {
             type="button"
             onClick={(event) => {
               event.stopPropagation();
-              navigate(`/product/${product.slug}`);
+              router.push(`/product/${product.slug}`);
             }}
             className="rounded-full border border-ink px-5 py-3 text-sm font-medium transition hover:border-accent hover:text-accent"
           >
