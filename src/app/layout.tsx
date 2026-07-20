@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { DM_Sans, Newsreader, Space_Grotesk } from "next/font/google";
+import { Providers } from "./providers";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -53,7 +54,9 @@ export default function RootLayout({
           <Link href="/invalid/url">404 Test</Link>
         </nav>
         <main className="flex-1 p-8">
-          {children}
+          <Providers>
+            {children}
+          </Providers>
         </main>
       </body>
     </html>
