@@ -1,7 +1,15 @@
 import { ImageResponse } from 'next/og';
-import { getProductBySlug } from '@/data/products';
+import { getProductBySlug, productCategories, fandomCollections } from '@/data/products';
+export const dynamicParams = false;
 
-export const runtime = 'edge';
+export function generateStaticParams() {
+  const allCategories = [...productCategories, ...fandomCollections];
+  const allProducts = allCategories.flatMap((c) => c.products);
+  
+  return allProducts.map((product) => ({
+    slug: product.slug,
+  }));
+}
 
 // Image metadata
 export const alt = 'Bedroom Studios Product';

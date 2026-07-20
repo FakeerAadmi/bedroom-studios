@@ -9,6 +9,17 @@ import ProductPurchaseCard from '@/components/product/ProductPurchaseCard';
 import { productCategories, fandomCollections } from '@/data/products';
 import { Metadata } from 'next';
 
+export const dynamicParams = false;
+
+export function generateStaticParams() {
+  const allCategories = [...productCategories, ...fandomCollections];
+  const allProducts = allCategories.flatMap((c) => c.products);
+  
+  return allProducts.map((product) => ({
+    slug: product.slug,
+  }));
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const allCategories = [...productCategories, ...fandomCollections];
@@ -204,7 +215,7 @@ export default async function ProductPage({ params }) {
 
           <div className="order-4 lg:order-none">
             <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 lg:grid lg:overflow-x-visible lg:pb-0 scrollbar-hide">
-              {product.gallery.slice(1).map((frame) => (
+              {(product.gallery?.slice(1) ?? []).map((frame) => (
                 <div key={frame.label} className={`min-w-[85vw] snap-center lg:min-w-0 rounded-[2rem] border border-ink/15 p-4 relative overflow-hidden ${frame.className}`}>
                   {frame.image ? (
                     <>
@@ -346,7 +357,7 @@ export default async function ProductPage({ params }) {
           </h2>
         </div>
         <div className="mt-8 grid gap-6 md:grid-cols-3">
-          {product.reviews.map((review) => (
+          {(product.reviews ?? []).map((review) => (
             <div key={review.author} className="rounded-[2rem] border border-ink/15 p-6 shadow-card">
               <p className="font-display text-2xl font-bold leading-tight">&quot;{review.quote}&quot;</p>
               <p className="mt-4 text-sm uppercase tracking-[0.2em] text-ink/55">{review.author}</p>

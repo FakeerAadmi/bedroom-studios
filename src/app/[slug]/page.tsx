@@ -5,6 +5,14 @@ import PageShell from '@/components/PageShell';
 import { footerPages } from '@/data/products';
 import { Metadata } from 'next';
 
+export const dynamicParams = false;
+
+export function generateStaticParams() {
+  return Object.keys(footerPages).map((slug) => ({
+    slug,
+  }));
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const content = (footerPages as any)[slug];
