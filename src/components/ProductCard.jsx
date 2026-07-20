@@ -7,6 +7,7 @@
 
 import { motion } from 'framer-motion';
 import { ArrowUpRight, Heart } from 'lucide-react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useCart } from '../context/CartContext';
 import { formatPrice } from '../utils';
@@ -42,12 +43,12 @@ export default function ProductCard({ product, index }) {
       <div className={`relative h-72 overflow-hidden bg-gradient-to-br ${product.color} p-6`}>
         {product.image ? (
           <>
-            <img 
+            <Image 
               src={product.image} 
               alt={product.name} 
-              loading="lazy"
-              decoding="async"
-              className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" 
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              className="object-cover transition-transform duration-700 group-hover:scale-105" 
             />
             <div className="absolute inset-0 bg-gradient-to-t from-paper/90 via-paper/40 to-transparent z-[1]" />
           </>

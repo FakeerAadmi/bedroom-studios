@@ -65,16 +65,10 @@ export default function SplashLoader() {
             transition={{ duration: 0.5, ease: 'easeOut' }}
             className="flex flex-col items-center gap-2"
           >
-            <p
-              className="font-display text-4xl font-bold tracking-tight text-ink"
-              style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-            >
+            <p className="font-display text-4xl font-bold tracking-tight text-ink">
               Bedroom Studios
             </p>
-            <p
-              className="text-[0.6rem] uppercase tracking-[0.35em] text-ink/40"
-              style={{ fontFamily: "'DM Sans', sans-serif" }}
-            >
+            <p className="text-[0.6rem] uppercase tracking-[0.35em] text-ink/40">
               Handmade Indian desk objects
             </p>
           </motion.div>

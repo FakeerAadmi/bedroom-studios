@@ -4,6 +4,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Camera, ChevronRight, X, Send, ArrowLeft, Package, LayoutDashboard, Inbox, Tags, Users, Settings, LogOut, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
@@ -360,7 +361,7 @@ export default function AdminHQPage() {
                               <>
                                 {photoArray.map((photoUrl, photoIdx) => (
                                   <div key={photoIdx} className="relative inline-block">
-                                    <img src={photoUrl} alt="Progress" className="h-24 w-24 rounded-xl object-cover border border-ink/10 shadow-sm" />
+                                    <Image src={photoUrl} width={96} height={96} alt="Progress" className="h-24 w-24 rounded-xl object-cover border border-ink/10 shadow-sm" />
                                     <button onClick={() => handleClearPhoto(index, photoIdx)} className="absolute -right-2 -top-2 rounded-full bg-red-500 p-1 text-white shadow-md hover:bg-red-600 transition hover:scale-110">
                                       <X className="h-3 w-3" />
                                     </button>
@@ -491,7 +492,7 @@ export default function AdminHQPage() {
             {localInventory && localInventory.map((p, i) => (
               <tr key={i} className="hover:bg-ink/5 transition-colors">
                 <td className="px-6 py-4 font-medium flex items-center gap-3">
-                  <img src={p.gallery[0].image} alt="" className="w-10 h-10 rounded-lg object-cover" />
+                  <Image src={p.gallery[0].image} width={40} height={40} alt="" className="w-10 h-10 rounded-lg object-cover" />
                   {p.name}
                 </td>
                 <td className="px-6 py-4 font-mono">₹{p.price}</td>

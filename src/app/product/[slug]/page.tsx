@@ -7,6 +7,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Heart, ShoppingBag, Share2, Loader2 } from 'lucide-react';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import PageShell from '@/components/PageShell';
 import ProductCard from '@/components/ProductCard';
@@ -223,12 +224,13 @@ export default function ProductPage() {
             <div className={`rounded-[2.8rem] border border-ink/15 p-6 ${product.panelClass}`}>
               <div className={`relative min-h-[25rem] overflow-hidden rounded-[2.2rem] bg-gradient-to-br ${product.color} p-6 ${product.textureClass}`}>
                 {product.image ? (
-                  <img 
+                  <Image 
                     src={product.image} 
                     alt={product.name} 
-                    fetchPriority="high"
-                    loading="eager"
-                    className="absolute inset-0 h-full w-full object-cover" 
+                    priority
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    className="object-cover" 
                   />
                 ) : (
                   <>
@@ -253,12 +255,12 @@ export default function ProductPage() {
                 <div key={frame.label} className={`min-w-[85vw] snap-center lg:min-w-0 rounded-[2rem] border border-ink/15 p-4 relative overflow-hidden ${frame.className}`}>
                   {frame.image ? (
                     <>
-                      <img 
+                      <Image 
                         src={frame.image} 
                         alt={frame.label} 
-                        loading="lazy"
-                        decoding="async"
-                        className="absolute inset-0 h-full w-full object-cover" 
+                        fill
+                        sizes="(max-width: 1024px) 85vw, 33vw"
+                        className="object-cover" 
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-paper/90 via-paper/10 to-transparent z-[1]" />
                       <div className="relative flex min-h-[12rem] flex-col justify-between rounded-[1.6rem] border border-white/20 bg-white/45 p-4 z-[2]">

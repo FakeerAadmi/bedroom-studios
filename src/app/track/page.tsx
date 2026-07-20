@@ -6,6 +6,8 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Upload, CheckCircle2, Shield, Hammer, Cpu, Package, Sparkles } from 'lucide-react';
+import Link from 'next/link';
+import Image from 'next/image';
 
 import PageShell from '@/components/PageShell';
 
@@ -532,9 +534,12 @@ export default function OrderTrackerPage() {
                                 <div className={`grid gap-3 ${photoArray.length > 1 ? 'grid-cols-2' : 'grid-cols-1'}`}>
                                   {photoArray.map((p, pIdx) => (
                                     <div key={pIdx} className="relative rounded-2xl overflow-hidden border border-ink/10 bg-black/5">
-                                      <img
+                                      <Image
                                         src={p}
                                         alt={`Progress of ${stage.title} - ${pIdx + 1}`}
+                                        width={800}
+                                        height={600}
+                                        sizes="(max-width: 768px) 100vw, 50vw"
                                         className="w-full h-full max-h-[22rem] object-cover hover:scale-105 transition duration-500"
                                       />
                                     </div>

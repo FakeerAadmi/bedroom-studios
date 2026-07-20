@@ -6,6 +6,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import PageShell from '@/components/PageShell';
 import ProductCard from '@/components/ProductCard';
 import { useStoreState } from '@/context/StoreContext';
@@ -180,9 +181,11 @@ function FandomSection({ collection }) {
       >
 
         {collection.logoUrl && (
-          <img
+          <Image
             src={collection.logoUrl}
             alt={`${collection.name} logo`}
+            width={160}
+            height={160}
             className="pointer-events-none absolute -bottom-4 -right-4 h-40 w-40 object-contain opacity-10 mix-blend-luminosity grayscale"
           />
         )}
@@ -208,9 +211,11 @@ function FandomSection({ collection }) {
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-current opacity-10" />
 
           {collection.logoUrl && (
-            <img
+            <Image
               src={collection.logoUrl}
               alt={`${collection.name} logo`}
+              width={160}
+              height={160}
               className="pointer-events-none absolute -bottom-4 -right-4 h-40 w-40 object-contain opacity-10 mix-blend-luminosity grayscale"
             />
           )}
