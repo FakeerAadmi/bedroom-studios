@@ -73,7 +73,7 @@ export default function ShopPage() {
     <PageShell className="mx-auto max-w-7xl px-4 py-10 md:px-8 md:py-16">
       <>
 
-        <title>Shop — Bedroom Studios</title>
+        
         <meta name="description" content="Browse fidget gears, cable organisers, cement planters, desk organisers, and oddities. All small-batch, all made in India." />
         <meta property="og:title" content="Shop — Bedroom Studios" />
         <meta property="og:description" content="Browse fidget gears, cable organisers, cement planters, desk organisers, and oddities. All small-batch, all made in India." />

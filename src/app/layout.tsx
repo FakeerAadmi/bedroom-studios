@@ -25,8 +25,40 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "Bedroom Studios | Handmade Desk Objects & Cementware",
-  description: "Quirky 3D printed gadgets and brutalist cementware for modern Indian desks. Designed and made in India.",
+  metadataBase: new URL('https://bedroomstudios.vercel.app'),
+  title: {
+    default: "Bedroom Studios | Handmade Desk Objects & Cementware",
+    template: "%s | Bedroom Studios"
+  },
+  description: "Small-batch, essentially handmade desk objects built in India. Quirky 3D printed gadgets and brutalist cementware.",
+  keywords: ["desk setup", "desk toys", "cementware", "3D printed gadgets", "fidget toys", "made in India"],
+  alternates: {
+    canonical: '/',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  openGraph: {
+    title: "Bedroom Studios",
+    description: "Small-batch, essentially handmade desk objects built in India.",
+    url: 'https://bedroomstudios.vercel.app',
+    siteName: 'Bedroom Studios',
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "Bedroom Studios",
+    description: "Small-batch, essentially handmade desk objects built in India.",
+  },
 };
 
 export default function RootLayout({

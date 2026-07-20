@@ -32,7 +32,7 @@ export default function HomePage() {
     return (
       <PageShell>
         <>
-        <title>Bedroom Studios — Handmade Desk Objects, Made in India</title>
+        
       </>
         <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 py-40 text-ink/50">
           <Loader2 className="h-6 w-6 animate-spin text-ink/40" />
@@ -48,7 +48,7 @@ export default function HomePage() {
     <PageShell>
       <>
 
-        <title>Bedroom Studios — Handmade Desk Objects, Made in India</title>
+        
         <meta name="description" content="Small-batch 3D printed desk toys, brutalist cementware, cable organizers, and fandom props. Designed and made in India." />
         <meta property="og:title" content="Bedroom Studios — Handmade Desk Objects, Made in India" />
         <meta property="og:description" content="Small-batch 3D printed desk toys, brutalist cementware, cable organizers, and fandom props. Designed and made in India." />

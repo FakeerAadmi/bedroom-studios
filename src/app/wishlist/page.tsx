@@ -14,7 +14,7 @@ export default function WishlistPage() {
   return (
     <PageShell className="mx-auto max-w-7xl px-4 py-10 md:px-8 md:py-16">
       <>
-        <title>Saved Items — Bedroom Studios</title>
+        
       </>
       <div className="max-w-3xl">
         <p className="font-display text-sm font-bold uppercase tracking-[0.3em] text-ink/45">

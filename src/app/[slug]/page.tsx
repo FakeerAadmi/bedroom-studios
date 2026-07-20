@@ -16,7 +16,7 @@ export default function InfoPage() {
   return (
     <PageShell className="mx-auto max-w-5xl px-4 py-10 md:px-8 md:py-16">
       <>
-        <title>{content.title} — Bedroom Studios</title>
+        
       </>
       <div className="rounded-[2.5rem] border border-ink bg-paper p-8 shadow-card md:p-10">
         <p className="font-display text-sm font-bold uppercase tracking-[0.3em] text-ink/45">

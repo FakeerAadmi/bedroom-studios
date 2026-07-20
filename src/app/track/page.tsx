@@ -216,7 +216,7 @@ export default function OrderTrackerPage() {
   return (
     <PageShell className="mx-auto max-w-7xl px-4 py-10 md:px-8">
       <>
-        <title>{isLoggedIn ? `Track Build #${orderNum} — Bedroom Studios` : 'Track Build — Bedroom Studios'}</title>
+        
       </>
       <AnimatePresence mode="wait">
         {isInitialLoading ? (

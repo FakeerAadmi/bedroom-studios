@@ -129,7 +129,7 @@ export default function CheckoutPage() {
   return (
     <PageShell className="mx-auto max-w-7xl px-4 py-10 md:px-8 md:py-16">
       <>
-        <title>Checkout — Bedroom Studios</title>
+        
       </>
       <div className="mb-10 max-w-3xl">
         <p className="font-display text-sm font-bold uppercase tracking-[0.3em] text-ink/45">

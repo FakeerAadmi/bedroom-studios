@@ -73,7 +73,7 @@ export default function CommissionPage() {
     <PageShell className="mx-auto max-w-7xl px-4 py-10 md:px-8 md:py-16">
       <>
 
-        <title>Custom Commissions — Bedroom Studios</title>
+        
         <meta name="description" content="Commission a custom desk object, fandom prop, diorama, or collectible display. We build to your brief — small-batch, made in India." />
         <meta property="og:title" content="Custom Commissions — Bedroom Studios" />
         <meta property="og:description" content="Commission a custom desk object, fandom prop, diorama, or collectible display. We build to your brief." />

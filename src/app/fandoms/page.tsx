@@ -255,7 +255,7 @@ export default function FandomPage() {
     return (
       <PageShell className="mx-auto max-w-7xl px-4 py-10 md:px-8 md:py-16">
         <>
-        <title>Fandom Lab — Bedroom Studios</title>
+        
       </>
         <div className="flex justify-center py-40 text-ink/50 font-mono animate-pulse text-sm uppercase tracking-widest">
           Loading Fandoms...
@@ -268,7 +268,7 @@ export default function FandomPage() {
     <PageShell className="mx-auto max-w-7xl px-4 py-10 md:px-8 md:py-16">
       <>
 
-        <title>Fandom Lab — Bedroom Studios</title>
+        
         <meta name="description" content="Fan-inspired desk props, dioramas, and collectible objects for gamers, anime fans, and anyone with too much lore and not enough shelf space." />
         <meta property="og:title" content="Fandom Lab — Bedroom Studios" />
         <meta property="og:description" content="Fan-inspired desk props, dioramas, and collectible objects for gamers and fans with too much lore." />

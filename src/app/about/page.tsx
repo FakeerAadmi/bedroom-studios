@@ -13,7 +13,7 @@ export default function AboutPage() {
     <PageShell className="mx-auto max-w-7xl px-4 py-10 md:px-8 md:py-16">
       <>
 
-        <title>Our Story — Bedroom Studios</title>
+        
         <meta name="description" content="Bedroom Studios is a small Indian studio making desk objects that are tactile, opinionated, and genuinely useful. Here's how it started." />
         <meta property="og:title" content="Our Story — Bedroom Studios" />
         <meta property="og:description" content="A small Indian studio making desk objects that are tactile, opinionated, and genuinely useful." />

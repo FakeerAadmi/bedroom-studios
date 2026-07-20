@@ -159,7 +159,7 @@ export default function ProductPage() {
     return (
       <PageShell>
         <>
-        <title>Bedroom Studios</title>
+        
       </>
         <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 py-40 text-ink/50">
           <Loader2 className="h-6 w-6 animate-spin text-ink/40" />
@@ -196,7 +196,7 @@ export default function ProductPage() {
     <PageShell className="mx-auto max-w-7xl px-4 py-10 md:px-8 md:py-16">
       <>
 
-        <title>{product.name} — Bedroom Studios</title>
+        
         <meta name="description" content={`${product.story} ${product.materials?.join(', ')}. Made in India by Bedroom Studios.`} />
         <meta property="og:title" content={`${product.name} — Bedroom Studios`} />
         <meta property="og:description" content={product.story} />
