@@ -3,8 +3,8 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, ChevronRight, X, Send, ArrowLeft, Package, LayoutDashboard, Inbox, Tags, Users, Settings, LogOut, CheckCircle } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Camera, X, Send, ArrowLeft, Package, LayoutDashboard, Inbox, Tags, Users, Settings, LogOut, CheckCircle, Search, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
 import { useStoreState } from '@/context/StoreContext';
 
@@ -24,9 +24,17 @@ export default function HQClientFeatures() {
   const [loginError, setLoginError] = useState('');
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   
-  const { inventory: liveInventory, settings: liveSettings, isStoreLoading } = useStoreState();
+  const { inventory: liveInventory, settings: liveSettings } = useStoreState();
 
-  const [localSettings, setLocalSettings] = useState({ maintenanceMode: false, announcementBanner: '' });
+  const [localSettings, setLocalSettings] = useState({
+    maintenanceMode: false,
+    announcementBanner: '',
+    supportEmail: 'hello@bedroomstudios.store',
+    shippingLeadTime: 'Ships in 4-7 days',
+    featuredFamily: 'Hybrid Builds',
+    featuredMaterialFocus: 'Cast cement + PLA+',
+    experimentalNotice: 'Bedroom Labs is for experiments, prototypes, and material tests.',
+  });
   const [localInventory, setLocalInventory] = useState<any[] | null>(null);
   const [editingProduct, setEditingProduct] = useState<any>(null);
   
@@ -37,6 +45,10 @@ export default function HQClientFeatures() {
 
   const [orders, setOrders] = useState<Record<string, any>>({});
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [orderSearch, setOrderSearch] = useState('');
+  const [orderStageFilter, setOrderStageFilter] = useState('all');
+  const [inventorySearch, setInventorySearch] = useState('');
+  const [inventoryStatusFilter, setInventoryStatusFilter] = useState('all');
   
   const [selectedOrderCode, setSelectedOrderCode] = useState<string | null>(null);
   const [uploadedPhotos, setUploadedPhotos] = useState({});
@@ -201,6 +213,49 @@ export default function HQClientFeatures() {
   };
 
   const activeOrder = selectedOrderCode ? orders[selectedOrderCode] : null;
+  const orderEntries = Object.entries(orders).map(([id, order]: any) => ({ id, ...order }));
+  const orderValues = orderEntries.map((entry) => entry);
+  const totalRevenue = orderValues.reduce((sum, ord: any) => sum + (ord.total || 0), 0);
+  const activeBuilds = orderValues.filter((o: any) => (o.currentStage || 0) < STAGES.length).length;
+  const averageOrderValue = orderValues.length ? Math.round(totalRevenue / orderValues.length) : 0;
+  const customers = orderValues.reduce((acc: any, order: any) => {
+    const key = order.email || order.customerName;
+    if (!acc[key]) {
+      acc[key] = {
+        name: order.customerName,
+        email: order.email,
+        spent: 0,
+        orders: 0,
+        lastOrderDate: order.date,
+      };
+    }
+    acc[key].spent += order.total || 0;
+    acc[key].orders += 1;
+    acc[key].lastOrderDate = order.date;
+    return acc;
+  }, {});
+  const customerList = Object.values(customers).sort((left: any, right: any) => right.spent - left.spent);
+  const repeatCustomers = customerList.filter((customer: any) => customer.orders > 1).length;
+  const inventoryList = localInventory || [];
+  const lowStockCount = inventoryList.filter((product: any) => (product.stock ?? 0) <= 5).length;
+  const experimentalCount = inventoryList.filter((product: any) => product.adminStatus === 'experimental').length;
+  const limitedDropCount = inventoryList.filter((product: any) => product.limitedDrop).length;
+  const filteredOrders = orderEntries
+    .filter((order: any) => {
+      const haystack = `${order.id} ${order.customerName} ${order.productName} ${order.material || ''}`.toLowerCase();
+      const matchesSearch = !orderSearch || haystack.includes(orderSearch.toLowerCase());
+      const matchesStage = orderStageFilter === 'all' || String(order.currentStage) === orderStageFilter;
+      return matchesSearch && matchesStage;
+    })
+    .reverse();
+  const filteredInventory = inventoryList.filter((product: any) => {
+    const haystack = `${product.name} ${product.sku || ''} ${product.family || ''} ${product.label || ''}`.toLowerCase();
+    const matchesSearch = !inventorySearch || haystack.includes(inventorySearch.toLowerCase());
+    if (inventoryStatusFilter === 'all') return matchesSearch;
+    if (inventoryStatusFilter === 'limited') return matchesSearch && product.limitedDrop;
+    if (inventoryStatusFilter === 'low-stock') return matchesSearch && (product.stock ?? 0) <= 5;
+    return matchesSearch && product.adminStatus === inventoryStatusFilter;
+  });
 
   if (isInitialLoading) {
     return (
@@ -254,14 +309,10 @@ export default function HQClientFeatures() {
   }
 
   const renderDashboardTab = () => {
-    const orderValues = Object.values(orders);
-    const totalRevenue = orderValues.reduce((sum, ord) => sum + (ord.total || 0), 0);
-    const activeBuilds = orderValues.filter((o: any) => o.currentStage < 6).length;
-
     return (
       <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
         <h2 className="font-display text-3xl font-bold">Analytics Overview</h2>
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
           <div className="rounded-3xl border border-ink bg-paper p-6 shadow-sm">
             <p className="text-sm font-bold uppercase tracking-widest text-ink/50">Total Revenue</p>
             <p className="mt-2 text-4xl font-display font-bold">₹{totalRevenue.toLocaleString('en-IN')}</p>
@@ -274,11 +325,99 @@ export default function HQClientFeatures() {
             <p className="text-sm font-bold uppercase tracking-widest text-ink/50">Total Orders</p>
             <p className="mt-2 text-4xl font-display font-bold">{orderValues.length}</p>
           </div>
+          <div className="rounded-3xl border border-ink bg-paper p-6 shadow-sm">
+            <p className="text-sm font-bold uppercase tracking-widest text-ink/50">Average Order Value</p>
+            <p className="mt-2 text-4xl font-display font-bold">₹{averageOrderValue.toLocaleString('en-IN')}</p>
+          </div>
+          <div className="rounded-3xl border border-ink bg-paper p-6 shadow-sm">
+            <p className="text-sm font-bold uppercase tracking-widest text-ink/50">Low Stock Alerts</p>
+            <p className="mt-2 text-4xl font-display font-bold">{lowStockCount}</p>
+          </div>
         </div>
-        <div className="rounded-3xl border border-ink bg-[#f4f1ea] p-8 mt-8">
-          <p className="font-mono text-sm text-ink/50 mb-4">Live Redis Connection Status</p>
-          <div className="flex items-center gap-2 text-lime-600 font-bold uppercase tracking-widest text-xs">
-            <span className="h-2 w-2 rounded-full bg-lime-500 animate-pulse"></span> Connected to Upstash Vercel KV
+
+        <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+          <div className="rounded-[2rem] border border-ink bg-paper p-6 shadow-sm">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-sm font-bold uppercase tracking-widest text-ink/50">Recent Orders</p>
+                <p className="mt-2 text-sm text-ink/60">A quick read on what is moving through the workshop right now.</p>
+              </div>
+              <button
+                onClick={() => setActiveTab('orders')}
+                className="rounded-full border border-ink px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] transition hover:bg-ink hover:text-paper"
+              >
+                Open orders
+              </button>
+            </div>
+
+            <div className="mt-6 space-y-3">
+              {filteredOrders.slice(0, 5).map((order: any) => (
+                <button
+                  key={order.id}
+                  type="button"
+                  onClick={() => {
+                    setActiveTab('orders');
+                    openOrder(order.id);
+                  }}
+                  className="flex w-full items-center justify-between rounded-[1.4rem] border border-ink/10 bg-[#f6f3ee] px-4 py-4 text-left transition hover:border-ink/30 hover:bg-white"
+                >
+                  <div>
+                    <p className="font-mono text-xs text-ink/45">BS-{order.id}</p>
+                    <p className="mt-1 font-bold">{order.customerName}</p>
+                    <p className="mt-1 text-sm text-ink/60">{order.productName}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs uppercase tracking-[0.15em] text-ink/45">
+                      {STAGES[(order.currentStage || 1) - 1]?.label || 'Order received'}
+                    </p>
+                    <p className="mt-2 font-bold">₹{(order.total || 0).toLocaleString('en-IN')}</p>
+                  </div>
+                </button>
+              ))}
+              {filteredOrders.length === 0 ? (
+                <div className="rounded-[1.4rem] border border-dashed border-ink/20 px-4 py-8 text-center text-sm text-ink/50">
+                  No order activity yet.
+                </div>
+              ) : null}
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            <div className="rounded-[2rem] border border-ink bg-paper p-6 shadow-sm">
+              <p className="text-sm font-bold uppercase tracking-widest text-ink/50">Catalog Health</p>
+              <div className="mt-5 grid gap-4 sm:grid-cols-3">
+                <div className="rounded-[1.4rem] bg-[#f6f3ee] p-4">
+                  <p className="text-[11px] uppercase tracking-[0.16em] text-ink/45">Experimental</p>
+                  <p className="mt-2 text-3xl font-display font-bold">{experimentalCount}</p>
+                </div>
+                <div className="rounded-[1.4rem] bg-[#f6f3ee] p-4">
+                  <p className="text-[11px] uppercase tracking-[0.16em] text-ink/45">Limited Drops</p>
+                  <p className="mt-2 text-3xl font-display font-bold">{limitedDropCount}</p>
+                </div>
+                <div className="rounded-[1.4rem] bg-[#fff4e8] p-4">
+                  <p className="text-[11px] uppercase tracking-[0.16em] text-ink/45">Low Stock</p>
+                  <p className="mt-2 text-3xl font-display font-bold">{lowStockCount}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-3xl border border-ink bg-[#f4f1ea] p-8">
+              <p className="font-mono text-sm text-ink/50 mb-4">Store Operations</p>
+              <div className="grid gap-3 text-sm text-ink/70">
+                <div className="flex items-center justify-between rounded-2xl border border-ink/10 bg-white/70 px-4 py-3">
+                  <span>Repeat customers</span>
+                  <span className="font-bold text-ink">{repeatCustomers}</span>
+                </div>
+                <div className="flex items-center justify-between rounded-2xl border border-ink/10 bg-white/70 px-4 py-3">
+                  <span>Featured family</span>
+                  <span className="font-bold text-ink">{localSettings.featuredFamily || 'Not set'}</span>
+                </div>
+                <div className="flex items-center justify-between rounded-2xl border border-ink/10 bg-white/70 px-4 py-3">
+                  <span>Lead time</span>
+                  <span className="font-bold text-ink">{localSettings.shippingLeadTime || 'Not set'}</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -381,17 +520,69 @@ export default function HQClientFeatures() {
 
     return (
       <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-        <h2 className="font-display text-3xl font-bold mb-8">Order Management</h2>
+        <div className="flex flex-col gap-4 mb-8 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <h2 className="font-display text-3xl font-bold">Order Management</h2>
+            <p className="mt-2 text-sm text-ink/60">Search by customer, product, or order code and jump into build progress fast.</p>
+          </div>
+          <div className="grid gap-3 md:grid-cols-[1fr_220px]">
+            <label className="relative">
+              <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/35" />
+              <input
+                value={orderSearch}
+                onChange={(event) => setOrderSearch(event.target.value)}
+                placeholder="Search orders..."
+                className="w-full rounded-full border border-ink/15 bg-paper py-3 pl-11 pr-4 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20"
+              />
+            </label>
+            <select
+              value={orderStageFilter}
+              onChange={(event) => setOrderStageFilter(event.target.value)}
+              className="rounded-full border border-ink/15 bg-paper px-4 py-3 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20"
+            >
+              <option value="all">All stages</option>
+              {STAGES.map((stage, index) => (
+                <option key={stage.label} value={String(index + 1)}>
+                  Stage {index + 1} · {stage.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="grid gap-4 mb-8 md:grid-cols-4">
+          <div className="rounded-[1.8rem] border border-ink/10 bg-paper p-4">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-ink/45">Queued orders</p>
+            <p className="mt-2 text-3xl font-display font-bold">{orderValues.length}</p>
+          </div>
+          <div className="rounded-[1.8rem] border border-ink/10 bg-paper p-4">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-ink/45">In production</p>
+            <p className="mt-2 text-3xl font-display font-bold">
+              {orderValues.filter((order: any) => (order.currentStage || 0) >= 2 && (order.currentStage || 0) < STAGES.length).length}
+            </p>
+          </div>
+          <div className="rounded-[1.8rem] border border-ink/10 bg-paper p-4">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-ink/45">Ready / shipped</p>
+            <p className="mt-2 text-3xl font-display font-bold">
+              {orderValues.filter((order: any) => (order.currentStage || 0) === STAGES.length).length}
+            </p>
+          </div>
+          <div className="rounded-[1.8rem] border border-ink/10 bg-paper p-4">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-ink/45">Revenue in queue</p>
+            <p className="mt-2 text-3xl font-display font-bold">₹{totalRevenue.toLocaleString('en-IN')}</p>
+          </div>
+        </div>
+
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {Object.entries(orders).reverse().map(([orderId, order]: any) => (
-            <div key={orderId} onClick={() => openOrder(orderId)} className="cursor-pointer rounded-3xl border border-ink/20 bg-paper p-6 shadow-sm transition hover:-translate-y-1 hover:border-ink hover:shadow-card relative overflow-hidden group">
+          {filteredOrders.map((order: any) => (
+            <div key={order.id} onClick={() => openOrder(order.id)} className="cursor-pointer rounded-3xl border border-ink/20 bg-paper p-6 shadow-sm transition hover:-translate-y-1 hover:border-ink hover:shadow-card relative overflow-hidden group">
               <div className="absolute top-0 left-0 w-full h-1 bg-ink/5 group-hover:bg-accent transition-colors"></div>
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="font-mono text-xs font-bold text-ink/50">BS-{orderId}</p>
+                  <p className="font-mono text-xs font-bold text-ink/50">BS-{order.id}</p>
                   <h3 className="mt-1 font-bold text-lg">{order.customerName}</h3>
                 </div>
-                <span className={`rounded-full px-2 py-1 text-[10px] font-bold uppercase ${order.currentStage === 6 ? 'bg-ink text-paper' : 'bg-accent/30 text-ink'}`}>
+                <span className={`rounded-full px-2 py-1 text-[10px] font-bold uppercase ${order.currentStage === STAGES.length ? 'bg-ink text-paper' : 'bg-accent/30 text-ink'}`}>
                   Stage {order.currentStage}
                 </span>
               </div>
@@ -403,9 +594,9 @@ export default function HQClientFeatures() {
               </div>
             </div>
           ))}
-          {Object.keys(orders).length === 0 && (
+          {filteredOrders.length === 0 && (
             <div className="col-span-full py-12 text-center text-ink/50 border border-dashed border-ink/20 rounded-3xl">
-              No orders found in Redis.
+              No orders match the current search or stage filter.
             </div>
           )}
         </div>
@@ -434,7 +625,21 @@ export default function HQClientFeatures() {
 
   const handleSaveProductEdit = (e: any) => {
     e.preventDefault();
-    setLocalInventory((prev: any) => prev.map((p: any) => p.id === editingProduct.id ? editingProduct : p));
+    const normalizedProduct = {
+      ...editingProduct,
+      price: Number(editingProduct.price) || 0,
+      stock: Number(editingProduct.stock) || 0,
+      colors: typeof editingProduct.colors === 'string'
+        ? editingProduct.colors.split(',').map((item: string) => item.trim()).filter(Boolean)
+        : editingProduct.colors,
+      materialOptions: typeof editingProduct.materialOptions === 'string'
+        ? editingProduct.materialOptions.split(',').map((item: string) => item.trim()).filter(Boolean)
+        : editingProduct.materialOptions,
+      materials: typeof editingProduct.materials === 'string'
+        ? editingProduct.materials.split(',').map((item: string) => item.trim()).filter(Boolean)
+        : editingProduct.materials,
+    };
+    setLocalInventory((prev: any) => prev.map((p: any) => p.id === normalizedProduct.id ? normalizedProduct : p));
     setEditingProduct(null);
   };
 
@@ -451,35 +656,106 @@ export default function HQClientFeatures() {
         </button>
       </div>
       <p className="text-ink/60 mb-8">Manage product listings, pricing, and stock levels. (Syncs with Redis state)</p>
+
+      <div className="grid gap-4 mb-8 md:grid-cols-4">
+        <div className="rounded-[1.8rem] border border-ink/10 bg-paper p-4">
+          <p className="text-[11px] uppercase tracking-[0.16em] text-ink/45">Total SKUs</p>
+          <p className="mt-2 text-3xl font-display font-bold">{inventoryList.length}</p>
+        </div>
+        <div className="rounded-[1.8rem] border border-ink/10 bg-paper p-4">
+          <p className="text-[11px] uppercase tracking-[0.16em] text-ink/45">Active</p>
+          <p className="mt-2 text-3xl font-display font-bold">{inventoryList.filter((item: any) => item.adminStatus === 'active').length}</p>
+        </div>
+        <div className="rounded-[1.8rem] border border-ink/10 bg-paper p-4">
+          <p className="text-[11px] uppercase tracking-[0.16em] text-ink/45">Experimental</p>
+          <p className="mt-2 text-3xl font-display font-bold">{experimentalCount}</p>
+        </div>
+        <div className="rounded-[1.8rem] border border-ink/10 bg-[#fff4e8] p-4">
+          <p className="text-[11px] uppercase tracking-[0.16em] text-ink/45">Low stock</p>
+          <p className="mt-2 text-3xl font-display font-bold">{lowStockCount}</p>
+        </div>
+      </div>
+
+      <div className="mb-6 grid gap-3 lg:grid-cols-[1fr_220px]">
+        <label className="relative">
+          <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/35" />
+          <input
+            value={inventorySearch}
+            onChange={(event) => setInventorySearch(event.target.value)}
+            placeholder="Search by product, SKU, or family..."
+            className="w-full rounded-full border border-ink/15 bg-paper py-3 pl-11 pr-4 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20"
+          />
+        </label>
+        <select
+          value={inventoryStatusFilter}
+          onChange={(event) => setInventoryStatusFilter(event.target.value)}
+          className="rounded-full border border-ink/15 bg-paper px-4 py-3 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20"
+        >
+          <option value="all">All statuses</option>
+          <option value="active">Active</option>
+          <option value="draft">Draft</option>
+          <option value="experimental">Experimental</option>
+          <option value="limited">Limited drops</option>
+          <option value="low-stock">Low stock</option>
+        </select>
+      </div>
       
       <div className="rounded-3xl border border-ink bg-paper shadow-sm overflow-hidden">
         <table className="w-full text-left text-sm">
           <thead className="bg-ink/5 text-xs uppercase tracking-widest text-ink/50">
             <tr>
               <th className="px-6 py-4 font-bold">Product</th>
+              <th className="px-6 py-4 font-bold">SKU</th>
+              <th className="px-6 py-4 font-bold">Family</th>
               <th className="px-6 py-4 font-bold">Price</th>
+              <th className="px-6 py-4 font-bold">Stock</th>
               <th className="px-6 py-4 font-bold">Status</th>
               <th className="px-6 py-4 font-bold text-right">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-ink/10">
-            {localInventory && localInventory.map((p: any, i: number) => (
+            {filteredInventory.map((p: any, i: number) => (
               <tr key={i} className="hover:bg-ink/5 transition-colors">
                 <td className="px-6 py-4 font-medium flex items-center gap-3">
-                  <Image src={p.gallery[0].image} width={40} height={40} alt="" className="w-10 h-10 rounded-lg object-cover" />
+                  {p.gallery?.[0]?.image ? (
+                    <Image src={p.gallery[0].image} width={40} height={40} alt="" className="w-10 h-10 rounded-lg object-cover" />
+                  ) : (
+                    <div className="w-10 h-10 rounded-lg border border-ink/10 bg-[#f4f1ea]" />
+                  )}
                   {p.name}
                 </td>
+                <td className="px-6 py-4 font-mono text-xs">{p.sku || 'No SKU'}</td>
+                <td className="px-6 py-4 text-ink/65">{p.family || 'Unassigned'}</td>
                 <td className="px-6 py-4 font-mono">₹{p.price}</td>
                 <td className="px-6 py-4">
-                  <span className={`rounded-full px-2 py-1 text-[10px] font-bold uppercase ${p.limitedDrop ? 'bg-orange-100 text-orange-800' : 'bg-lime-100 text-lime-800'}`}>
-                    {p.limitedDrop ? 'Limited' : 'Core'}
+                  <span className={`rounded-full px-2 py-1 text-[10px] font-bold uppercase ${(p.stock ?? 0) <= 5 ? 'bg-[#fff1e4] text-[#9a4f1e]' : 'bg-[#eef6ea] text-[#43733c]'}`}>
+                    {p.stock ?? 0} units
                   </span>
+                </td>
+                <td className="px-6 py-4">
+                  <div className="flex flex-wrap gap-2">
+                    <span className={`rounded-full px-2 py-1 text-[10px] font-bold uppercase ${p.adminStatus === 'experimental' ? 'bg-[#eef0ff] text-[#4859a5]' : p.adminStatus === 'draft' ? 'bg-[#f0f0f0] text-[#666]' : 'bg-lime-100 text-lime-800'}`}>
+                      {p.adminStatus || 'active'}
+                    </span>
+                    {p.limitedDrop ? (
+                      <span className="rounded-full bg-orange-100 px-2 py-1 text-[10px] font-bold uppercase text-orange-800">
+                        Limited
+                      </span>
+                    ) : null}
+                  </div>
                 </td>
                 <td className="px-6 py-4 text-right">
                   <button onClick={() => setEditingProduct(p)} className="text-xs font-bold uppercase tracking-widest text-ink/50 hover:text-ink transition">Edit Details</button>
                 </td>
               </tr>
             ))}
+            {filteredInventory.length === 0 ? (
+              <tr>
+                <td colSpan={7} className="px-6 py-12 text-center text-ink/50">
+                  No products match the current inventory search.
+                </td>
+              </tr>
+            ) : null}
           </tbody>
         </table>
       </div>
@@ -504,24 +780,31 @@ export default function HQClientFeatures() {
                   <input type="text" value={editingProduct.name} onChange={e => setEditingProduct({...editingProduct, name: e.target.value})} className="w-full rounded-xl border border-ink/20 bg-white px-4 py-3 text-sm focus:ring-1 focus:ring-accent outline-none" required />
                 </div>
                 <div>
+                  <label className="block text-xs font-bold uppercase tracking-widest text-ink/50 mb-1">SKU</label>
+                  <input type="text" value={editingProduct.sku || ''} onChange={e => setEditingProduct({...editingProduct, sku: e.target.value})} className="w-full rounded-xl border border-ink/20 bg-white px-4 py-3 text-sm focus:ring-1 focus:ring-accent outline-none" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
                   <label className="block text-xs font-bold uppercase tracking-widest text-ink/50 mb-1">Price (₹)</label>
                   <input type="number" value={editingProduct.price} onChange={e => setEditingProduct({...editingProduct, price: Number(e.target.value)})} className="w-full rounded-xl border border-ink/20 bg-white px-4 py-3 text-sm focus:ring-1 focus:ring-accent outline-none" required />
                 </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-widest text-ink/50 mb-1">Stock</label>
+                  <input type="number" value={editingProduct.stock ?? 0} onChange={e => setEditingProduct({...editingProduct, stock: Number(e.target.value)})} className="w-full rounded-xl border border-ink/20 bg-white px-4 py-3 text-sm focus:ring-1 focus:ring-accent outline-none" required />
+                </div>
               </div>
               
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-widest text-ink/50 mb-1">Label</label>
-                <input type="text" value={editingProduct.label || ''} onChange={e => setEditingProduct({...editingProduct, label: e.target.value})} className="w-full rounded-xl border border-ink/20 bg-white px-4 py-3 text-sm focus:ring-1 focus:ring-accent outline-none" />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-widest text-ink/50 mb-1">Description</label>
-                <textarea value={editingProduct.description} onChange={e => setEditingProduct({...editingProduct, description: e.target.value})} className="w-full rounded-xl border border-ink/20 bg-white px-4 py-3 text-sm focus:ring-1 focus:ring-accent outline-none min-h-[80px]" required />
-              </div>
-              
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-widest text-ink/50 mb-1">Story / Lore</label>
-                <textarea value={editingProduct.story || ''} onChange={e => setEditingProduct({...editingProduct, story: e.target.value})} className="w-full rounded-xl border border-ink/20 bg-white px-4 py-3 text-sm focus:ring-1 focus:ring-accent outline-none min-h-[100px]" />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-widest text-ink/50 mb-1">Label</label>
+                  <input type="text" value={editingProduct.label || ''} onChange={e => setEditingProduct({...editingProduct, label: e.target.value})} className="w-full rounded-xl border border-ink/20 bg-white px-4 py-3 text-sm focus:ring-1 focus:ring-accent outline-none" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-widest text-ink/50 mb-1">Family</label>
+                  <input type="text" value={editingProduct.family || ''} onChange={e => setEditingProduct({...editingProduct, family: e.target.value})} className="w-full rounded-xl border border-ink/20 bg-white px-4 py-3 text-sm focus:ring-1 focus:ring-accent outline-none" />
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -533,6 +816,42 @@ export default function HQClientFeatures() {
                   <label className="block text-xs font-bold uppercase tracking-widest text-ink/50 mb-1">Care Instructions</label>
                   <input type="text" value={editingProduct.care || ''} onChange={e => setEditingProduct({...editingProduct, care: e.target.value})} className="w-full rounded-xl border border-ink/20 bg-white px-4 py-3 text-sm focus:ring-1 focus:ring-accent outline-none" />
                 </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-widest text-ink/50 mb-1">Admin Status</label>
+                  <select value={editingProduct.adminStatus || 'active'} onChange={e => setEditingProduct({...editingProduct, adminStatus: e.target.value})} className="w-full rounded-xl border border-ink/20 bg-white px-4 py-3 text-sm focus:ring-1 focus:ring-accent outline-none">
+                    <option value="active">Active</option>
+                    <option value="draft">Draft</option>
+                    <option value="experimental">Experimental</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-widest text-ink/50 mb-1">Colors</label>
+                  <input type="text" value={Array.isArray(editingProduct.colors) ? editingProduct.colors.join(', ') : editingProduct.colors || ''} onChange={e => setEditingProduct({...editingProduct, colors: e.target.value})} className="w-full rounded-xl border border-ink/20 bg-white px-4 py-3 text-sm focus:ring-1 focus:ring-accent outline-none" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-widest text-ink/50 mb-1">Materials</label>
+                  <input type="text" value={Array.isArray(editingProduct.materials) ? editingProduct.materials.join(', ') : editingProduct.materials || ''} onChange={e => setEditingProduct({...editingProduct, materials: e.target.value})} className="w-full rounded-xl border border-ink/20 bg-white px-4 py-3 text-sm focus:ring-1 focus:ring-accent outline-none" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-widest text-ink/50 mb-1">Material Options</label>
+                  <input type="text" value={Array.isArray(editingProduct.materialOptions) ? editingProduct.materialOptions.join(', ') : editingProduct.materialOptions || ''} onChange={e => setEditingProduct({...editingProduct, materialOptions: e.target.value})} className="w-full rounded-xl border border-ink/20 bg-white px-4 py-3 text-sm focus:ring-1 focus:ring-accent outline-none" />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-widest text-ink/50 mb-1">Description</label>
+                <textarea value={editingProduct.description} onChange={e => setEditingProduct({...editingProduct, description: e.target.value})} className="w-full rounded-xl border border-ink/20 bg-white px-4 py-3 text-sm focus:ring-1 focus:ring-accent outline-none min-h-[80px]" required />
+              </div>
+              
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-widest text-ink/50 mb-1">Story / Lore</label>
+                <textarea value={editingProduct.story || ''} onChange={e => setEditingProduct({...editingProduct, story: e.target.value})} className="w-full rounded-xl border border-ink/20 bg-white px-4 py-3 text-sm focus:ring-1 focus:ring-accent outline-none min-h-[100px]" />
               </div>
 
               <div className="flex items-center gap-3 pt-4 border-t border-ink/10">
@@ -559,22 +878,30 @@ export default function HQClientFeatures() {
   );
 
   const renderCRMTab = () => {
-    const customers = Object.values(orders).reduce((acc: any, order: any) => {
-      if (!acc[order.customerName]) {
-        acc[order.customerName] = { name: order.customerName, email: order.email, spent: 0, orders: 0 };
-      }
-      acc[order.customerName].spent += (order.total || 0);
-      acc[order.customerName].orders += 1;
-      return acc;
-    }, {});
-
     return (
       <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
         <h2 className="font-display text-3xl font-bold mb-4">Customers (CRM)</h2>
         <p className="text-ink/60 mb-8">View lifetime value and contact info for all buyers.</p>
+
+        <div className="grid gap-4 mb-8 md:grid-cols-3">
+          <div className="rounded-[1.8rem] border border-ink/10 bg-paper p-4">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-ink/45">Customers</p>
+            <p className="mt-2 text-3xl font-display font-bold">{customerList.length}</p>
+          </div>
+          <div className="rounded-[1.8rem] border border-ink/10 bg-paper p-4">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-ink/45">Repeat buyers</p>
+            <p className="mt-2 text-3xl font-display font-bold">{repeatCustomers}</p>
+          </div>
+          <div className="rounded-[1.8rem] border border-ink/10 bg-paper p-4">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-ink/45">Average customer spend</p>
+            <p className="mt-2 text-3xl font-display font-bold">
+              ₹{customerList.length ? Math.round(totalRevenue / customerList.length).toLocaleString('en-IN') : 0}
+            </p>
+          </div>
+        </div>
         
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {Object.values(customers).map((c: any, i: number) => (
+          {customerList.map((c: any, i: number) => (
             <div key={i} className="rounded-3xl border border-ink/20 bg-paper p-6 shadow-sm">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 rounded-full bg-accent/30 flex items-center justify-center font-bold text-ink">
@@ -595,6 +922,9 @@ export default function HQClientFeatures() {
                   <p className="font-mono text-sm mt-1 font-bold text-lime-600">₹{c.spent.toLocaleString()}</p>
                 </div>
               </div>
+              <p className="mt-4 text-xs uppercase tracking-[0.16em] text-ink/40">
+                {c.orders > 1 ? 'Repeat buyer' : 'First-time buyer'} · Last order {c.lastOrderDate || 'Unknown'}
+              </p>
             </div>
           ))}
         </div>
@@ -616,6 +946,68 @@ export default function HQClientFeatures() {
             onChange={(e) => setLocalSettings(s => ({ ...s, announcementBanner: e.target.value }))}
             placeholder="e.g. Free shipping on all orders this weekend!" 
             className="w-full rounded-xl border border-ink/20 bg-white px-4 py-3 text-sm focus:ring-1 focus:ring-accent outline-none" 
+          />
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-2">
+          <div className="rounded-3xl border border-ink bg-paper p-8 shadow-sm">
+            <h3 className="font-bold mb-2">Support Email</h3>
+            <p className="text-xs text-ink/50 mb-4">Primary contact shown in operations and support copy.</p>
+            <input 
+              type="email" 
+              value={localSettings.supportEmail || ''}
+              onChange={(e) => setLocalSettings(s => ({ ...s, supportEmail: e.target.value }))}
+              placeholder="hello@bedroomstudios.store" 
+              className="w-full rounded-xl border border-ink/20 bg-white px-4 py-3 text-sm focus:ring-1 focus:ring-accent outline-none" 
+            />
+          </div>
+
+          <div className="rounded-3xl border border-ink bg-paper p-8 shadow-sm">
+            <h3 className="font-bold mb-2">Shipping Lead Time</h3>
+            <p className="text-xs text-ink/50 mb-4">Useful for banners, customer chat, and future storefront messaging.</p>
+            <input 
+              type="text" 
+              value={localSettings.shippingLeadTime || ''}
+              onChange={(e) => setLocalSettings(s => ({ ...s, shippingLeadTime: e.target.value }))}
+              placeholder="Ships in 4-7 days" 
+              className="w-full rounded-xl border border-ink/20 bg-white px-4 py-3 text-sm focus:ring-1 focus:ring-accent outline-none" 
+            />
+          </div>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-2">
+          <div className="rounded-3xl border border-ink bg-paper p-8 shadow-sm">
+            <h3 className="font-bold mb-2">Featured Family</h3>
+            <p className="text-xs text-ink/50 mb-4">A merchandiser-friendly field for what the store should currently push.</p>
+            <input 
+              type="text" 
+              value={localSettings.featuredFamily || ''}
+              onChange={(e) => setLocalSettings(s => ({ ...s, featuredFamily: e.target.value }))}
+              placeholder="Hybrid Builds" 
+              className="w-full rounded-xl border border-ink/20 bg-white px-4 py-3 text-sm focus:ring-1 focus:ring-accent outline-none" 
+            />
+          </div>
+
+          <div className="rounded-3xl border border-ink bg-paper p-8 shadow-sm">
+            <h3 className="font-bold mb-2">Material Focus</h3>
+            <p className="text-xs text-ink/50 mb-4">Helps define current launch language and editorial direction.</p>
+            <input 
+              type="text" 
+              value={localSettings.featuredMaterialFocus || ''}
+              onChange={(e) => setLocalSettings(s => ({ ...s, featuredMaterialFocus: e.target.value }))}
+              placeholder="Cast cement + PLA+" 
+              className="w-full rounded-xl border border-ink/20 bg-white px-4 py-3 text-sm focus:ring-1 focus:ring-accent outline-none" 
+            />
+          </div>
+        </div>
+
+        <div className="rounded-3xl border border-ink bg-paper p-8 shadow-sm">
+          <h3 className="font-bold mb-2 flex items-center gap-2"><AlertTriangle className="w-4 h-4" /> Bedroom Labs Notice</h3>
+          <p className="text-xs text-ink/50 mb-4">Admin-facing note for how the experimental area should be positioned.</p>
+          <textarea
+            value={localSettings.experimentalNotice || ''}
+            onChange={(e) => setLocalSettings(s => ({ ...s, experimentalNotice: e.target.value }))}
+            className="w-full rounded-xl border border-ink/20 bg-white px-4 py-3 text-sm focus:ring-1 focus:ring-accent outline-none min-h-[100px]"
           />
         </div>
 

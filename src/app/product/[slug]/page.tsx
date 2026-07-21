@@ -4,7 +4,7 @@ import Image from 'next/image';
 import PageShell from '@/components/PageShell';
 import ProductCard from '@/components/ProductCard';
 import ProductPurchaseCard from '@/components/product/ProductPurchaseCard';
-import { productCategories, fandomCollections } from '@/data/products';
+import { productCategories, fandomCollections } from '@/data/catalog';
 import { Metadata } from 'next';
 
 export const dynamicParams = false;

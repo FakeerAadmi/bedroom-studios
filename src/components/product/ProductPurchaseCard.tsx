@@ -16,6 +16,7 @@ export default function ProductPurchaseCard({ product }) {
   const [selectedColor, setSelectedColor] = useState(colors[0] ?? '');
   const [selectedMaterial, setSelectedMaterial] = useState(materialOptions[0] ?? '');
   const [copiedLink, setCopiedLink] = useState(false);
+  const isUnavailable = product.price === null || product.price === undefined || product.adminStatus !== 'active' || product.stock <= 0;
 
   useEffect(() => {
     if (product) {
@@ -57,6 +58,10 @@ export default function ProductPurchaseCard({ product }) {
         <div>
           <p className="font-display text-3xl font-bold">{formatPrice(product.price)}</p>
           <p className="mt-2 text-sm text-ink/60">{product.description}</p>
+          <div className="mt-4 flex flex-wrap gap-2 text-[11px] uppercase tracking-[0.18em] text-ink/55">
+            <span className="rounded-full border border-ink/10 px-3 py-1">{product.family}</span>
+            <span className="rounded-full border border-ink/10 px-3 py-1">{product.stock <= 0 ? 'Out of stock' : `${product.stock} ready to ship`}</span>
+          </div>
         </div>
         <div className="flex gap-2 shrink-0">
           <div className="relative">
@@ -156,17 +161,17 @@ export default function ProductPurchaseCard({ product }) {
       <div className="mt-6 flex flex-wrap gap-3">
         <button
           type="button"
-          disabled={(product.price === null || product.price === undefined) || (colors.length > 0 && !selectedColor) || (materialOptions.length > 0 && !selectedMaterial)}
+          disabled={isUnavailable || (colors.length > 0 && !selectedColor) || (materialOptions.length > 0 && !selectedMaterial)}
           onClick={() => addItem({ ...product, selectedColor, selectedMaterial })}
           className={`inline-flex flex-[1.25] items-center justify-center gap-3 rounded-full px-6 py-4 font-medium transition ${
-            ((product.price === null || product.price === undefined) || (colors.length > 0 && !selectedColor) || (materialOptions.length > 0 && !selectedMaterial))
+            (isUnavailable || (colors.length > 0 && !selectedColor) || (materialOptions.length > 0 && !selectedMaterial))
               ? 'bg-ink/10 text-ink/40 cursor-not-allowed border border-ink/10'
               : 'bg-ink text-paper hover:bg-accent'
           }`}
         >
           <ShoppingBag className="h-4 w-4 shrink-0" />
           <span className="whitespace-nowrap">
-            {product.price === null || product.price === undefined ? 'Coming soon' : 'Add to cart'}
+            {product.stock <= 0 ? 'Currently sold out' : product.price === null || product.price === undefined ? 'Coming soon' : 'Add to cart'}
           </span>
         </button>
         <Link

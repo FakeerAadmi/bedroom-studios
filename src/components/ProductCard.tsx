@@ -15,6 +15,8 @@ export default function ProductCard({ product, index }) {
   const router = useRouter();
   const { addItem, toggleWishlist, wishlistIds } = useCart();
   const isWishlisted = wishlistIds.includes(product.id);
+  const isUnavailable = product.price === null || product.price === undefined || product.adminStatus !== 'active' || product.stock <= 0;
+  const stockLabel = product.stock <= 0 ? 'Out of stock' : product.stock <= 5 ? `Low stock · ${product.stock} left` : `${product.stock} in stock`;
 
   return (
     <motion.article
@@ -59,9 +61,14 @@ export default function ProductCard({ product, index }) {
         )}
         <div className="relative flex h-full items-end justify-between z-[2]">
           <div>
-            <span className="rounded-full border border-ink/15 bg-white/80 px-3 py-1 text-xs uppercase tracking-[0.2em] text-ink">
-              {product.label}
-            </span>
+            <div className="flex flex-wrap gap-2">
+              <span className="rounded-full border border-ink/15 bg-white/80 px-3 py-1 text-xs uppercase tracking-[0.2em] text-ink">
+                {product.label}
+              </span>
+              <span className="rounded-full border border-ink/10 bg-white/70 px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-ink/65">
+                {product.family}
+              </span>
+            </div>
             <p className="mt-4 max-w-[14rem] text-sm text-ink/80 font-medium transition duration-300 group-hover:translate-y-1">
               {product.description}
             </p>
@@ -77,6 +84,9 @@ export default function ProductCard({ product, index }) {
           <div>
             <h3 className="font-display text-2xl font-bold leading-tight">{product.name}</h3>
             <p className="mt-2 text-sm text-ink/60">{formatPrice(product.price)}</p>
+            <p className={`mt-2 text-xs uppercase tracking-[0.18em] ${product.stock <= 5 ? 'text-[#9a4f1e]' : 'text-ink/45'}`}>
+              {stockLabel}
+            </p>
           </div>
           <ArrowUpRight className="mt-1 h-5 w-5 text-ink/40 transition group-hover:text-ink" />
         </div>
@@ -84,18 +94,18 @@ export default function ProductCard({ product, index }) {
         <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
           <button
             type="button"
-            disabled={product.price === null || product.price === undefined}
+            disabled={isUnavailable}
             onClick={(event) => {
               event.stopPropagation();
               addItem(product);
             }}
             className={`rounded-full border px-5 py-3 text-sm font-medium transition ${
-              product.price === null || product.price === undefined
+              isUnavailable
                 ? 'border-ink/10 bg-ink/5 text-ink/30 cursor-not-allowed'
                 : 'border-ink bg-ink text-paper hover:scale-[1.01] hover:bg-accent'
             }`}
           >
-            {product.price === null || product.price === undefined ? 'Soon' : index % 2 === 0 ? 'Snag It' : 'Yeet into Cart'}
+            {product.stock <= 0 ? 'Sold out' : product.price === null || product.price === undefined ? 'Soon' : index % 2 === 0 ? 'Add to cart' : 'Take one home'}
           </button>
           <button
             type="button"

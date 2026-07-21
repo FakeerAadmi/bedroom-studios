@@ -1,5 +1,5 @@
 import { ImageResponse } from 'next/og';
-import { getProductBySlug, productCategories, fandomCollections } from '@/data/products';
+import { getProductBySlug, productCategories, fandomCollections } from '@/data/catalog';
 export const dynamicParams = false;
 
 export function generateStaticParams() {

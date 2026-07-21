@@ -23,9 +23,10 @@ export default function ShopClientFeatures({ initialCategories }) {
         ...category,
         products: category.products
           .filter((product) => {
+            const isVisible = (product.adminStatus ?? 'active') === 'active';
             const matchesSearch =
               !search ||
-              `${product.name} ${product.description} ${product.categoryName}`
+              `${product.name} ${product.description} ${product.categoryName} ${product.family} ${product.materials?.join(' ')}`
                 .toLowerCase()
                 .includes(search.toLowerCase());
             const matchesMaterial =
@@ -37,7 +38,7 @@ export default function ShopClientFeatures({ initialCategories }) {
               dropFilter === 'all' ||
               (dropFilter === 'limited' ? product.limitedDrop : !product.limitedDrop);
 
-            return matchesSearch && matchesMaterial && matchesDrop;
+            return isVisible && matchesSearch && matchesMaterial && matchesDrop;
           })
           .sort((left, right) => {
             if (sort === 'price-low') return left.price - right.price;
@@ -56,14 +57,14 @@ export default function ShopClientFeatures({ initialCategories }) {
     <>
       <div className="max-w-3xl">
         <p className="font-display text-sm font-bold uppercase tracking-[0.3em] text-ink/45">
-          Shop the stash
+          Main shop
         </p>
         <h1 className="mt-4 font-display text-5xl font-bold tracking-tight md:text-7xl">
-          Weirdly useful objects for neat freaks and little chaos goblins.
+          Cast, printed, and hybrid desk objects with an actual point of view.
         </h1>
         <p className="mt-5 text-lg text-ink/70">
-          Every section now works like an actual category shelf, with singular products sitting
-          inside the family they belong to instead of one giant wall of vibes.
+          The catalog is now split into proper families so the useful pieces, slower ritual objects,
+          and heavier statement forms each get their own lane instead of fighting in one endless grid.
         </p>
       </div>
 
@@ -75,7 +76,7 @@ export default function ShopClientFeatures({ initialCategories }) {
             <input
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search products, moods, categories..."
+              placeholder="Search products, families, materials..."
               className="w-full rounded-full border border-ink/15 bg-paper pl-12 pr-4 py-3 outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20"
             />
           </div>
@@ -103,7 +104,7 @@ export default function ShopClientFeatures({ initialCategories }) {
             ['pla', 'PLA family'],
             ['petg', 'PETG'],
             ['cement', 'Cement'],
-            ['resin', 'Resin / composite'],
+            ['tpu', 'TPU / flexible'],
           ]}
         />
 
@@ -178,7 +179,7 @@ export default function ShopClientFeatures({ initialCategories }) {
 
       <section className="mt-14 rounded-[2.5rem] border border-ink/15 bg-[#edf4ff] p-8">
         <p className="font-display text-sm font-bold uppercase tracking-[0.25em] text-ink/45">
-          Comparison mode
+          Quick compare
         </p>
         <div className="mt-5 grid gap-4 md:grid-cols-4">
           {filteredCategories.flatMap((category) => category.products).slice(0, 4).map((product) => (

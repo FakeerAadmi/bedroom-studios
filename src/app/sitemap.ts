@@ -1,5 +1,5 @@
 import { MetadataRoute } from 'next';
-import { productCategories, fandomCollections } from '@/data/products';
+import { productCategories, fandomCollections } from '@/data/catalog';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://bedroomstudios.vercel.app';

@@ -1,17 +1,17 @@
 import PageShell from '@/components/PageShell';
 import ShopClientFeatures from '@/components/shop/ShopClientFeatures';
-import { productCategories } from '@/data/products';
+import { productCategories } from '@/data/catalog';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Shop',
-  description: 'Browse fidget gears, cable organisers, cement planters, desk organisers, and oddities. All small-batch, all made in India.',
+  description: 'Browse small-batch desk objects, ritual pieces, shelf objects, and hybrid builds made in India.',
   alternates: {
     canonical: '/shop',
   },
   openGraph: {
     title: 'Shop — Bedroom Studios',
-    description: 'Browse fidget gears, cable organisers, cement planters, desk organisers, and oddities. All small-batch, all made in India.',
+    description: 'Browse small-batch desk objects, ritual pieces, shelf objects, and hybrid builds made in India.',
   },
 };
 

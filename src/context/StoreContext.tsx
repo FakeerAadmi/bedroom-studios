@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { allProducts as staticProducts } from '../data/products';
+import { allProducts as staticProducts } from '../data/catalog';
 
 const StoreContext = createContext<any>(null);
 
@@ -18,7 +18,7 @@ export const StoreProvider = ({ children }: { children: React.ReactNode }) => {
   const [liveFandoms, setLiveFandoms] = useState<any[]>([]);
 
   useEffect(() => {
-    import('../data/products').then((module) => {
+    import('../data/catalog').then((module) => {
       setLiveCategories(module.productCategories);
       setLiveFandoms(module.fandomCollections);
     });
@@ -31,7 +31,7 @@ export const StoreProvider = ({ children }: { children: React.ReactNode }) => {
           if (data.inventory) {
             setInventory(data.inventory);
             // Merge dynamic inventory into static categories and fandoms
-            import('../data/products').then((module) => {
+            import('../data/catalog').then((module) => {
               const updatedCats = module.productCategories.map((cat: any) => ({
                 ...cat,
                 products: cat.products.map((staticProd: any) => {

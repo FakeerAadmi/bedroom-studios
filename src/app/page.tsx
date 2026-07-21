@@ -4,18 +4,18 @@ import Link from 'next/link';
 import PageShell from '@/components/PageShell';
 import HomeHeroMotion from '@/components/home/HomeHeroMotion';
 import DropCountdown from '@/components/home/DropCountdown';
-import { productCategories, fandomCollections } from '@/data/products';
+import { productCategories, fandomCollections } from '@/data/catalog';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Bedroom Studios — Handmade Desk Objects, Made in India',
-  description: 'Small-batch 3D printed desk toys, brutalist cementware, cable organizers, and fandom props. Designed and made in India.',
+  description: 'Small-batch desk objects, cast cement pieces, hybrid lights, and experimental builds. Designed and made in India.',
   alternates: {
     canonical: '/',
   },
   openGraph: {
     title: 'Bedroom Studios — Handmade Desk Objects, Made in India',
-    description: 'Small-batch 3D printed desk toys, brutalist cementware, cable organizers, and fandom props. Designed and made in India.',
+    description: 'Small-batch desk objects, cast cement pieces, hybrid lights, and experimental builds. Designed and made in India.',
     type: 'website',
   },
 };
@@ -102,8 +102,8 @@ export default function HomePage() {
               <p className="mt-3 text-ink/70">Heavy, sculptural objects that make a workspace feel more considered.</p>
             </div>
             <div className="rounded-[2rem] border border-ink/15 bg-[#edf4ff] p-5">
-              <p className="text-sm uppercase tracking-[0.25em] text-ink/45">Collectibles</p>
-              <p className="mt-3 text-ink/70">Shelf-worthy pieces and fandom drops that do not look like generic merch filler.</p>
+              <p className="text-sm uppercase tracking-[0.25em] text-ink/45">Hybrid builds</p>
+              <p className="mt-3 text-ink/70">Products that combine printed precision with cast weight where both materials actually make sense.</p>
             </div>
           </div>
         </div>
@@ -261,19 +261,19 @@ export default function HomePage() {
       <section className="mx-auto max-w-7xl px-4 pb-16 md:px-8 md:pb-28">
         <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="rounded-[2.5rem] border border-ink bg-lime p-8 shadow-card">
-            <p className="text-sm uppercase tracking-[0.25em] text-ink/55">Fandom branch</p>
+            <p className="text-sm uppercase tracking-[0.25em] text-ink/55">Bedroom Labs</p>
             <h2 className="mt-4 font-editorial text-4xl leading-tight md:text-5xl">
-              Also making dioramas, fandom merch, and collectible little worlds? Excellent.
+              Experiments, strange little prototypes, and objects that are not ready for the main store yet.
             </h2>
             <p className="mt-5 max-w-2xl text-lg leading-relaxed text-ink/70">
-              Explore fandom-inspired desk pieces, shelf collectibles, and miniature scenes built
-              for people who want their favourite worlds to exist a little closer to the keyboard.
+              This is where lamp studies, mould tests, finish experiments, and over-specific ideas
+              can be seen without muddying the main catalog.
             </p>
             <Link
               href="/fandoms"
               className="mt-8 inline-flex items-center gap-3 rounded-full border border-ink px-6 py-3 font-medium transition hover:bg-ink hover:text-paper"
             >
-              Explore the fandom lab
+              Explore bedroom labs
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
