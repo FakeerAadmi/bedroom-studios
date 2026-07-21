@@ -338,6 +338,15 @@ const rawProducts: Record<string, Partial<Product>[]> = {
       price: 1890,
       label: 'Hybrid Build',
       description: 'A small lamp with a cast cement base and 3D printed shade, built for desks that need real mood.',
+      image: '/images/brutalist-cement-desk-lamp.png',
+      gallery: [
+        {
+          label: 'Halo Lamp Hero',
+          caption: 'Cast cement base with 3D printed shade.',
+          className: 'col-span-2 row-span-2',
+          image: '/images/brutalist-cement-desk-lamp.png',
+        },
+      ],
       color: 'from-[#d9dff0] via-[#edf1fb] to-[#ffffff]',
       materials: ['Cast cement base', 'PLA+ shade', 'warm LED module'],
       dimensions: '205 mm x 110 mm x 110 mm',
