@@ -14,14 +14,14 @@ export default function HomeHeroMotion() {
       <div className="absolute right-5 top-5 rounded-full border border-ink/15 bg-paper/80 px-3 py-1 text-xs uppercase tracking-[0.2em]">
         Bedroom made
       </div>
-      <div className="flex min-h-[32rem] flex-col justify-between bg-[linear-gradient(160deg,rgba(255,255,255,0.55),rgba(0,87,255,0.1))] p-6">
+      <div className="flex min-h-[30rem] flex-col justify-between bg-[linear-gradient(160deg,rgba(255,255,255,0.55),rgba(0,87,255,0.08))] p-6">
         <div className="flex justify-end">
-          <div className="relative h-64 w-64 sm:h-72 sm:w-72 overflow-hidden rounded-[2.2rem] border border-ink/15 bg-paper/70 shadow-sm">
+          <div className="relative h-72 w-full max-w-[320px] overflow-hidden rounded-3xl">
             <Image
               src="/images/brutalist-cement-desk-lamp.png"
               alt="Brutalist Cement Desk Lamp"
               fill
-              className="object-cover"
+              className="object-cover object-center"
               priority
             />
           </div>
