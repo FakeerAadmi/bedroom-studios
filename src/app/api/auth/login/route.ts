@@ -5,24 +5,42 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { username, password } = body;
 
-    const validUsernames = ['admin', 'workshop', 'bedroom'];
-    const validPasswords = [
-      process.env.ADMIN_PASSWORD,
-      'bedroom',
-      'bedroom123',
-      'admin',
-      'studio',
-    ].filter(Boolean);
+    const envUser = process.env.ADMIN_USERNAME || process.env.ADMIN_USER || process.env.HQ_USERNAME || process.env.HQ_USER;
+    const envPass = process.env.ADMIN_PASSWORD || process.env.ADMIN_PASS || process.env.HQ_PASSWORD || process.env.HQ_PASS;
 
-    const isUsernameValid = !username || validUsernames.includes(username.toLowerCase().trim());
-    const isPasswordValid = validPasswords.includes(password?.trim());
+    const inputUser = (username || '').toLowerCase().trim();
+    const inputPass = (password || '').trim();
 
-    if (isUsernameValid && isPasswordValid) {
+    // Check against Vercel environment variables first
+    let isMatch = false;
+
+    if (envPass) {
+      const isUserMatch = !envUser || inputUser === envUser.toLowerCase().trim() || inputUser === 'admin';
+      const isPassMatch = inputPass === envPass.trim();
+      if (isUserMatch && isPassMatch) {
+        isMatch = true;
+      }
+    }
+
+    // Fallback checks for local development or default access
+    if (!isMatch) {
+      const validUsernames = ['admin', 'workshop', 'bedroom'];
+      const validPasswords = ['bedroom', 'bedroom123', 'admin', 'studio'];
+      
+      const isUserValid = !inputUser || validUsernames.includes(inputUser);
+      const isPassValid = validPasswords.includes(inputPass);
+      
+      if (isUserValid && isPassValid) {
+        isMatch = true;
+      }
+    }
+
+    if (isMatch) {
       const response = NextResponse.json({ success: true });
       response.cookies.set('hq_auth_token', 'authenticated', {
-        httpOnly: false, // Accessible by client JS as well for cookie checks
+        httpOnly: false,
         path: '/',
-        maxAge: 60 * 60 * 24 * 7, // 7 days
+        maxAge: 60 * 60 * 24 * 7,
         sameSite: 'lax',
       });
       return response;
