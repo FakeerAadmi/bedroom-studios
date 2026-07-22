@@ -29,8 +29,7 @@ export async function POST(request: Request) {
       or(
         eq(ordersTable.orderNumber, orderCode),
         eq(ordersTable.orderNumber, cleanCode),
-        eq(ordersTable.orderNumber, `BRD-MANUAL-${cleanCode}`), // For legacy seeded orders
-        eq(ordersTable.id, cleanCode)
+        eq(ordersTable.orderNumber, `BRD-MANUAL-${cleanCode}`)
       )
     );
 
