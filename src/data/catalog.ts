@@ -596,7 +596,7 @@ Launching soon. If you collect, you know the vibe.`,
             label: 'Slot detail',
             caption: 'Adjustable rail spacing. Snug enough to hold, loose enough to swap.',
             className: 'bg-[#f4f1ea] texture-lines',
-            image: '/products/hot-wheels-card-rack.jpg',
+            image: '/products/hot-wheels-card-rack-detail.jpg',
           },
         ],
         reviews: [
