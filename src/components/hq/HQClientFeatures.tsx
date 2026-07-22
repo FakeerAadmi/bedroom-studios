@@ -4,9 +4,11 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Camera, X, Send, ArrowLeft, Package, LayoutDashboard, Inbox, Tags, Users, Settings, LogOut, CheckCircle, Search, AlertTriangle } from 'lucide-react';
+import { Camera, X, Send, ArrowLeft, Package, LayoutDashboard, Inbox, Tags, Users, Settings, LogOut, CheckCircle, Search, AlertTriangle, Plus, MessageCircle, Calculator } from 'lucide-react';
 import Link from 'next/link';
 import { useStoreState } from '@/context/StoreContext';
+import CommissionsTab from '@/components/hq/tabs/CommissionsTab';
+import CostCalculatorTab from '@/components/hq/tabs/CostCalculatorTab';
 
 const STAGES = [
   { label: 'Order Received', icon: '📥' },
@@ -56,6 +58,9 @@ export default function HQClientFeatures() {
   const [newComment, setNewComment] = useState('');
   const [copiedShareText, setCopiedShareText] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [showCreateOrder, setShowCreateOrder] = useState(false);
+  const [newOrder, setNewOrder] = useState({ customerName: '', phone: '', email: '', productName: '', material: '', total: '', notes: '' });
+  const [customerNotes, setCustomerNotes] = useState<Record<string, { notes: string; tags: string }>>({});
 
   useEffect(() => {
     verifySession();
@@ -212,6 +217,40 @@ export default function HQClientFeatures() {
     } catch (err) {}
   };
 
+  const handleWhatsAppSend = () => {
+    if (!activeOrder) return;
+    const trackUrl = `${window.location.origin}/track`;
+    const phone = activeOrder.phone || '';
+    const messageText = encodeURIComponent(`Hey ${activeOrder.customerName}! Your '${activeOrder.productName}' build is underway ✦\n\nTrack your progress live:\n🔗 ${trackUrl}\nOrder: BS-${selectedOrderCode}\n\nCheers,\nBedroom Studios`);
+    const url = phone
+      ? `https://wa.me/91${phone}?text=${messageText}`
+      : `https://wa.me/?text=${messageText}`;
+    window.open(url, '_blank');
+  };
+
+  const handleCreateOrder = async (e: any) => {
+    e.preventDefault();
+    const orderId = String(Date.now()).slice(-6);
+    const orderData = {
+      id: orderId,
+      customerName: newOrder.customerName,
+      phone: newOrder.phone,
+      email: newOrder.email,
+      productName: newOrder.productName,
+      material: newOrder.material,
+      total: Number(newOrder.total) || 0,
+      notes: newOrder.notes,
+      date: new Date().toISOString().split('T')[0],
+      currentStage: 1,
+      comments: newOrder.notes ? [{ text: newOrder.notes, author: 'Admin', time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }] : [],
+      uploadedPhotos: {},
+    };
+    await syncToCloud(orderId, orderData);
+    setNewOrder({ customerName: '', phone: '', email: '', productName: '', material: '', total: '', notes: '' });
+    setShowCreateOrder(false);
+    fetchOrders();
+  };
+
   const activeOrder = selectedOrderCode ? orders[selectedOrderCode] : null;
   const orderEntries = Object.entries(orders).map(([id, order]: any) => ({ id, ...order }));
   const orderValues = orderEntries.map((entry) => entry);
@@ -307,6 +346,57 @@ export default function HQClientFeatures() {
       </div>
     );
   }
+
+  const renderRevenueChart = () => {
+    const days = 30;
+    const dayData: { date: string; rev: number }[] = [];
+    for (let i = days - 1; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const key = d.toISOString().split('T')[0];
+      const rev = orderValues
+        .filter((o: any) => o.date === key)
+        .reduce((s: number, o: any) => s + (o.total || 0), 0);
+      dayData.push({ date: key, rev });
+    }
+    const maxRev = Math.max(...dayData.map(d => d.rev), 1);
+    const W = 600;
+    const H = 80;
+    const barW = W / days - 2;
+    return (
+      <div className="rounded-[2rem] border border-ink bg-paper p-6 shadow-sm">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <p className="text-sm font-bold uppercase tracking-widest text-ink/50">Revenue — Last 30 Days</p>
+            <p className="mt-1 text-xs text-ink/40 font-mono">{dayData[0]?.date} → {dayData[days - 1]?.date}</p>
+          </div>
+          <p className="font-display text-2xl font-bold">₹{dayData.reduce((s, d) => s + d.rev, 0).toLocaleString('en-IN')}</p>
+        </div>
+        <svg viewBox={`0 0 ${W} ${H + 20}`} className="w-full" preserveAspectRatio="none">
+          {dayData.map((d, i) => {
+            const barH = d.rev > 0 ? Math.max((d.rev / maxRev) * H, 4) : 2;
+            const x = i * (W / days) + 1;
+            const y = H - barH;
+            return (
+              <g key={d.date}>
+                <rect
+                  x={x} y={y} width={barW} height={barH}
+                  rx={2}
+                  fill={d.rev > 0 ? '#1a1a1a' : '#f4f1ea'}
+                  className="transition-all duration-300"
+                />
+                {d.rev > 0 && (
+                  <title>₹{d.rev.toLocaleString('en-IN')} on {d.date}</title>
+                )}
+              </g>
+            );
+          })}
+          <text x="0" y={H + 16} fontSize="8" fill="#aaa" fontFamily="monospace">{dayData[0]?.date?.slice(5)}</text>
+          <text x={W - 30} y={H + 16} fontSize="8" fill="#aaa" fontFamily="monospace">{dayData[days - 1]?.date?.slice(5)}</text>
+        </svg>
+      </div>
+    );
+  };
 
   const renderDashboardTab = () => {
     return (
@@ -420,6 +510,8 @@ export default function HQClientFeatures() {
             </div>
           </div>
         </div>
+
+        {renderRevenueChart()}
       </div>
     );
   };
@@ -432,9 +524,14 @@ export default function HQClientFeatures() {
             <button onClick={() => setSelectedOrderCode(null)} className="inline-flex items-center gap-2 rounded-full border border-ink bg-paper px-4 py-2 text-xs font-bold uppercase tracking-[0.15em] hover:bg-ink hover:text-paper transition">
               <ArrowLeft className="h-3.5 w-3.5" /> Back to Orders
             </button>
-            <button onClick={handleShareTrackingMessage} className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-bold uppercase tracking-[0.15em] transition ${copiedShareText ? 'border-accent bg-accent text-ink' : 'border-ink bg-ink text-paper hover:bg-accent hover:text-ink'}`}>
-              {copiedShareText ? '✓ Copied' : 'Share Tracking Link'}
-            </button>
+            <div className="flex gap-2 flex-wrap">
+              <button onClick={handleShareTrackingMessage} className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-bold uppercase tracking-[0.15em] transition ${copiedShareText ? 'border-accent bg-accent text-ink' : 'border-ink/30 text-ink/70 hover:border-ink hover:bg-ink hover:text-paper'}`}>
+                {copiedShareText ? '✓ Copied' : 'Copy Tracking Link'}
+              </button>
+              <button onClick={handleWhatsAppSend} className="inline-flex items-center gap-2 rounded-full border border-[#25D366] bg-[#25D366]/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.15em] text-[#128C7E] hover:bg-[#25D366]/20 transition">
+                <MessageCircle className="h-3.5 w-3.5" /> WhatsApp
+              </button>
+            </div>
           </div>
 
           <div className="rounded-[2.5rem] border border-ink bg-paper p-8 shadow-card">
@@ -525,7 +622,14 @@ export default function HQClientFeatures() {
             <h2 className="font-display text-3xl font-bold">Order Management</h2>
             <p className="mt-2 text-sm text-ink/60">Search by customer, product, or order code and jump into build progress fast.</p>
           </div>
-          <div className="grid gap-3 md:grid-cols-[1fr_220px]">
+          <div className="flex flex-col gap-3">
+            <button
+              onClick={() => setShowCreateOrder(true)}
+              className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-xs font-bold uppercase tracking-widest text-ink hover:bg-ink hover:text-paper transition"
+            >
+              <Plus className="w-3.5 h-3.5" /> New Manual Order
+            </button>
+            <div className="grid gap-3 md:grid-cols-[1fr_220px]">
             <label className="relative">
               <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/35" />
               <input
@@ -547,6 +651,7 @@ export default function HQClientFeatures() {
                 </option>
               ))}
             </select>
+            </div>
           </div>
         </div>
 
@@ -881,7 +986,7 @@ export default function HQClientFeatures() {
     return (
       <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
         <h2 className="font-display text-3xl font-bold mb-4">Customers (CRM)</h2>
-        <p className="text-ink/60 mb-8">View lifetime value and contact info for all buyers.</p>
+        <p className="text-ink/60 mb-8">View lifetime value, contact info, and notes for all buyers.</p>
 
         <div className="grid gap-4 mb-8 md:grid-cols-3">
           <div className="rounded-[1.8rem] border border-ink/10 bg-paper p-4">
@@ -901,32 +1006,65 @@ export default function HQClientFeatures() {
         </div>
         
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {customerList.map((c: any, i: number) => (
-            <div key={i} className="rounded-3xl border border-ink/20 bg-paper p-6 shadow-sm">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-accent/30 flex items-center justify-center font-bold text-ink">
-                  {c.name.charAt(0).toUpperCase()}
+          {customerList.map((c: any, i: number) => {
+            const key = c.email || c.name;
+            const meta = customerNotes[key] || { notes: '', tags: '' };
+            return (
+              <div key={i} className="rounded-3xl border border-ink/20 bg-paper p-6 shadow-sm">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-full bg-accent/30 flex items-center justify-center font-bold text-ink">
+                    {c.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <h3 className="font-bold">{c.name}</h3>
+                    <p className="text-xs text-ink/50 font-mono">{c.email || 'No email'}</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-bold">{c.name}</h3>
-                  <p className="text-xs text-ink/50 font-mono">{c.email || 'No email'}</p>
+                <div className="flex justify-between pt-4 border-t border-ink/10">
+                  <div className="text-center">
+                    <p className="text-[10px] uppercase tracking-widest text-ink/50 font-bold">Orders</p>
+                    <p className="font-mono text-sm mt-1">{c.orders}</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-[10px] uppercase tracking-widest text-ink/50 font-bold">Lifetime Spent</p>
+                    <p className="font-mono text-sm mt-1 font-bold text-lime-600">₹{c.spent.toLocaleString()}</p>
+                  </div>
+                </div>
+                <p className="mt-4 text-xs uppercase tracking-[0.16em] text-ink/40">
+                  {c.orders > 1 ? 'Repeat buyer' : 'First-time buyer'} · Last order {c.lastOrderDate || 'Unknown'}
+                </p>
+
+                {/* Tags */}
+                {meta.tags && (
+                  <div className="mt-3 flex flex-wrap gap-1">
+                    {meta.tags.split(',').filter(Boolean).map((t: string) => (
+                      <span key={t} className="rounded-full bg-accent/20 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-ink/60">{t.trim()}</span>
+                    ))}
+                  </div>
+                )}
+
+                {/* Admin Notes */}
+                <div className="mt-4 pt-4 border-t border-ink/10 space-y-2">
+                  <label className="block text-[10px] uppercase tracking-widest font-bold text-ink/40">Tags (comma separated)</label>
+                  <input
+                    type="text"
+                    value={meta.tags}
+                    onChange={e => setCustomerNotes(prev => ({ ...prev, [key]: { ...meta, tags: e.target.value } }))}
+                    placeholder="instagram, commission client, repeat"
+                    className="w-full rounded-xl border border-ink/10 bg-[#f6f3ee] px-3 py-2 text-xs outline-none focus:ring-1 focus:ring-accent"
+                  />
+                  <label className="block text-[10px] uppercase tracking-widest font-bold text-ink/40">Private Notes</label>
+                  <textarea
+                    value={meta.notes}
+                    onChange={e => setCustomerNotes(prev => ({ ...prev, [key]: { ...meta, notes: e.target.value } }))}
+                    placeholder="Internal notes..."
+                    rows={2}
+                    className="w-full rounded-xl border border-ink/10 bg-[#f6f3ee] px-3 py-2 text-xs outline-none focus:ring-1 focus:ring-accent resize-none"
+                  />
                 </div>
               </div>
-              <div className="flex justify-between pt-4 border-t border-ink/10">
-                <div className="text-center">
-                  <p className="text-[10px] uppercase tracking-widest text-ink/50 font-bold">Orders</p>
-                  <p className="font-mono text-sm mt-1">{c.orders}</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-[10px] uppercase tracking-widest text-ink/50 font-bold">Lifetime Spent</p>
-                  <p className="font-mono text-sm mt-1 font-bold text-lime-600">₹{c.spent.toLocaleString()}</p>
-                </div>
-              </div>
-              <p className="mt-4 text-xs uppercase tracking-[0.16em] text-ink/40">
-                {c.orders > 1 ? 'Repeat buyer' : 'First-time buyer'} · Last order {c.lastOrderDate || 'Unknown'}
-              </p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     );
@@ -1051,8 +1189,10 @@ export default function HQClientFeatures() {
           {[
             { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
             { id: 'orders', icon: Inbox, label: 'Orders' },
+            { id: 'commissions', icon: MessageCircle, label: 'Commissions' },
             { id: 'inventory', icon: Package, label: 'Inventory' },
             { id: 'crm', icon: Users, label: 'Customers' },
+            { id: 'costcalc', icon: Calculator, label: 'Cost Calc' },
             { id: 'settings', icon: Settings, label: 'Settings' }
           ].map((tab) => (
             <button
@@ -1076,11 +1216,69 @@ export default function HQClientFeatures() {
         <div className="max-w-6xl mx-auto">
           {activeTab === 'dashboard' && renderDashboardTab()}
           {activeTab === 'orders' && renderOrdersTab()}
+          {activeTab === 'commissions' && <CommissionsTab />}
           {activeTab === 'inventory' && renderInventoryTab()}
           {activeTab === 'crm' && renderCRMTab()}
+          {activeTab === 'costcalc' && <CostCalculatorTab />}
           {activeTab === 'settings' && renderSettingsTab()}
         </div>
       </main>
+
+      {/* Create Order Modal */}
+      {showCreateOrder && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/70 backdrop-blur-sm">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            className="w-full max-w-lg rounded-[2.5rem] bg-paper p-8 shadow-card relative"
+          >
+            <button onClick={() => setShowCreateOrder(false)} className="absolute top-6 right-6 text-ink/40 hover:text-ink">
+              <X className="w-5 h-5" />
+            </button>
+            <h3 className="font-display text-2xl font-bold mb-2">New Manual Order</h3>
+            <p className="text-sm text-ink/55 mb-6">Log an order from Instagram, WhatsApp, UPI, or any offline channel.</p>
+            <form onSubmit={handleCreateOrder} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-widest text-ink/50 mb-1">Customer Name *</label>
+                  <input required type="text" value={newOrder.customerName} onChange={e => setNewOrder(p => ({ ...p, customerName: e.target.value }))} className="w-full rounded-xl border border-ink/20 bg-white px-4 py-2.5 text-sm outline-none focus:ring-1 focus:ring-accent" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-widest text-ink/50 mb-1">Phone (for WhatsApp)</label>
+                  <input type="tel" value={newOrder.phone} onChange={e => setNewOrder(p => ({ ...p, phone: e.target.value }))} placeholder="10-digit" className="w-full rounded-xl border border-ink/20 bg-white px-4 py-2.5 text-sm outline-none focus:ring-1 focus:ring-accent" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-widest text-ink/50 mb-1">Email</label>
+                  <input type="email" value={newOrder.email} onChange={e => setNewOrder(p => ({ ...p, email: e.target.value }))} className="w-full rounded-xl border border-ink/20 bg-white px-4 py-2.5 text-sm outline-none focus:ring-1 focus:ring-accent" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-widest text-ink/50 mb-1">Amount (₹) *</label>
+                  <input required type="number" value={newOrder.total} onChange={e => setNewOrder(p => ({ ...p, total: e.target.value }))} className="w-full rounded-xl border border-ink/20 bg-white px-4 py-2.5 text-sm font-mono outline-none focus:ring-1 focus:ring-accent" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-widest text-ink/50 mb-1">Product *</label>
+                  <input required type="text" value={newOrder.productName} onChange={e => setNewOrder(p => ({ ...p, productName: e.target.value }))} placeholder="e.g. Halo Lamp" className="w-full rounded-xl border border-ink/20 bg-white px-4 py-2.5 text-sm outline-none focus:ring-1 focus:ring-accent" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-widest text-ink/50 mb-1">Material</label>
+                  <input type="text" value={newOrder.material} onChange={e => setNewOrder(p => ({ ...p, material: e.target.value }))} placeholder="e.g. Cast cement + PLA+" className="w-full rounded-xl border border-ink/20 bg-white px-4 py-2.5 text-sm outline-none focus:ring-1 focus:ring-accent" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-widest text-ink/50 mb-1">Notes / Source</label>
+                <input type="text" value={newOrder.notes} onChange={e => setNewOrder(p => ({ ...p, notes: e.target.value }))} placeholder="e.g. Paid via UPI on Instagram DM" className="w-full rounded-xl border border-ink/20 bg-white px-4 py-2.5 text-sm outline-none focus:ring-1 focus:ring-accent" />
+              </div>
+              <button type="submit" className="w-full rounded-xl bg-ink py-4 text-sm font-bold uppercase tracking-widest text-paper hover:bg-accent transition mt-2">
+                Create Order
+              </button>
+            </form>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }

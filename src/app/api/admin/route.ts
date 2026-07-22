@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/db';
 import { orders as ordersTable } from '@/db/schema';
+import { sendDiscordAlert, DiscordColors } from '@/lib/discord';
 
 // In-memory fallback order store for demo / development when DB is unpopulated
 const mockOrders: Record<string, any> = {
@@ -68,7 +69,24 @@ export async function PUT(request: Request) {
     const body = await request.json();
     const { orderId, orderData } = body;
     if (orderId && orderData) {
+      const prev = mockOrders[orderId];
       mockOrders[orderId] = orderData;
+
+      // Discord ping when a new order is manually created
+      if (!prev && orderData.customerName) {
+        await sendDiscordAlert(
+          '🛒 New Manual Order',
+          `**${orderData.customerName}** — ${orderData.productName}`,
+          {
+            color: DiscordColors.green,
+            fields: [
+              { name: 'Order ID', value: `BS-${orderId}`, inline: true },
+              { name: 'Total', value: `₹${orderData.total?.toLocaleString('en-IN') ?? 0}`, inline: true },
+              { name: 'Material', value: orderData.material || 'Not specified', inline: true },
+            ],
+          }
+        );
+      }
     }
     return NextResponse.json({ success: true });
   } catch (error) {
