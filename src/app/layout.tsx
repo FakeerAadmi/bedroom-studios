@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Script from "next/script";
 import { DM_Sans, Newsreader, Space_Grotesk } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { Providers } from "./providers";
 import Layout from "@/components/Layout";
 import "./globals.css";
@@ -79,6 +80,7 @@ export default function RootLayout({
             {children}
           </Layout>
         </Providers>
+        <Analytics />
 
         {/* Analytics Placeholders */}
         <Script
