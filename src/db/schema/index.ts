@@ -173,6 +173,7 @@ export const orders = pgTable('orders', {
   total: decimal('total', { precision: 10, scale: 2 }).notNull(),
   status: orderStatusEnum('status').default('pending').notNull(),
   notes: text('notes'),
+  uploadedPhotos: jsonb('uploaded_photos').default('{}'), // Structure: { [stageIndex]: string[] }
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
@@ -246,3 +247,36 @@ export const ordersRelations = relations(orders, ({ one, many }) => ({
   items: many(orderItems),
   payments: many(payments),
 }));
+
+// ─── HQ ADMIN ───────────────────────────────────────────────────────────────
+
+export const workshopSupplies = pgTable('workshop_supplies', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  category: text('category').notNull(),
+  brand: text('brand'),
+  quantity: decimal('quantity', { precision: 10, scale: 2 }).notNull(),
+  unit: text('unit').notNull(),
+  threshold: decimal('threshold', { precision: 10, scale: 2 }).notNull(),
+  cost: decimal('cost', { precision: 10, scale: 2 }).notNull(),
+  notes: text('notes'),
+  lastRestocked: timestamp('last_restocked').defaultNow(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const costPresets = pgTable('cost_presets', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  materialCostPerKg: decimal('material_cost_per_kg', { precision: 10, scale: 2 }).notNull(),
+  printWeight: decimal('print_weight', { precision: 10, scale: 2 }).notNull(),
+  printTimeHours: decimal('print_time_hours', { precision: 10, scale: 2 }).notNull(),
+  powerConsumptionKw: decimal('power_consumption_kw', { precision: 10, scale: 2 }).notNull(),
+  powerCostPerKwh: decimal('power_cost_per_kwh', { precision: 10, scale: 2 }).notNull(),
+  failureRatePercent: decimal('failure_rate_percent', { precision: 5, scale: 2 }).notNull(),
+  laborTimeHours: decimal('labor_time_hours', { precision: 10, scale: 2 }).notNull(),
+  laborRatePerHour: decimal('labor_rate_per_hour', { precision: 10, scale: 2 }).notNull(),
+  marginPercent: decimal('margin_percent', { precision: 10, scale: 2 }).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
