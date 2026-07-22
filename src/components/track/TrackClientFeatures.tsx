@@ -33,7 +33,7 @@ function compressImage(base64Str, maxWidth = 1000, quality = 0.7) {
 
 const stages = [
   {
-    title: "Calibration & Slicing",
+    title: "Order Received",
     subtitle: "Queueing build files",
     icon: Cpu,
     description: "Setting up the G-code parameter files. Calibrating the print bed mesh leveling matrix to 0.01mm tolerance. Slicing profile: layer height 0.16mm, infill gyroid 15%. Preheating nozzle hotend.",
@@ -43,7 +43,7 @@ const stages = [
     ]
   },
   {
-    title: "FDM 3D Printing",
+    title: "Files Prep",
     subtitle: "Material extrusion",
     icon: Hammer,
     description: "Extruding PLA+/TPU material layer-by-layer on the heated printing bed. Custom structural geometry is created over several hours under close temperature calibration.",
@@ -53,7 +53,7 @@ const stages = [
     ]
   },
   {
-    title: "Sanding & Post-Processing",
+    title: "Printing",
     subtitle: "Sanding out layer lines",
     icon: Sparkles,
     description: "Removing the print from the build plate. Initiating manual wet-sanding sequence (grit 220 -> 400 -> 800) to clear surface stepping. Prepping the surface for a seamless, sanded satin finish.",
@@ -63,7 +63,7 @@ const stages = [
     ]
   },
   {
-    title: "Concrete Pour & Curing",
+    title: "Post-Processing",
     subtitle: "Silicon mold casting",
     icon: Hammer,
     description: "For concrete items: casting silicone mold matrices. Pouring hand-mixed 53-grade high early strength cement + fine silica sand + pigment wash. Vibration sequence to eliminate air voids. Curing phase.",
@@ -73,7 +73,7 @@ const stages = [
     ]
   },
   {
-    title: "QC Assembly & Fitting",
+    title: "Quality Check",
     subtitle: "Felt bases & alignment",
     icon: Shield,
     description: "Testing fitting dimensions. Precision sanding check. Aligning and gluing soft cork bases/felt pads to protect desk surfaces. Affixing final quality control certification stamp.",
@@ -83,7 +83,7 @@ const stages = [
     ]
   },
   {
-    title: "Boxed & Dispatched",
+    title: "Shipped",
     subtitle: "Dispatched to logistics",
     icon: Package,
     description: "Wrapping object in double-layered bubble wrap and enclosing it in cardboard packaging. Shipping label generated and package scanned by delivery partner.",

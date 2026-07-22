@@ -185,6 +185,13 @@ export default function HQClientFeatures() {
     await syncToCloud(selectedOrderCode as string, { ...activeOrder, uploadedPhotos: updatedPhotos });
   };
 
+  const handleClearComment = async (commentIndex: number) => {
+    if (!activeOrder) return;
+    const updatedComments = comments.filter((_: any, i: number) => i !== commentIndex);
+    setComments(updatedComments);
+    await syncToCloud(selectedOrderCode as string, { ...activeOrder, comments: updatedComments });
+  };
+
   const handleStageUpdate = async (newStage: number) => {
     if (!activeOrder) return;
     await syncToCloud(selectedOrderCode as string, { ...activeOrder, currentStage: newStage });
@@ -599,7 +606,14 @@ export default function HQClientFeatures() {
                 <div className="space-y-4 mb-4">
                   {comments.map((c: any, i: number) => (
                     <div key={i} className={`flex ${c.author === 'Admin' ? 'justify-end' : 'justify-start'}`}>
-                      <div className={`max-w-[80%] rounded-2xl px-4 py-3 shadow-sm ${c.author === 'Admin' ? 'bg-ink text-paper rounded-br-none' : 'bg-black/5 rounded-bl-none'}`}>
+                      <div className={`group relative max-w-[80%] rounded-2xl px-4 py-3 shadow-sm ${c.author === 'Admin' ? 'bg-ink text-paper rounded-br-none' : 'bg-black/5 rounded-bl-none'}`}>
+                        <button 
+                          onClick={() => handleClearComment(i)}
+                          className={`absolute -top-2 ${c.author === 'Admin' ? '-left-2' : '-right-2'} rounded-full bg-red-500 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100 shadow-md hover:bg-red-600 hover:scale-110 z-10`}
+                          title="Delete message"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
                         <p className="text-sm">{c.text}</p>
                         <span className="mt-1 block text-[10px] opacity-60 font-mono">{c.time} • {c.author}</span>
                       </div>
