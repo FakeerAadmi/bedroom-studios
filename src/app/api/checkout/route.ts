@@ -14,8 +14,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, message: 'Cart is empty' }, { status: 400 });
     }
 
-    // Generate unique order ID
-    const orderId = `ORD-${uuidv4().substring(0, 8).toUpperCase()}`;
+    // Generate unique 6-digit order ID prefixed with BS-
+    const orderId = `BS-${Math.floor(100000 + Math.random() * 900000)}`;
 
     // Calculate total if not provided (safety fallback)
     const orderTotal = total || cartItems.reduce((acc: number, item: any) => acc + (item.price * item.quantity), 0);
@@ -84,7 +84,7 @@ export async function POST(request: Request) {
     console.error('Checkout error (falling back to mock):', error);
     return NextResponse.json({ 
       success: true, 
-      orderCode: `ORD-LOCAL-${uuidv4().substring(0, 5).toUpperCase()}`,
+      orderCode: `BS-${Math.floor(100000 + Math.random() * 900000)}`,
       message: 'Processed via local fallback'
     });
   }
