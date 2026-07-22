@@ -9,6 +9,8 @@ import Link from 'next/link';
 import { useStoreState } from '@/context/StoreContext';
 import CommissionsTab from '@/components/hq/tabs/CommissionsTab';
 import CostCalculatorTab from '@/components/hq/tabs/CostCalculatorTab';
+import SuppliesTab from '@/components/hq/tabs/SuppliesTab';
+import { Wrench } from 'lucide-react';
 
 const STAGES = [
   { label: 'Order Received', icon: '📥' },
@@ -1191,6 +1193,7 @@ export default function HQClientFeatures() {
             { id: 'orders', icon: Inbox, label: 'Orders' },
             { id: 'commissions', icon: MessageCircle, label: 'Commissions' },
             { id: 'inventory', icon: Package, label: 'Inventory' },
+            { id: 'supplies', icon: Wrench, label: 'Materials' },
             { id: 'crm', icon: Users, label: 'Customers' },
             { id: 'costcalc', icon: Calculator, label: 'Cost Calc' },
             { id: 'settings', icon: Settings, label: 'Settings' }
@@ -1218,6 +1221,7 @@ export default function HQClientFeatures() {
           {activeTab === 'orders' && renderOrdersTab()}
           {activeTab === 'commissions' && <CommissionsTab />}
           {activeTab === 'inventory' && renderInventoryTab()}
+          {activeTab === 'supplies' && <SuppliesTab />}
           {activeTab === 'crm' && renderCRMTab()}
           {activeTab === 'costcalc' && <CostCalculatorTab />}
           {activeTab === 'settings' && renderSettingsTab()}
