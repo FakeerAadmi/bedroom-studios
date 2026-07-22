@@ -547,37 +547,30 @@ export const fandomCollections: CategoryDefinition[] = [
         label: 'Arriving Soon',
         image: '/products/hot-wheels-card-rack.jpg',
         description:
-          'An adjustable vertical rack for 1:64 blister cards. Holds your Hot Wheels, Matchbox, and Majorette collection in full card-on display without a single wall hole.',
+          'Adjustable vertical rack for 1:64 blister cards. Holds your collection in full card-on display without wall damage.',
         color: 'from-[#16213e] via-[#0f3460] to-[#533483]',
-        materials: ['PLA+', 'PLA+ (matte black)'],
+        materials: ['PLA (Bone)', 'PLA+ (Matte Black)'],
         dimensions: '~120 mm base × 280 mm tall (6-card config) · Adjustable slot spacing',
-        care: 'Wipe with a dry cloth. No direct sunlight for extended periods — even the rack gets tired of UV.',
+        care: 'Wipe with a dry cloth. No direct sunlight for extended periods.',
         goodFor: [
           'Hot Wheels / Matchbox / Majorette collectors',
           'desk display without wall damage',
           'fandom setups and content shoots',
-          'gifting to the person who owns 200 blister cards and zero display logic',
         ],
-        story: `You've hunted the chase card. You've scored the Treasure Hunt at the Tuesday restock. You've explained to three people why the '67 Camaro variant with the redline wheels is worth ₹800. And then you put the whole collection in a cardboard box under the bed.
+        story: `The Diecast Card Tower is a printed vertical display rack for standard 1:64 blister-pack cards. Adjustable slot spacing means it fits most international card sizes without modification. Six cards in a tower. Clean rails. Weighted base. No wobble.
 
-That ends here.
-
-The Diecast Card Tower is a printed vertical display rack for standard 1:64 blister-pack cards. Adjustable slot spacing means it fits Hot Wheels, Matchbox, Majorette, and most international card sizes without modification. Six cards in a tower. Clean rails. Weighted base. No wobble.
-
-This is a Bedroom Labs prototype — designed in-house and currently in fit and finish testing. The goal is a rack that looks like it belongs on the desk, not in a toy store.
-
-Launching soon. If you collect, you know the vibe.`,
+This is a Bedroom Labs prototype — designed in-house and currently in fit and finish testing. The goal is a rack that looks like it belongs on the desk, not in a toy store.`,
         comparison: [
           ['Fits', 'Hot Wheels, Matchbox, Majorette, most 1:64 blister cards'],
           ['Capacity', '4–6 cards (adjustable rail spacing)'],
-          ['Material', 'PLA+ matte black · base weighted for stability'],
+          ['Material', 'PLA or PLA+ · base weighted for stability'],
           ['Status', 'Bedroom Labs prototype — launching soon'],
           ['Wall damage', 'None. Zero. Your landlord is safe.'],
         ],
         releaseDate: '2026-09-01T18:00:00+05:30',
         limitedDrop: true,
-        colors: ['Soot (Matte Black)', 'Bone (Off-White)'],
-        materialOptions: ['PLA+ Matte Black', 'PLA+ Bone'],
+        colors: ['Bone (White)', 'Soot (Matte Black)'],
+        materialOptions: ['PLA (Bone)', 'PLA+ (Matte Black)'],
         textureClass: 'texture-lines',
         gallery: [
           {

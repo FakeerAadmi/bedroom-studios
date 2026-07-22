@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 const quickLinks = [
   { to: '/shop', label: 'Shop' },
-  { to: '/fandoms', label: 'Fandom Lab' },
+  { to: '/fandoms', label: 'Bedroom Labs' },
   { to: '/commissions', label: 'Commissions' },
   { to: '/about', label: 'Our Story' },
   { to: '/track', label: 'Track Build' },

@@ -14,7 +14,7 @@ import { useCart } from '../context/CartContext';
 const links = [
   { to: '/', label: 'Home',        num: '01' },
   { to: '/shop', label: 'Shop',    num: '02' },
-  { to: '/fandoms', label: 'Fandom Lab', num: '03' },
+  { to: '/fandoms', label: 'Bedroom Labs', num: '03' },
   { to: '/commissions', label: 'Commissions', num: '04' },
   { to: '/about', label: 'Our Story', num: '05' },
 ];
