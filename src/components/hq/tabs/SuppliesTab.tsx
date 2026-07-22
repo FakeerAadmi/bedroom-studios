@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Wrench, Search, AlertTriangle, Edit2, Trash2, Check, RefreshCw } from 'lucide-react';
+import { Plus, Wrench, Search, AlertTriangle, Edit2, Trash2, Check, RefreshCw, ChevronUp, ChevronDown, Layers, Droplet, PenTool, Settings, Package, Box } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const CATEGORIES = ['Filament', 'Resin', 'Tool', 'Hardware', 'Packaging', 'Other'];
@@ -23,6 +23,7 @@ export default function SuppliesTab() {
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('All');
+  const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
   
   const [showModal, setShowModal] = useState(false);
   const [editingItem, setEditingItem] = useState<any>(null);
@@ -128,6 +129,51 @@ export default function SuppliesTab() {
     return matchesSearch && matchesCategory;
   });
 
+  const sortedSupplies = React.useMemo(() => {
+    let sortableItems = [...filteredSupplies];
+    if (sortConfig !== null) {
+      sortableItems.sort((a, b) => {
+        let aValue = a[sortConfig.key];
+        let bValue = b[sortConfig.key];
+        
+        if (aValue === undefined) aValue = '';
+        if (bValue === undefined) bValue = '';
+        
+        if (sortConfig.key === 'quantity' || sortConfig.key === 'cost') {
+          aValue = Number(aValue);
+          bValue = Number(bValue);
+        } else {
+          aValue = String(aValue).toLowerCase();
+          bValue = String(bValue).toLowerCase();
+        }
+
+        if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
+        if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+        return 0;
+      });
+    }
+    return sortableItems;
+  }, [filteredSupplies, sortConfig]);
+
+  const requestSort = (key: string) => {
+    let direction: 'asc' | 'desc' = 'asc';
+    if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const getCategoryIcon = (cat: string) => {
+    switch (cat) {
+      case 'Filament': return <Layers className="w-4 h-4 text-ink/40" />;
+      case 'Resin': return <Droplet className="w-4 h-4 text-ink/40" />;
+      case 'Tool': return <PenTool className="w-4 h-4 text-ink/40" />;
+      case 'Hardware': return <Settings className="w-4 h-4 text-ink/40" />;
+      case 'Packaging': return <Package className="w-4 h-4 text-ink/40" />;
+      default: return <Box className="w-4 h-4 text-ink/40" />;
+    }
+  };
+
   const lowStockItems = supplies.filter(s => s.quantity <= s.threshold);
 
   return (
@@ -194,23 +240,36 @@ export default function SuppliesTab() {
             <table className="w-full text-left text-sm">
               <thead className="bg-ink/5 text-xs uppercase tracking-widest text-ink/50">
                 <tr>
-                  <th className="px-6 py-4 font-bold">Item</th>
-                  <th className="px-6 py-4 font-bold">Category</th>
-                  <th className="px-6 py-4 font-bold">Stock</th>
-                  <th className="px-6 py-4 font-bold">Unit Cost</th>
+                  <th className="px-6 py-4 font-bold cursor-pointer hover:text-ink transition select-none" onClick={() => requestSort('name')}>
+                    <div className="flex items-center gap-1">Item {sortConfig?.key === 'name' ? (sortConfig.direction === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />) : null}</div>
+                  </th>
+                  <th className="px-6 py-4 font-bold cursor-pointer hover:text-ink transition select-none" onClick={() => requestSort('category')}>
+                    <div className="flex items-center gap-1">Category {sortConfig?.key === 'category' ? (sortConfig.direction === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />) : null}</div>
+                  </th>
+                  <th className="px-6 py-4 font-bold cursor-pointer hover:text-ink transition select-none" onClick={() => requestSort('quantity')}>
+                    <div className="flex items-center gap-1">Stock {sortConfig?.key === 'quantity' ? (sortConfig.direction === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />) : null}</div>
+                  </th>
+                  <th className="px-6 py-4 font-bold cursor-pointer hover:text-ink transition select-none" onClick={() => requestSort('cost')}>
+                    <div className="flex items-center gap-1">Unit Cost {sortConfig?.key === 'cost' ? (sortConfig.direction === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />) : null}</div>
+                  </th>
                   <th className="px-6 py-4 font-bold text-right">Adjust</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-ink/10">
-                {filteredSupplies.map((item) => (
+                {sortedSupplies.map((item) => (
                   <tr key={item.id} className="hover:bg-ink/5 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        {item.quantity <= item.threshold && (
-                          <AlertTriangle className="w-4 h-4 text-[#ff4e4e]" />
-                        )}
+                        <div className="shrink-0 w-8 h-8 rounded-full bg-ink/5 flex items-center justify-center">
+                          {getCategoryIcon(item.category)}
+                        </div>
                         <div>
-                          <p className="font-bold">{item.name}</p>
+                          <p className="font-bold flex items-center gap-2">
+                            {item.name}
+                            {item.quantity <= item.threshold && (
+                              <span title="Low Stock"><AlertTriangle className="w-3.5 h-3.5 text-[#ff4e4e]" /></span>
+                            )}
+                          </p>
                           {item.brand && <p className="text-xs text-ink/50 mt-0.5">{item.brand}</p>}
                         </div>
                       </div>
