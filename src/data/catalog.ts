@@ -538,7 +538,7 @@ export const fandomCollections: CategoryDefinition[] = [
       {
         id: 203,
         slug: 'diecast-card-tower',
-        name: 'Diecast Card Tower',
+        name: 'Diecast Card Display',
         sku: 'LAB-003',
         family: 'Bedroom Labs',
         stock: 3,
@@ -557,7 +557,7 @@ export const fandomCollections: CategoryDefinition[] = [
           'desk display without wall damage',
           'fandom setups and content shoots',
         ],
-        story: `The Diecast Card Tower is a printed vertical display rack for standard 1:64 blister-pack cards. Adjustable slot spacing means it fits most international card sizes without modification. Six cards in a tower. Clean rails. Weighted base. No wobble.
+        story: `The Diecast Card Display is a printed vertical display rack for standard 1:64 blister-pack cards. Adjustable slot spacing means it fits most international card sizes without modification. Six cards in a tower. Clean rails. Weighted base. No wobble.
 
 This is a Bedroom Labs prototype — designed in-house and currently in fit and finish testing. The goal is a rack that looks like it belongs on the desk, not in a toy store.`,
         comparison: [

@@ -4,7 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Camera, X, Send, ArrowLeft, Package, LayoutDashboard, Inbox, Tags, Users, Settings, LogOut, CheckCircle, Search, AlertTriangle, Plus, MessageCircle, Calculator } from 'lucide-react';
+import { Camera, X, Send, ArrowLeft, Package, LayoutDashboard, Inbox, Tags, Users, Settings, LogOut, CheckCircle, Search, AlertTriangle, Plus, MessageCircle, Calculator, Printer, Hammer, ShieldCheck, Cog } from 'lucide-react';
 import Link from 'next/link';
 import { useStoreState } from '@/context/StoreContext';
 import CommissionsTab from '@/components/hq/tabs/CommissionsTab';
@@ -13,12 +13,12 @@ import SuppliesTab from '@/components/hq/tabs/SuppliesTab';
 import { Wrench } from 'lucide-react';
 
 const STAGES = [
-  { label: 'Order Received', icon: '📥' },
-  { label: 'Files Prep', icon: '⚙️' },
-  { label: 'Printing', icon: '🖨️' },
-  { label: 'Post-Processing', icon: '🛠️' },
-  { label: 'Quality Check', icon: '🔍' },
-  { label: 'Shipped', icon: '📦' }
+  { label: 'Order Received', icon: Inbox },
+  { label: 'Files Prep', icon: Cog },
+  { label: 'Printing', icon: Printer },
+  { label: 'Post-Processing', icon: Hammer },
+  { label: 'Quality Check', icon: ShieldCheck },
+  { label: 'Shipped', icon: Package }
 ];
 
 export default function HQClientFeatures() {
@@ -561,7 +561,7 @@ export default function HQClientFeatures() {
                     <div key={stage.label} className={`relative mb-8 transition-opacity ${isCompleted ? 'opacity-100' : 'opacity-40'}`}>
                       <div className={`absolute -left-[30px] flex h-4 w-4 items-center justify-center rounded-full border-2 bg-paper ${isCompleted ? 'border-accent' : 'border-ink/20'} ${isCurrent ? 'ring-4 ring-accent/20 scale-125' : ''}`} />
                       <div className="flex items-center gap-3">
-                        <span className="text-xl">{stage.icon}</span>
+                        <div className="text-ink/70 flex items-center justify-center p-1.5 rounded-full bg-ink/5 border border-ink/10"><stage.icon className="w-4 h-4" /></div>
                         <h3 className="font-bold">{stage.label}</h3>
                       </div>
                       {isCompleted && (

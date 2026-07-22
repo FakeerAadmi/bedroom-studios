@@ -7,27 +7,16 @@ import { sendDiscordAlert, DiscordColors } from '@/lib/discord';
 const mockOrders: Record<string, any> = {
   '1001': {
     id: '1001',
-    customerName: 'Aarav Sharma',
-    email: 'aarav@example.com',
-    productName: 'Halo Lamp',
-    material: 'Cast cement + PLA+',
-    total: 1890,
-    date: '2026-07-20',
-    currentStage: 3,
+    customerName: 'Priyaansh H',
+    email: 'priyaansh@example.com',
+    productName: 'Diecast Card Display (5x White, 5x Black)',
+    material: 'PLA',
+    total: 8000,
+    date: '2026-06-30',
+    currentStage: 5,
     comments: [
-      { text: 'Base casting complete. Preparing PLA shade.', author: 'Admin', time: '10:30 AM' }
+      { text: 'Printing complete. Moving to quality check.', author: 'Admin', time: '09:00 AM' }
     ]
-  },
-  '1002': {
-    id: '1002',
-    customerName: 'Riya Patel',
-    email: 'riya@example.com',
-    productName: 'Monolith Catchall',
-    material: 'Natural Cement',
-    total: 1450,
-    date: '2026-07-21',
-    currentStage: 1,
-    comments: []
   }
 };
 
