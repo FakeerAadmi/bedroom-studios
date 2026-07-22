@@ -524,6 +524,98 @@ export const fandomCollections: CategoryDefinition[] = [
       },
     ],
   },
+  {
+    id: 'bedroom-labs-fandom',
+    name: 'Bedroom Labs / Fandom Collectibles',
+    eyebrow: 'Experiment 03',
+    description: 'Display objects, organisers, and props built for collectors, fandom desks, and people whose hobbies have very specific needs.',
+    note: 'Because a ₹50 blister pack deserves better than a shoebox.',
+    identity: 'Collector-first design. Built for the people who hunt, not just buy.',
+    fandoms: ['Bedroom Labs', 'Hot Wheels', 'Diecast'],
+    panelClass: 'bg-[#1a1a2e] text-white',
+    cardColor: 'from-[#16213e] via-[#0f3460] to-[#533483]',
+    products: [
+      {
+        id: 203,
+        slug: 'diecast-card-tower',
+        name: 'Diecast Card Tower',
+        sku: 'LAB-003',
+        family: 'Bedroom Labs',
+        stock: 3,
+        adminStatus: 'experimental',
+        price: null,
+        label: 'Arriving Soon',
+        image: '/products/hot-wheels-card-rack.jpg',
+        description:
+          'An adjustable vertical rack for 1:64 blister cards. Holds your Hot Wheels, Matchbox, and Majorette collection in full card-on display without a single wall hole.',
+        color: 'from-[#16213e] via-[#0f3460] to-[#533483]',
+        materials: ['PLA+', 'PLA+ (matte black)'],
+        dimensions: '~120 mm base × 280 mm tall (6-card config) · Adjustable slot spacing',
+        care: 'Wipe with a dry cloth. No direct sunlight for extended periods — even the rack gets tired of UV.',
+        goodFor: [
+          'Hot Wheels / Matchbox / Majorette collectors',
+          'desk display without wall damage',
+          'fandom setups and content shoots',
+          'gifting to the person who owns 200 blister cards and zero display logic',
+        ],
+        story: `You've hunted the chase card. You've scored the Treasure Hunt at the Tuesday restock. You've explained to three people why the '67 Camaro variant with the redline wheels is worth ₹800. And then you put the whole collection in a cardboard box under the bed.
+
+That ends here.
+
+The Diecast Card Tower is a printed vertical display rack for standard 1:64 blister-pack cards. Adjustable slot spacing means it fits Hot Wheels, Matchbox, Majorette, and most international card sizes without modification. Six cards in a tower. Clean rails. Weighted base. No wobble.
+
+This is a Bedroom Labs prototype — designed in-house and currently in fit and finish testing. The goal is a rack that looks like it belongs on the desk, not in a toy store.
+
+Launching soon. If you collect, you know the vibe.`,
+        comparison: [
+          ['Fits', 'Hot Wheels, Matchbox, Majorette, most 1:64 blister cards'],
+          ['Capacity', '4–6 cards (adjustable rail spacing)'],
+          ['Material', 'PLA+ matte black · base weighted for stability'],
+          ['Status', 'Bedroom Labs prototype — launching soon'],
+          ['Wall damage', 'None. Zero. Your landlord is safe.'],
+        ],
+        releaseDate: '2026-09-01T18:00:00+05:30',
+        limitedDrop: true,
+        colors: ['Soot (Matte Black)', 'Bone (Off-White)'],
+        materialOptions: ['PLA+ Matte Black', 'PLA+ Bone'],
+        textureClass: 'texture-lines',
+        gallery: [
+          {
+            label: 'Full tower view',
+            caption: 'Six Hot Wheels cards. One tower. Maximum serotonin.',
+            className: 'from-[#16213e] via-[#0f3460] to-[#533483] texture-lines',
+            image: '/products/hot-wheels-card-rack.jpg',
+          },
+          {
+            label: 'Desk context',
+            caption: 'Sits between your keyboard and your keyboard-related anxiety.',
+            className: 'bg-[linear-gradient(140deg,rgba(81,51,131,0.25),rgba(255,255,255,0.06))] texture-lines',
+            image: '/products/hot-wheels-card-rack.jpg',
+          },
+          {
+            label: 'Slot detail',
+            caption: 'Adjustable rail spacing. Snug enough to hold, loose enough to swap.',
+            className: 'bg-[#f4f1ea] texture-lines',
+            image: '/products/hot-wheels-card-rack.jpg',
+          },
+        ],
+        reviews: [
+          {
+            quote: 'Finally. My Hot Wheels collection has left the shoebox era.',
+            author: 'Rohan, Bengaluru',
+          },
+          {
+            quote: 'This is the most niche thing I have ever wanted immediately.',
+            author: 'Priya, Hyderabad',
+          },
+          {
+            quote: 'Bought it as a gift. My friend cried. Mildly. It counts.',
+            author: 'Akshay, Pune',
+          },
+        ],
+      },
+    ],
+  },
 ];
 
 export const allProducts = [

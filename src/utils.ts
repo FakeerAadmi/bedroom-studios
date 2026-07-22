@@ -1,6 +1,6 @@
 export function formatPrice(value) {
   if (value === null || value === undefined || isNaN(value)) {
-    return 'Price TBD';
+    return 'Arriving Soon';
   }
   return new Intl.NumberFormat('en-IN', {
     style: 'currency',
