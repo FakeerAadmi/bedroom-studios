@@ -6,7 +6,29 @@ import { eq } from 'drizzle-orm';
 
 export async function GET() {
   try {
-    const dbOrdersList = await db.select().from(ordersTable);
+    let dbOrdersList = await db.select().from(ordersTable);
+    
+    // Seed Priyaansh manual order if the database is completely empty
+    if (dbOrdersList.length === 0) {
+      try {
+        await db.insert(ordersTable).values({
+          orderNumber: 'BRD-MANUAL-1001',
+          email: 'priyaansh@example.com',
+          shippingAddress: { name: 'Priyaansh H' },
+          subtotal: '8000.00',
+          shippingFee: '0.00',
+          total: '8000.00',
+          status: 'shipped', // mapped to stage 5
+          comments: [
+            { text: 'Printing complete. Moving to quality check.', author: 'Admin', time: '09:00 AM' }
+          ]
+        });
+        dbOrdersList = await db.select().from(ordersTable);
+      } catch (seedErr) {
+        console.error('Failed to seed manual order:', seedErr);
+      }
+    }
+    
     const formattedOrders: Record<string, any> = {};
 
     dbOrdersList.forEach((order: any) => {
@@ -28,26 +50,10 @@ export async function GET() {
         total: Number(order.total) || 0,
         date: new Date(order.createdAt).toISOString().split('T')[0],
         currentStage: stage,
-        comments: order.notes ? [{ text: order.notes, author: 'System', time: 'Auto' }] : [],
+        comments: order.comments || [],
         uploadedPhotos: order.uploadedPhotos || {}
       };
     });
-
-    // We'll inject Priyaansh's manual order here just so it's not lost since it wasn't created via checkout
-    formattedOrders['manual-1001'] = {
-      id: 'manual-1001',
-      customerName: 'Priyaansh H',
-      email: 'priyaansh@example.com',
-      productName: 'Diecast Card Display (5x White, 5x Black)',
-      material: 'PLA',
-      total: 8000,
-      date: '2026-06-30',
-      currentStage: 5,
-      comments: [
-        { text: 'Printing complete. Moving to quality check.', author: 'Admin', time: '09:00 AM' }
-      ],
-      uploadedPhotos: {}
-    };
 
     return NextResponse.json({ orders: formattedOrders });
   } catch (error) {
@@ -61,7 +67,7 @@ export async function PUT(request: Request) {
     const body = await request.json();
     const { orderId, orderData } = body;
     
-    if (orderId && orderData && !orderId.startsWith('manual-')) {
+    if (orderId && orderData) {
       // Map Kanban stage back to DB status
       let newStatus = 'pending';
       if (orderData.currentStage === 2) newStatus = 'processing';
@@ -72,6 +78,7 @@ export async function PUT(request: Request) {
       await db.update(ordersTable)
         .set({
           status: newStatus as any,
+          comments: orderData.comments || [],
           uploadedPhotos: orderData.uploadedPhotos || {},
           updatedAt: new Date(),
         })

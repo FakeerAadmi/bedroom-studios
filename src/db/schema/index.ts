@@ -173,6 +173,7 @@ export const orders = pgTable('orders', {
   total: decimal('total', { precision: 10, scale: 2 }).notNull(),
   status: orderStatusEnum('status').default('pending').notNull(),
   notes: text('notes'),
+  comments: jsonb('comments').default('[]'), // Structure: { text, author, time }[]
   uploadedPhotos: jsonb('uploaded_photos').default('{}'), // Structure: { [stageIndex]: string[] }
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
