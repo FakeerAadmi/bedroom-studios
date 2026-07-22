@@ -22,7 +22,7 @@ export default function Icon() {
           fontFamily: 'system-ui, sans-serif',
         }}
       >
-        BS
+        <span>B</span><span style={{ fontSize: '0.67em', marginLeft: '1px' }}>S</span>
       </div>
     ),
     { ...size }

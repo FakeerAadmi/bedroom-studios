@@ -569,8 +569,8 @@ This is a Bedroom Labs prototype — designed in-house and currently in fit and 
         ],
         releaseDate: '2026-09-01T18:00:00+05:30',
         limitedDrop: true,
-        colors: ['Bone (White)', 'Soot (Matte Black)'],
-        materialOptions: ['PLA (Bone)', 'PLA+ (Matte Black)'],
+        colors: ['Black (PLA+)', 'White (PLA)'],
+        materialOptions: [],
         textureClass: 'texture-lines',
         gallery: [
           {
