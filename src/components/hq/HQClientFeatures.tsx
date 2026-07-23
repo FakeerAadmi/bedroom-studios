@@ -230,7 +230,7 @@ export default function HQClientFeatures() {
     if (!activeOrder) return;
     const trackUrl = `${window.location.origin}/track`;
     const phone = activeOrder.phone || '';
-    const messageText = encodeURIComponent(`Hey ${activeOrder.customerName}! Your '${activeOrder.productName}' build is underway ✦\n\nTrack your progress live:\n🔗 ${trackUrl}\nOrder: BS-${selectedOrderCode}\n\nCheers,\nBedroom Studios`);
+    const messageText = encodeURIComponent(`Hey ${activeOrder.customerName}! Your '${activeOrder.productName}' build is underway ✦\n\nTrack your progress live:\n🔗 ${trackUrl}\nOrder: ${activeOrder.orderNumber}\n\nCheers,\nBedroom Studios`);
     const url = phone
       ? `https://wa.me/91${phone}?text=${messageText}`
       : `https://wa.me/?text=${messageText}`;
@@ -461,7 +461,7 @@ export default function HQClientFeatures() {
                   className="flex w-full items-center justify-between rounded-[1.4rem] border border-ink/10 bg-[#f6f3ee] px-4 py-4 text-left transition hover:border-ink/30 hover:bg-white"
                 >
                   <div>
-                    <p className="font-mono text-xs text-ink/45">BS-{order.id}</p>
+                    <p className="font-mono text-xs text-ink/45">{order.orderNumber}</p>
                     <p className="mt-1 font-bold">{order.customerName}</p>
                     <p className="mt-1 text-sm text-ink/60">{order.productName}</p>
                   </div>
@@ -545,7 +545,7 @@ export default function HQClientFeatures() {
 
           <div className="rounded-[2.5rem] border border-ink bg-paper p-8 shadow-card">
             <h2 className="font-display text-3xl font-bold">{activeOrder.customerName}'s {activeOrder.productName}</h2>
-            <p className="mt-2 font-mono text-sm text-ink/60">Order: BS-{selectedOrderCode} | Date: {activeOrder.date}</p>
+            <p className="mt-2 font-mono text-sm text-ink/60">Order: {activeOrder.orderNumber} | Date: {activeOrder.date}</p>
             
             <div className="mt-12 space-y-8">
               <div className="flex items-center gap-4">
@@ -700,7 +700,7 @@ export default function HQClientFeatures() {
               <div className="absolute top-0 left-0 w-full h-1 bg-ink/5 group-hover:bg-accent transition-colors"></div>
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="font-mono text-xs font-bold text-ink/50">BS-{order.id}</p>
+                  <p className="font-mono text-xs font-bold text-ink/50">{order.orderNumber}</p>
                   <h3 className="mt-1 font-bold text-lg">{order.customerName}</h3>
                 </div>
                 <span className={`rounded-full px-2 py-1 text-[10px] font-bold uppercase ${order.currentStage === STAGES.length ? 'bg-ink text-paper' : 'bg-accent/30 text-ink'}`}>

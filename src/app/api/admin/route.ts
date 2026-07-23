@@ -8,17 +8,28 @@ export async function GET() {
   try {
     let dbOrdersList = await db.select().from(ordersTable);
     
+    // Quick patch to fix existing seeded order in the DB (will update if it exists)
+    try {
+      await db.update(ordersTable).set({
+        orderNumber: 'BS-1001',
+        createdAt: new Date('2026-06-17T12:00:00Z')
+      }).where(eq(ordersTable.orderNumber, 'BRD-MANUAL-1001'));
+    } catch (e) {
+      console.error('Failed to run order patch', e);
+    }
+    
     // Seed Priyaansh manual order if the database is completely empty
     if (dbOrdersList.length === 0) {
       try {
         await db.insert(ordersTable).values({
-          orderNumber: 'BRD-MANUAL-1001',
+          orderNumber: 'BS-1001',
           email: 'priyaansh@example.com',
           shippingAddress: { name: 'Priyaansh H' },
           subtotal: '8000.00',
           shippingFee: '0.00',
           total: '8000.00',
           status: 'shipped', // mapped to stage 5
+          createdAt: new Date('2026-06-17T12:00:00Z'),
           comments: [
             { text: 'Printing complete. Moving to quality check.', author: 'Admin', time: '09:00 AM' }
           ]
