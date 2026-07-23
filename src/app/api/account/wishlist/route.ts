@@ -25,7 +25,7 @@ export async function PUT(request: Request) {
   const { items } = body; // array of product IDs from client (already merged)
 
   await db.update(profiles)
-    .set({ updatedAt: new Date(), ...(({ wishlistItems: items } as any)) })
+    .set({ wishlistItems: items, updatedAt: new Date() })
     .where(eq(profiles.id, user.id));
 
   return NextResponse.json({ success: true });

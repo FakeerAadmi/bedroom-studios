@@ -56,6 +56,7 @@ export const profiles = pgTable('profiles', {
   fullName: text('full_name'),
   phone: text('phone'),
   avatarUrl: text('avatar_url'),
+  wishlistItems: jsonb('wishlist_items').default('[]'), // Product IDs saved to wishlist
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
