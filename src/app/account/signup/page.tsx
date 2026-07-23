@@ -20,15 +20,6 @@ const OAUTH_PROVIDERS = [
     ),
   },
   {
-    id: 'apple',
-    label: 'Apple',
-    icon: (
-      <svg width="17" height="17" viewBox="0 0 814 1000" fill="currentColor">
-        <path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8s-105-57.8-155.5-127.4C46 405.8.1 303.5.1 205.6 0 104.3 45.7 55.1 97.2 32.9c47.6-20.4 108.2-32.9 163.7-32.9 59.2 0 112.9 20.6 148.4 20.6 34.2 0 93.4-23.7 163.7-23.7 31 0 138.2 2.6 208.5 97.7zm-135-170.7c30.4-35.4 52.4-84.7 52.4-134s-3.2-10.4-4.5-10.4c-43.3 2.6-94.7 28.9-125.8 64.3-28.2 32.3-55.1 81.6-55.1 132.5 0 5.2.6 10.4 1.3 12.4 3.2.6 7.1 1.3 11 1.3 38.4 0 86.4-25.5 120.7-65.1z"/>
-      </svg>
-    ),
-  },
-  {
     id: 'github',
     label: 'GitHub',
     icon: (
@@ -114,7 +105,7 @@ export default function SignupPage() {
         <div className="w-full max-w-md text-center">
           <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-full bg-accent/20 text-3xl">✉️</div>
           <h1 className="font-display text-3xl font-bold">Almost there!</h1>
-          <p className="mt-3 text-ink/60">We sent a confirmation email to <strong>{form.email}</strong>. Click the link to activate your account.</p>
+          <p className="mt-3 text-ink/60">We sent a confirmation to <strong>{form.email}</strong>. Click the link to activate your account.</p>
           <Link href="/account/login" className="mt-6 inline-block text-sm font-bold text-ink hover:text-accent transition">→ Back to login</Link>
         </div>
       </div>
@@ -122,87 +113,123 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-16 bg-paper">
-      <div className="w-full max-w-md">
-        {/* Header */}
-        <div className="mb-10 text-center">
-          <Link href="/" className="inline-block font-display text-lg font-bold mb-8 hover:text-accent transition-colors">
-            Bedroom Studios
-          </Link>
-          <h1 className="font-display text-4xl font-bold">Create account.</h1>
-          <p className="mt-2 text-ink/55 text-sm">Track your builds, save addresses, and shop faster.</p>
-        </div>
+    <div className="flex min-h-screen bg-paper">
 
-        {/* OAuth providers */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          {OAUTH_PROVIDERS.map((provider) => (
-            <button
-              key={provider.id}
-              onClick={() => handleOAuth(provider.id)}
-              disabled={!!oauthLoading}
-              className="flex items-center justify-center gap-2.5 rounded-2xl border border-ink/15 bg-white px-4 py-3 text-sm font-medium shadow-sm hover:border-ink/30 hover:shadow-md transition disabled:opacity-60"
-            >
-              {oauthLoading === provider.id
-                ? <Loader2 className="h-4 w-4 animate-spin" />
-                : provider.icon
-              }
-              <span>{provider.label}</span>
-            </button>
-          ))}
-        </div>
+      {/* ── LEFT PANEL — GIF / VISUAL ───────────────────────────────── */}
+      <div className="relative hidden lg:flex lg:w-1/2 xl:w-[55%] flex-col items-center justify-end overflow-hidden bg-ink">
+        {/* Drop your gif/video here — replace the src with your file path */}
+        <video
+          id="auth-left-video-signup"
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 h-full w-full object-cover opacity-80"
+        >
+          {/* Replace this src with your gif or video file */}
+          <source src="/auth-bg.mp4" type="video/mp4" />
+        </video>
 
-        <div className="relative mb-6 flex items-center gap-3">
-          <div className="flex-1 h-px bg-ink/10" />
-          <span className="text-xs uppercase tracking-[0.2em] text-ink/35">or sign up with email</span>
-          <div className="flex-1 h-px bg-ink/10" />
-        </div>
+        {/* Gradient vignette */}
+        <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-ink/10" />
 
-        <form onSubmit={handleSignup} className="space-y-4">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <label htmlFor="fullName" className="block text-xs font-bold uppercase tracking-[0.15em] text-ink/50 mb-2">Full Name</label>
-              <input id="fullName" name="fullName" type="text" required value={form.fullName} onChange={handleChange} placeholder="Priyaansh H" className="w-full rounded-2xl border border-ink/15 bg-white/60 px-4 py-3.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/15 placeholder:text-ink/30" />
-            </div>
-            <div>
-              <label htmlFor="phone" className="block text-xs font-bold uppercase tracking-[0.15em] text-ink/50 mb-2">
-                Phone <span className="text-red-400 font-normal normal-case tracking-normal">required</span>
-              </label>
-              <input id="phone" name="phone" type="tel" required value={form.phone} onChange={handleChange} placeholder="+91 98765 43210" className="w-full rounded-2xl border border-ink/15 bg-white/60 px-4 py-3.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/15 placeholder:text-ink/30" />
-            </div>
-          </div>
-
-          <div>
-            <label htmlFor="email" className="block text-xs font-bold uppercase tracking-[0.15em] text-ink/50 mb-2">Email</label>
-            <input id="email" name="email" type="email" required value={form.email} onChange={handleChange} placeholder="you@example.com" className="w-full rounded-2xl border border-ink/15 bg-white/60 px-4 py-3.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/15 placeholder:text-ink/30" />
-          </div>
-
-          <div>
-            <label htmlFor="password" className="block text-xs font-bold uppercase tracking-[0.15em] text-ink/50 mb-2">Password</label>
-            <div className="relative">
-              <input id="password" name="password" type={showPassword ? 'text' : 'password'} required minLength={8} value={form.password} onChange={handleChange} placeholder="At least 8 characters" className="w-full rounded-2xl border border-ink/15 bg-white/60 px-4 py-3.5 pr-12 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/15 placeholder:text-ink/30" />
-              <button type="button" onClick={() => setShowPassword((p) => !p)} className="absolute right-4 top-1/2 -translate-y-1/2 text-ink/40 hover:text-ink transition">
-                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </button>
-            </div>
-          </div>
-
-          {error && <div className="rounded-xl bg-red-50 border border-red-100 px-4 py-3 text-sm text-red-600">{error}</div>}
-
-          <button type="submit" disabled={isLoading || !!oauthLoading} className="flex w-full items-center justify-center gap-2 rounded-2xl bg-ink px-4 py-3.5 text-sm font-bold text-paper transition hover:bg-accent hover:text-ink disabled:opacity-50">
-            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-            Create account
-            {!isLoading && <ArrowRight className="h-4 w-4" />}
-          </button>
-
-          <p className="text-center text-[11px] text-ink/35 leading-relaxed">
-            Phone number is used for delivery coordination only and will never be shared.
+        {/* Bottom caption */}
+        <div className="relative z-10 p-10 text-paper">
+          <p className="font-display text-3xl font-bold leading-tight">
+            Built in a bedroom.<br />Shipped with intent.
           </p>
-        </form>
+          <p className="mt-3 text-sm text-paper/60 max-w-xs">
+            Small-batch desk objects handmade in India. Your build is tracked every step of the way.
+          </p>
+        </div>
+      </div>
 
-        <p className="mt-8 text-center text-sm text-ink/50">
-          Already have an account?{' '}
-          <Link href="/account/login" className="font-bold text-ink hover:text-accent transition">Log in</Link>
-        </p>
+      {/* ── RIGHT PANEL — FORM ──────────────────────────────────────── */}
+      <div className="flex w-full lg:w-1/2 xl:w-[45%] flex-col items-center justify-center px-8 py-16 overflow-y-auto">
+        <div className="w-full max-w-sm">
+
+          {/* Brand */}
+          <Link href="/" className="inline-block font-display text-base font-bold mb-10 hover:text-accent transition-colors">
+            ← Bedroom Studios
+          </Link>
+
+          <h1 className="font-display text-4xl font-bold">Create account.</h1>
+          <p className="mt-2 mb-8 text-ink/50 text-sm">Track your builds, save addresses, shop faster.</p>
+
+          {/* OAuth providers */}
+          <div className="flex flex-col gap-3 mb-6">
+            {OAUTH_PROVIDERS.map((provider) => (
+              <button
+                key={provider.id}
+                id={`signup-oauth-${provider.id}`}
+                onClick={() => handleOAuth(provider.id)}
+                disabled={!!oauthLoading}
+                className="flex items-center justify-center gap-3 rounded-2xl border border-ink/15 bg-white px-4 py-3 text-sm font-medium shadow-sm hover:border-ink/25 hover:shadow-md transition disabled:opacity-60"
+              >
+                {oauthLoading === provider.id
+                  ? <Loader2 className="h-4 w-4 animate-spin" />
+                  : provider.icon
+                }
+                <span>Continue with {provider.label}</span>
+              </button>
+            ))}
+          </div>
+
+          <div className="relative my-6 flex items-center gap-3">
+            <div className="flex-1 h-px bg-ink/10" />
+            <span className="text-xs uppercase tracking-[0.2em] text-ink/35">or</span>
+            <div className="flex-1 h-px bg-ink/10" />
+          </div>
+
+          {/* Email form */}
+          <form onSubmit={handleSignup} className="space-y-4">
+            <div className="grid gap-4 grid-cols-2">
+              <div>
+                <label htmlFor="fullName" className="block text-xs font-bold uppercase tracking-[0.15em] text-ink/50 mb-2">Full Name</label>
+                <input id="fullName" name="fullName" type="text" required value={form.fullName} onChange={handleChange} placeholder="Priyaansh H" className="w-full rounded-2xl border border-ink/15 bg-white/60 px-4 py-3.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/15 placeholder:text-ink/30" />
+              </div>
+              <div>
+                <label htmlFor="phone" className="block text-xs font-bold uppercase tracking-[0.15em] text-ink/50 mb-2">
+                  Phone <span className="text-red-400 font-normal normal-case tracking-normal text-[10px]">req.</span>
+                </label>
+                <input id="phone" name="phone" type="tel" required value={form.phone} onChange={handleChange} placeholder="+91 98765" className="w-full rounded-2xl border border-ink/15 bg-white/60 px-4 py-3.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/15 placeholder:text-ink/30" />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="signup-email" className="block text-xs font-bold uppercase tracking-[0.15em] text-ink/50 mb-2">Email</label>
+              <input id="signup-email" name="email" type="email" required value={form.email} onChange={handleChange} placeholder="you@example.com" className="w-full rounded-2xl border border-ink/15 bg-white/60 px-4 py-3.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/15 placeholder:text-ink/30" />
+            </div>
+
+            <div>
+              <label htmlFor="signup-password" className="block text-xs font-bold uppercase tracking-[0.15em] text-ink/50 mb-2">Password</label>
+              <div className="relative">
+                <input id="signup-password" name="password" type={showPassword ? 'text' : 'password'} required minLength={8} value={form.password} onChange={handleChange} placeholder="At least 8 characters" className="w-full rounded-2xl border border-ink/15 bg-white/60 px-4 py-3.5 pr-12 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/15 placeholder:text-ink/30" />
+                <button type="button" onClick={() => setShowPassword((p) => !p)} className="absolute right-4 top-1/2 -translate-y-1/2 text-ink/40 hover:text-ink transition">
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+            </div>
+
+            {error && <div className="rounded-xl bg-red-50 border border-red-100 px-4 py-3 text-sm text-red-600">{error}</div>}
+
+            <button type="submit" disabled={isLoading || !!oauthLoading} className="flex w-full items-center justify-center gap-2 rounded-2xl bg-ink px-4 py-3.5 text-sm font-bold text-paper transition hover:bg-accent hover:text-ink disabled:opacity-50">
+              {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+              Create account
+              {!isLoading && <ArrowRight className="h-4 w-4" />}
+            </button>
+
+            <p className="text-center text-[10px] text-ink/30 leading-relaxed">
+              Phone is used for delivery only — never shared.
+            </p>
+          </form>
+
+          <p className="mt-8 text-center text-sm text-ink/50">
+            Already have an account?{' '}
+            <Link href="/account/login" className="font-bold text-ink hover:text-accent transition">Log in</Link>
+          </p>
+
+        </div>
       </div>
     </div>
   );

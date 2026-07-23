@@ -13,7 +13,10 @@ export default function StoreLayoutClientWrapper({ children }) {
   const pathname = usePathname();
 
   const isHQ = pathname?.startsWith('/hq');
-  const showMaintenance = settings?.maintenanceMode && !isHQ;
+  // Auth pages are full-screen splits — no navbar or footer needed
+  const isAuthPage = pathname === '/account/login' || pathname === '/account/signup' || pathname === '/account/reset-password';
+  const isChrome = isHQ || isAuthPage;
+  const showMaintenance = settings?.maintenanceMode && !isChrome;
 
   if (showMaintenance) {
     return (
@@ -26,18 +29,18 @@ export default function StoreLayoutClientWrapper({ children }) {
 
   return (
     <>
-      {settings?.announcementBanner && !isHQ && (
+      {settings?.announcementBanner && !isChrome && (
         <div className="bg-ink text-paper py-2 px-4 text-center text-[10px] font-bold uppercase tracking-widest relative z-50">
           {settings.announcementBanner}
         </div>
       )}
 
       <ScrollToTop />
-      {!isHQ && <Navbar />}
+      {!isChrome && <Navbar />}
       <CartDrawer />
       <Toast />
       <main>{children}</main>
-      {!isHQ && <Footer />}
+      {!isChrome && <Footer />}
     </>
   );
 }

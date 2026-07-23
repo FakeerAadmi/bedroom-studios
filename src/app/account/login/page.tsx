@@ -20,15 +20,6 @@ const OAUTH_PROVIDERS = [
     ),
   },
   {
-    id: 'apple',
-    label: 'Apple',
-    icon: (
-      <svg width="17" height="17" viewBox="0 0 814 1000" fill="currentColor">
-        <path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8s-105-57.8-155.5-127.4C46 405.8.1 303.5.1 205.6 0 104.3 45.7 55.1 97.2 32.9c47.6-20.4 108.2-32.9 163.7-32.9 59.2 0 112.9 20.6 148.4 20.6 34.2 0 93.4-23.7 163.7-23.7 31 0 138.2 2.6 208.5 97.7zm-135-170.7c30.4-35.4 52.4-84.7 52.4-134s-3.2-10.4-4.5-10.4c-43.3 2.6-94.7 28.9-125.8 64.3-28.2 32.3-55.1 81.6-55.1 132.5 0 5.2.6 10.4 1.3 12.4 3.2.6 7.1 1.3 11 1.3 38.4 0 86.4-25.5 120.7-65.1z"/>
-      </svg>
-    ),
-  },
-  {
     id: 'github',
     label: 'GitHub',
     icon: (
@@ -111,108 +102,140 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-16 bg-paper">
-      <div className="w-full max-w-md">
-        {/* Header */}
-        <div className="mb-10 text-center">
-          <Link href="/" className="inline-block font-display text-lg font-bold mb-8 hover:text-accent transition-colors">
-            Bedroom Studios
+    <div className="flex min-h-screen bg-paper">
+
+      {/* ── LEFT PANEL — GIF / VISUAL ───────────────────────────────── */}
+      <div className="relative hidden lg:flex lg:w-1/2 xl:w-[55%] flex-col items-center justify-end overflow-hidden bg-ink">
+        {/* Drop your gif/video here — replace the src with your file path */}
+        <video
+          id="auth-left-video"
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 h-full w-full object-cover opacity-80"
+        >
+          {/* Replace this src with your gif or video file */}
+          <source src="/auth-bg.mp4" type="video/mp4" />
+        </video>
+
+        {/* Gradient vignette */}
+        <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-ink/10" />
+
+        {/* Bottom caption */}
+        <div className="relative z-10 p-10 text-paper">
+          <p className="font-display text-3xl font-bold leading-tight">
+            Built in a bedroom.<br />Shipped with intent.
+          </p>
+          <p className="mt-3 text-sm text-paper/60 max-w-xs">
+            Small-batch desk objects handmade in India. Your build is tracked every step of the way.
+          </p>
+        </div>
+      </div>
+
+      {/* ── RIGHT PANEL — FORM ──────────────────────────────────────── */}
+      <div className="flex w-full lg:w-1/2 xl:w-[45%] flex-col items-center justify-center px-8 py-16 overflow-y-auto">
+        <div className="w-full max-w-sm">
+
+          {/* Brand */}
+          <Link href="/" className="inline-block font-display text-base font-bold mb-10 hover:text-accent transition-colors">
+            ← Bedroom Studios
           </Link>
+
           <h1 className="font-display text-4xl font-bold">Welcome back.</h1>
-          <p className="mt-2 text-ink/55 text-sm">Log in to track your builds and manage your orders.</p>
-        </div>
+          <p className="mt-2 mb-8 text-ink/50 text-sm">Log in to track your builds and manage orders.</p>
 
-        {/* OAuth providers */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          {OAUTH_PROVIDERS.map((provider) => (
-            <button
-              key={provider.id}
-              onClick={() => handleOAuth(provider.id)}
-              disabled={!!oauthLoading}
-              className="flex items-center justify-center gap-2.5 rounded-2xl border border-ink/15 bg-white px-4 py-3 text-sm font-medium shadow-sm hover:border-ink/30 hover:shadow-md transition disabled:opacity-60"
-            >
-              {oauthLoading === provider.id
-                ? <Loader2 className="h-4 w-4 animate-spin" />
-                : provider.icon
-              }
-              <span>{provider.label}</span>
-            </button>
-          ))}
-        </div>
-
-        <div className="relative mb-6 flex items-center gap-3">
-          <div className="flex-1 h-px bg-ink/10" />
-          <span className="text-xs uppercase tracking-[0.2em] text-ink/35">or continue with email</span>
-          <div className="flex-1 h-px bg-ink/10" />
-        </div>
-
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div>
-            <label htmlFor="login-email" className="block text-xs font-bold uppercase tracking-[0.15em] text-ink/50 mb-2">Email</label>
-            <input
-              id="login-email"
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-              className="w-full rounded-2xl border border-ink/15 bg-white/60 px-4 py-3.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/15 placeholder:text-ink/30"
-            />
+          {/* OAuth providers */}
+          <div className="flex flex-col gap-3 mb-6">
+            {OAUTH_PROVIDERS.map((provider) => (
+              <button
+                key={provider.id}
+                id={`oauth-${provider.id}`}
+                onClick={() => handleOAuth(provider.id)}
+                disabled={!!oauthLoading}
+                className="flex items-center justify-center gap-3 rounded-2xl border border-ink/15 bg-white px-4 py-3 text-sm font-medium shadow-sm hover:border-ink/25 hover:shadow-md transition disabled:opacity-60"
+              >
+                {oauthLoading === provider.id
+                  ? <Loader2 className="h-4 w-4 animate-spin" />
+                  : provider.icon
+                }
+                <span>Continue with {provider.label}</span>
+              </button>
+            ))}
           </div>
 
-          {!isMagicLink && (
-            <div>
-              <label htmlFor="login-password" className="block text-xs font-bold uppercase tracking-[0.15em] text-ink/50 mb-2">Password</label>
-              <div className="relative">
-                <input
-                  id="login-password"
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full rounded-2xl border border-ink/15 bg-white/60 px-4 py-3.5 pr-12 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/15 placeholder:text-ink/30"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((p) => !p)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-ink/40 hover:text-ink transition"
-                >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-              </div>
-              <div className="mt-2 text-right">
-                <Link href="/account/reset-password" className="text-xs text-ink/45 hover:text-ink transition">Forgot password?</Link>
-              </div>
-            </div>
-          )}
+          <div className="relative my-6 flex items-center gap-3">
+            <div className="flex-1 h-px bg-ink/10" />
+            <span className="text-xs uppercase tracking-[0.2em] text-ink/35">or</span>
+            <div className="flex-1 h-px bg-ink/10" />
+          </div>
 
-          {error && (
-            <div className="rounded-xl bg-red-50 border border-red-100 px-4 py-3 text-sm text-red-600">{error}</div>
-          )}
+          {/* Email form */}
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div>
+              <label htmlFor="login-email" className="block text-xs font-bold uppercase tracking-[0.15em] text-ink/50 mb-2">Email</label>
+              <input
+                id="login-email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                className="w-full rounded-2xl border border-ink/15 bg-white/60 px-4 py-3.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/15 placeholder:text-ink/30"
+              />
+            </div>
+
+            {!isMagicLink && (
+              <div>
+                <label htmlFor="login-password" className="block text-xs font-bold uppercase tracking-[0.15em] text-ink/50 mb-2">Password</label>
+                <div className="relative">
+                  <input
+                    id="login-password"
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="w-full rounded-2xl border border-ink/15 bg-white/60 px-4 py-3.5 pr-12 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/15 placeholder:text-ink/30"
+                  />
+                  <button type="button" onClick={() => setShowPassword((p) => !p)} className="absolute right-4 top-1/2 -translate-y-1/2 text-ink/40 hover:text-ink transition">
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+                <div className="mt-2 text-right">
+                  <Link href="/account/reset-password" className="text-xs text-ink/45 hover:text-ink transition">Forgot password?</Link>
+                </div>
+              </div>
+            )}
+
+            {error && (
+              <div className="rounded-xl bg-red-50 border border-red-100 px-4 py-3 text-sm text-red-600">{error}</div>
+            )}
+
+            <button
+              type="submit"
+              disabled={isLoading || !!oauthLoading}
+              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-ink px-4 py-3.5 text-sm font-bold text-paper transition hover:bg-accent hover:text-ink disabled:opacity-50"
+            >
+              {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+              {isMagicLink ? 'Send magic link' : 'Log in'}
+              {!isLoading && <ArrowRight className="h-4 w-4" />}
+            </button>
+          </form>
 
           <button
-            type="submit"
-            disabled={isLoading || !!oauthLoading}
-            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-ink px-4 py-3.5 text-sm font-bold text-paper transition hover:bg-accent hover:text-ink disabled:opacity-50"
+            onClick={() => { setIsMagicLink((p) => !p); setError(''); }}
+            className="mt-4 w-full text-center text-xs text-ink/40 hover:text-ink transition underline"
           >
-            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-            {isMagicLink ? 'Send magic link' : 'Log in'}
-            {!isLoading && <ArrowRight className="h-4 w-4" />}
+            {isMagicLink ? '← Use password instead' : 'Send me a magic link →'}
           </button>
-        </form>
 
-        <button
-          onClick={() => { setIsMagicLink((p) => !p); setError(''); }}
-          className="mt-4 w-full text-center text-xs text-ink/45 hover:text-ink transition underline"
-        >
-          {isMagicLink ? '← Log in with password instead' : 'Send me a magic link instead →'}
-        </button>
+          <p className="mt-8 text-center text-sm text-ink/50">
+            Don't have an account?{' '}
+            <Link href="/account/signup" className="font-bold text-ink hover:text-accent transition">Sign up</Link>
+          </p>
 
-        <p className="mt-8 text-center text-sm text-ink/50">
-          Don't have an account?{' '}
-          <Link href="/account/signup" className="font-bold text-ink hover:text-accent transition">Sign up</Link>
-        </p>
+        </div>
       </div>
     </div>
   );
