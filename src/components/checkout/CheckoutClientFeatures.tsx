@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo, useState } from 'react';
-import { LoaderCircle, ShieldCheck, TicketPercent, Truck } from 'lucide-react';
+import { useMemo, useState, useEffect } from 'react';
+import { LoaderCircle, ShieldCheck, TicketPercent, Truck, User } from 'lucide-react';
 import Link from 'next/link';
 
 import { useCart } from '@/context/CartContext';
+import { useAuth } from '@/context/AuthContext';
 import { applyCoupon, formatPrice, getDeliveryInfoFromPincode } from '@/utils';
 
 const paymentMethods = [
@@ -44,10 +45,39 @@ const initialForm = {
 
 export default function CheckoutClientFeatures() {
   const { clearCart, items, subtotal } = useCart();
+  const { user, profile } = useAuth();
   const [form, setForm] = useState(initialForm);
   const [selectedPayment, setSelectedPayment] = useState('upi');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
+
+  // Auto-fill from account profile + default address
+  useEffect(() => {
+    if (!profile && !user) return;
+    const autofill: any = {};
+    if (profile?.fullName) autofill.name = profile.fullName;
+    if (profile?.phone) autofill.phone = profile.phone;
+    if (user?.email) autofill.email = user.email;
+    if (Object.keys(autofill).length > 0) {
+      setForm((prev) => ({ ...prev, ...autofill }));
+    }
+    // Also try to fetch default address
+    if (user) {
+      fetch('/api/account/addresses').then((r) => r.json()).then((data) => {
+        const def = (data.addresses || []).find((a: any) => a.isDefault) || data.addresses?.[0];
+        if (def) {
+          setForm((prev) => ({
+            ...prev,
+            name: prev.name || def.fullName,
+            phone: prev.phone || def.phone,
+            address: def.streetAddress,
+            pincode: def.pincode,
+            state: def.state,
+          }));
+        }
+      }).catch(() => {});
+    }
+  }, [profile, user]);
   const [confirmedOrderId, setConfirmedOrderId] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState({ valid: false, discount: 0, message: '' });
 

@@ -5,11 +5,12 @@
 "use client";
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowUpRight, Heart, ShoppingBag } from 'lucide-react';
+import { ArrowUpRight, Heart, ShoppingBag, User } from 'lucide-react';
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 
 const links = [
   { to: '/', label: 'Home',        num: '01' },
@@ -51,8 +52,13 @@ function HamburgerIcon({ open }) {
 
 export default function Navbar() {
   const { itemCount, setIsCartOpen, wishlistIds } = useCart();
+  const { user, profile } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
+
+  const initials = profile?.fullName
+    ? profile.fullName.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()
+    : user?.email?.[0]?.toUpperCase() || null;
 
   function closeMobile() { setMobileOpen(false); }
 
@@ -89,6 +95,19 @@ export default function Navbar() {
 
           {/* Right controls */}
           <div className="flex items-center gap-3">
+            {/* Account */}
+            <Link
+              href="/account"
+              aria-label="My Account"
+              className="relative inline-flex items-center justify-center gap-2 rounded-full border border-ink px-3 py-2 text-sm font-medium transition hover:border-accent hover:text-accent"
+            >
+              {user && initials ? (
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-accent text-[10px] font-bold text-ink">{initials}</span>
+              ) : (
+                <User className="h-4 w-4" />
+              )}
+            </Link>
+
             <Link
               href="/wishlist"
               aria-label="Wishlist"
