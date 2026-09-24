@@ -6,7 +6,7 @@ import { Search } from 'lucide-react';
 import Link from 'next/link';
 import ProductCard from '@/components/ProductCard';
 import { useCart } from '@/context/CartContext';
-import { formatPrice } from '@/utils';
+
 
 export default function ShopClientFeatures({ initialCategories }) {
   const { recentlyViewed, wishlistItems } = useCart();
@@ -41,10 +41,10 @@ export default function ShopClientFeatures({ initialCategories }) {
             return isVisible && matchesSearch && matchesMaterial && matchesDrop;
           })
           .sort((left, right) => {
-            if (sort === 'price-low') return left.price - right.price;
-            if (sort === 'price-high') return right.price - left.price;
+            if (sort === 'price-low') return (left.price ?? Infinity) - (right.price ?? Infinity);
+            if (sort === 'price-high') return (right.price ?? -1) - (left.price ?? -1);
             if (sort === 'name') return left.name.localeCompare(right.name);
-            if (sort === 'newest') return new Date(right.releaseDate) - new Date(left.releaseDate);
+            if (sort === 'newest') return new Date(right.releaseDate).getTime() - new Date(left.releaseDate).getTime();
             return 0;
           }),
       }))
@@ -89,8 +89,6 @@ export default function ShopClientFeatures({ initialCategories }) {
           options={[
             ['featured', 'Featured'],
             ['newest', 'Newest drops'],
-            ['price-low', 'Price: low to high'],
-            ['price-high', 'Price: high to low'],
             ['name', 'Alphabetical'],
           ]}
         />
@@ -187,7 +185,6 @@ export default function ShopClientFeatures({ initialCategories }) {
               <p className="font-display text-xl font-bold">{product.name}</p>
               <p className="mt-2 text-sm text-ink/55">{product.dimensions}</p>
               <p className="mt-2 text-sm text-ink/55">{product.materials.join(' · ')}</p>
-              <p className="mt-3 font-medium">{formatPrice(product.price)}</p>
             </div>
           ))}
         </div>

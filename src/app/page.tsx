@@ -148,7 +148,7 @@ export default function HomePage() {
               <div className="mt-8 flex items-center justify-between border-t border-ink/10 pt-5">
                 <span className="text-sm uppercase tracking-[0.25em] text-ink/55">Active Release</span>
                 <Link href="/product/modern-ribbed-led-lamp" className="font-display text-xl font-bold hover:text-accent transition">
-                  ₹1,499 →
+                  View →
                 </Link>
               </div>
             </div>
