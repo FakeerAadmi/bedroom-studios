@@ -50,9 +50,19 @@ export default function FandomPage() {
 
       {/* ── Collections ── */}
       <div className="mt-12 space-y-16">
-        {fandomCollections.map((collection) => (
-          <FandomSection key={collection.id} collection={collection} />
-        ))}
+        {fandomCollections.length > 0 ? (
+          fandomCollections.map((collection) => (
+            <FandomSection key={collection.id} collection={collection} />
+          ))
+        ) : (
+          <div className="rounded-[2.5rem] border border-ink/20 bg-paper p-10 text-center">
+            <h3 className="font-display text-2xl font-bold">All current lighting studies are featured in the main collection.</h3>
+            <p className="mt-3 text-ink/65">Explore our curated architectural desk and ambient lamps.</p>
+            <Link href="/shop" className="mt-6 inline-flex rounded-full bg-ink px-6 py-3 text-sm font-bold uppercase tracking-wider text-paper hover:bg-accent transition">
+              View Desk Lamps
+            </Link>
+          </div>
+        )}
       </div>
 
       {/* ── Custom fandom builds CTA ── */}

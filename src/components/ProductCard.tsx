@@ -23,10 +23,21 @@ export default function ProductCard({ product, index }) {
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05 }}
-      whileHover={{ y: -10, rotate: -0.2 }}
-      onClick={() => router.push(`/product/${product.slug}`)}
-      className={`group relative cursor-pointer overflow-hidden rounded-[2rem] border border-ink/15 bg-paper shadow-card transition ${product.textureClass}`}
+      whileHover={isUnavailable ? {} : { y: -10, rotate: -0.2 }}
+      onClick={() => !isUnavailable && router.push(`/product/${product.slug}`)}
+      className={`group relative overflow-hidden rounded-[2rem] border border-ink/15 bg-paper shadow-card transition ${product.textureClass} ${isUnavailable ? 'cursor-default' : 'cursor-pointer'}`}
     >
+      {/* Coming Soon overlay for unavailable products */}
+      {isUnavailable && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center">
+          <span className="rounded-full border border-ink/20 bg-white/90 px-5 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-ink/70 shadow-lg backdrop-blur-sm">
+            Coming Soon
+          </span>
+        </div>
+      )}
+
+      {/* Blur wrapper for unavailable cards */}
+      <div className={isUnavailable ? 'pointer-events-none select-none blur-[2px] grayscale-[40%] opacity-60' : ''}>
       <button
         type="button"
         aria-label="Toggle wishlist"
@@ -51,7 +62,7 @@ export default function ProductCard({ product, index }) {
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               className="object-cover transition-transform duration-700 group-hover:scale-105" 
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-paper/90 via-paper/40 to-transparent z-[1]" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-[1]" />
           </>
         ) : (
           <>
@@ -62,19 +73,21 @@ export default function ProductCard({ product, index }) {
         <div className="relative flex h-full items-end justify-between z-[2]">
           <div>
             <div className="flex flex-wrap gap-2">
-              <span className="rounded-full border border-ink/15 bg-white/80 px-3 py-1 text-xs uppercase tracking-[0.2em] text-ink">
+              <span className={`rounded-full border px-3 py-1 text-xs uppercase tracking-[0.2em] font-medium ${product.image ? 'bg-black/60 text-white border-white/20 backdrop-blur-sm' : 'bg-white/80 text-ink border-ink/15'}`}>
                 {product.label}
               </span>
-              <span className="rounded-full border border-ink/10 bg-white/70 px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-ink/65">
+              <span className={`rounded-full border px-3 py-1 text-[10px] uppercase tracking-[0.18em] ${product.image ? 'bg-black/40 text-white/80 border-white/10 backdrop-blur-sm' : 'bg-white/70 text-ink/65 border-ink/10'}`}>
                 {product.family}
               </span>
             </div>
-            <p className="mt-4 max-w-[14rem] text-sm text-ink/80 font-medium transition duration-300 group-hover:translate-y-1">
-              {product.description}
-            </p>
+            {!product.image && (
+              <p className="mt-4 max-w-[14rem] text-sm text-ink/80 font-medium transition duration-300 group-hover:translate-y-1">
+                {product.description}
+              </p>
+            )}
           </div>
-          <div className="flex h-20 w-20 items-center justify-center rounded-[1.7rem] border border-ink/15 bg-white/80 text-center text-[10px] uppercase tracking-[0.2em] text-ink transition duration-500 group-hover:rotate-6 group-hover:scale-110">
-            View gallery
+          <div className={`flex h-11 w-11 items-center justify-center rounded-full border shadow-sm transition duration-300 group-hover:scale-110 ${product.image ? 'bg-white text-ink border-white/40' : 'bg-white/80 text-ink border-ink/15'}`}>
+            <ArrowUpRight className="h-4 w-4" />
           </div>
         </div>
       </div>
@@ -83,9 +96,9 @@ export default function ProductCard({ product, index }) {
         <div className="flex items-start justify-between gap-4">
           <div>
             <h3 className="font-display text-2xl font-bold leading-tight">{product.name}</h3>
-            <p className="mt-2 text-sm text-ink/60">{formatPrice(product.price)}</p>
+            <p className="mt-2 text-sm text-ink/60">{isUnavailable && product.price === null ? '—' : formatPrice(product.price)}</p>
             <p className={`mt-2 text-xs uppercase tracking-[0.18em] ${product.stock <= 5 ? 'text-[#9a4f1e]' : 'text-ink/45'}`}>
-              {stockLabel}
+              {isUnavailable && product.adminStatus === 'draft' ? 'Coming soon' : stockLabel}
             </p>
           </div>
           <ArrowUpRight className="mt-1 h-5 w-5 text-ink/40 transition group-hover:text-ink" />
@@ -118,6 +131,7 @@ export default function ProductCard({ product, index }) {
             Details
           </button>
         </div>
+      </div>
       </div>
     </motion.article>
   );

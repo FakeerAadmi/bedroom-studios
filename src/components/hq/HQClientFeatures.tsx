@@ -103,8 +103,10 @@ export default function HQClientFeatures() {
     }
   };
 
-  const handleLogout = () => {
-    document.cookie = "hq_auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch {}
     window.location.reload();
   };
 

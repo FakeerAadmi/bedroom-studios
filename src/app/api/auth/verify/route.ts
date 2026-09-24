@@ -1,11 +1,10 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
+import { verifyAdminRequest } from '@/lib/auth/admin';
 
 export async function GET() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get('hq_auth_token')?.value;
+  const isAuthenticated = await verifyAdminRequest();
 
-  if (token === 'authenticated') {
+  if (isAuthenticated) {
     return NextResponse.json({ authenticated: true });
   }
 

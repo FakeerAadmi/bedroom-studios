@@ -3,8 +3,13 @@ import { db } from '@/db';
 import { workshopSupplies } from '@/db/schema';
 import { sendDiscordAlert, DiscordColors } from '@/lib/discord';
 import { eq } from 'drizzle-orm';
+import { verifyAdminRequest } from '@/lib/auth/admin';
 
 export async function GET() {
+  if (!await verifyAdminRequest()) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const suppliesList = await db.select().from(workshopSupplies);
     return NextResponse.json({ supplies: suppliesList });
@@ -15,6 +20,10 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+  if (!await verifyAdminRequest()) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const newSupply = await req.json();
     
@@ -33,6 +42,10 @@ export async function POST(req: Request) {
 }
 
 export async function PUT(req: Request) {
+  if (!await verifyAdminRequest()) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const { id, updates } = await req.json();
     
@@ -60,6 +73,10 @@ export async function PUT(req: Request) {
 }
 
 export async function DELETE(req: Request) {
+  if (!await verifyAdminRequest()) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');

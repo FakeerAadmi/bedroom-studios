@@ -1,10 +1,14 @@
 import { NextResponse } from 'next/server';
+import { verifyAdminRequest } from '@/lib/auth/admin';
 
 // Shared store — same instance as /api/commission in dev, separate in prod serverless
-// This is acceptable for MVP; swap for DB query in future
 let commissionStore: any[] = [];
 
 export async function GET() {
+  if (!await verifyAdminRequest()) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   // Try fetching from the live commission route store
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/commission`, {
@@ -19,6 +23,10 @@ export async function GET() {
 }
 
 export async function PUT(request: Request) {
+  if (!await verifyAdminRequest()) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const body = await request.json();
     const { id, status, adminNotes } = body;

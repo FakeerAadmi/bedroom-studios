@@ -23,7 +23,7 @@ export default function ShopClientFeatures({ initialCategories }) {
         ...category,
         products: category.products
           .filter((product) => {
-            const isVisible = (product.adminStatus ?? 'active') === 'active';
+            const isVisible = (product.adminStatus ?? 'active') !== 'experimental';
             const matchesSearch =
               !search ||
               `${product.name} ${product.description} ${product.categoryName} ${product.family} ${product.materials?.join(' ')}`

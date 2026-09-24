@@ -3,8 +3,13 @@ import { db } from '@/db';
 import { orders as ordersTable } from '@/db/schema';
 import { sendDiscordAlert, DiscordColors } from '@/lib/discord';
 import { eq } from 'drizzle-orm';
+import { verifyAdminRequest } from '@/lib/auth/admin';
 
 export async function GET() {
+  if (!await verifyAdminRequest()) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     let dbOrdersList = await db.select().from(ordersTable);
     
@@ -74,6 +79,10 @@ export async function GET() {
 }
 
 export async function PUT(request: Request) {
+  if (!await verifyAdminRequest()) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const body = await request.json();
     const { orderId, orderData } = body;

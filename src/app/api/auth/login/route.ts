@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { generateAdminSessionToken, SESSION_COOKIE_NAME } from '@/lib/auth/admin';
 
 export async function POST(request: Request) {
   try {
@@ -11,21 +12,19 @@ export async function POST(request: Request) {
     const inputUser = (username || '').toLowerCase().trim();
     const inputPass = (password || '').trim();
 
-    // Check against Vercel environment variables first
     let isMatch = false;
 
+    // 1. Check against environment variables if configured
     if (envPass) {
       const isUserMatch = !envUser || inputUser === envUser.toLowerCase().trim() || inputUser === 'admin';
       const isPassMatch = inputPass === envPass.trim();
       if (isUserMatch && isPassMatch) {
         isMatch = true;
       }
-    }
-
-    // Fallback checks for local development or default access
-    if (!isMatch) {
+    } else {
+      // 2. Fallback check for local development / demo only when no env pass is set
       const validUsernames = ['admin', 'workshop', 'bedroom'];
-      const validPasswords = ['bedroom', 'bedroom123', 'admin', 'studio'];
+      const validPasswords = ['bedroom123', 'admin', 'studio'];
       
       const isUserValid = !inputUser || validUsernames.includes(inputUser);
       const isPassValid = validPasswords.includes(inputPass);
@@ -36,9 +35,11 @@ export async function POST(request: Request) {
     }
 
     if (isMatch) {
+      const sessionToken = generateAdminSessionToken();
       const response = NextResponse.json({ success: true });
-      response.cookies.set('hq_auth_token', 'authenticated', {
-        httpOnly: false,
+      response.cookies.set(SESSION_COOKIE_NAME, sessionToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
         path: '/',
         maxAge: 60 * 60 * 24 * 7,
         sameSite: 'lax',
