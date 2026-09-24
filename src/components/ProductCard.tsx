@@ -19,13 +19,18 @@ export default function ProductCard({ product, index }) {
 
   return (
     <motion.article
-      initial={{ opacity: 0, y: 24 }}
+      initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.05 }}
-      whileHover={isUnavailable ? {} : { rotate: tiltAngle, scale: 1.01 }}
-      whileTap={isUnavailable ? {} : { rotate: tiltAngle * 1.4, scale: 0.99 }}
+      transition={{
+        opacity: { duration: 0.3, delay: index * 0.03 },
+        y: { duration: 0.3, delay: index * 0.03 },
+        rotate: { type: 'spring', stiffness: 520, damping: 24, mass: 0.4 },
+        scale: { type: 'spring', stiffness: 520, damping: 24, mass: 0.4 },
+      }}
+      whileHover={isUnavailable ? {} : { rotate: tiltAngle, scale: 1.012 }}
+      whileTap={isUnavailable ? {} : { rotate: tiltAngle * 1.5, scale: 0.985 }}
       onClick={() => !isUnavailable && router.push(`/product/${product.slug}`)}
-      className={`group relative overflow-hidden rounded-[2rem] border border-ink/15 bg-paper shadow-card transition-all duration-300 origin-center ${product.textureClass} ${isUnavailable ? 'cursor-default' : 'cursor-pointer'}`}
+      className={`group relative overflow-hidden rounded-[2rem] border border-ink/15 bg-paper shadow-card origin-center flex flex-col h-full ${product.textureClass} ${isUnavailable ? 'cursor-default' : 'cursor-pointer'}`}
     >
       {/* Coming Soon overlay for unavailable products */}
       {isUnavailable && (
@@ -37,7 +42,7 @@ export default function ProductCard({ product, index }) {
       )}
 
       {/* Blur wrapper for unavailable cards */}
-      <div className={isUnavailable ? 'pointer-events-none select-none blur-[2px] grayscale-[40%] opacity-60' : ''}>
+      <div className={`flex flex-col flex-1 h-full ${isUnavailable ? 'pointer-events-none select-none blur-[2px] grayscale-[40%] opacity-60' : ''}`}>
       <button
         type="button"
         aria-label="Toggle wishlist"
@@ -52,7 +57,7 @@ export default function ProductCard({ product, index }) {
         <Heart className={`h-4 w-4 ${isWishlisted ? 'fill-current' : ''}`} />
       </button>
 
-      <div className={`relative h-72 overflow-hidden bg-gradient-to-br ${product.color} p-6`}>
+      <div className={`relative h-72 w-full shrink-0 overflow-hidden bg-gradient-to-br ${product.color} p-6`}>
         {product.image ? (
           <>
             <Image 
@@ -92,24 +97,20 @@ export default function ProductCard({ product, index }) {
         </div>
       </div>
 
-      <div className="space-y-4 p-6">
+      <div className="flex flex-1 flex-col justify-between p-6 min-h-[160px]">
         <div className="flex items-start justify-between gap-4">
           <div>
             <h3 className="font-display text-2xl font-bold leading-tight">{product.name}</h3>
-            <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-ink/65 font-mono">
-              {product.dimensions && <span>{product.dimensions.split('(')[0].trim()}</span>}
-              {product.materials?.[0] && (
-                <>
-                  <span className="opacity-35">✦</span>
-                  <span>{product.materials[0]}</span>
-                </>
-              )}
-            </div>
+            {product.materials?.[0] && (
+              <p className="mt-2 text-xs uppercase tracking-[0.16em] text-ink/55 font-mono">
+                {product.materials[0]}
+              </p>
+            )}
           </div>
-          <ArrowUpRight className="mt-1 h-5 w-5 text-ink/40 transition group-hover:text-ink" />
+          <ArrowUpRight className="mt-1 h-5 w-5 text-ink/40 transition group-hover:text-ink shrink-0" />
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
+        <div className="mt-6 grid gap-3 sm:grid-cols-[1fr_auto]">
           <button
             type="button"
             disabled={isUnavailable}
