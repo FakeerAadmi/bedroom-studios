@@ -15,16 +15,17 @@ export default function ProductCard({ product, index }) {
   const { addItem, toggleWishlist, wishlistIds } = useCart();
   const isWishlisted = wishlistIds.includes(product.id);
   const isUnavailable = product.price === null || product.price === undefined || product.adminStatus !== 'active' || product.stock <= 0;
-
+  const tiltAngle = index % 2 === 0 ? -1.8 : 1.8;
 
   return (
     <motion.article
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05 }}
-      whileHover={isUnavailable ? {} : { y: -10, rotate: -0.2 }}
+      whileHover={isUnavailable ? {} : { rotate: tiltAngle, scale: 1.01 }}
+      whileTap={isUnavailable ? {} : { rotate: tiltAngle * 1.4, scale: 0.99 }}
       onClick={() => !isUnavailable && router.push(`/product/${product.slug}`)}
-      className={`group relative overflow-hidden rounded-[2rem] border border-ink/15 bg-paper shadow-card transition ${product.textureClass} ${isUnavailable ? 'cursor-default' : 'cursor-pointer'}`}
+      className={`group relative overflow-hidden rounded-[2rem] border border-ink/15 bg-paper shadow-card transition-all duration-300 origin-center ${product.textureClass} ${isUnavailable ? 'cursor-default' : 'cursor-pointer'}`}
     >
       {/* Coming Soon overlay for unavailable products */}
       {isUnavailable && (
@@ -95,6 +96,15 @@ export default function ProductCard({ product, index }) {
         <div className="flex items-start justify-between gap-4">
           <div>
             <h3 className="font-display text-2xl font-bold leading-tight">{product.name}</h3>
+            <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-ink/65 font-mono">
+              {product.dimensions && <span>{product.dimensions.split('(')[0].trim()}</span>}
+              {product.materials?.[0] && (
+                <>
+                  <span className="opacity-35">✦</span>
+                  <span>{product.materials[0]}</span>
+                </>
+              )}
+            </div>
           </div>
           <ArrowUpRight className="mt-1 h-5 w-5 text-ink/40 transition group-hover:text-ink" />
         </div>
@@ -113,7 +123,7 @@ export default function ProductCard({ product, index }) {
                 : 'border-ink bg-ink text-paper hover:scale-[1.01] hover:bg-accent'
             }`}
           >
-            {product.stock <= 0 ? 'Sold out' : product.price === null || product.price === undefined ? 'Soon' : index % 2 === 0 ? 'Add to cart' : 'Take one home'}
+            {isUnavailable ? 'Coming soon' : 'Request Sample'}
           </button>
           <button
             type="button"

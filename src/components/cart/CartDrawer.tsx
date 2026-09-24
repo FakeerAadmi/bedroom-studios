@@ -8,7 +8,6 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Minus, Plus, X } from 'lucide-react';
 import Link from 'next/link';
 import { useCart } from '../../context/CartContext';
-import { formatPrice } from '../../utils';
 
 export default function CartDrawer() {
   const {
@@ -74,13 +73,13 @@ export default function CartDrawer() {
                     <div className="flex items-start justify-between gap-4">
                       <div>
                         <p className="font-display text-lg font-semibold">{item.name}</p>
-                        <p className="text-sm text-ink/60">{formatPrice(item.price)}</p>
+                        <p className="text-sm text-ink/60">{item.family || 'Studio Object'}</p>
                       </div>
                       <button
                         onClick={() => removeItem(item.id)}
                         className="text-sm text-ink/60 transition hover:text-ink"
                       >
-                        Dump it
+                        Remove
                       </button>
                     </div>
 
@@ -94,7 +93,9 @@ export default function CartDrawer() {
                           <Plus className="h-4 w-4" />
                         </button>
                       </div>
-                      <p className="font-medium">{formatPrice(item.price * item.quantity)}</p>
+                      <span className="rounded-full border border-ink/15 px-3 py-1 text-xs font-mono uppercase tracking-wider text-ink/70">
+                        Sample Unit
+                      </span>
                     </div>
                   </div>
                 ))
@@ -129,15 +130,15 @@ export default function CartDrawer() {
             {items.length > 0 && (
               <div className="border-t border-ink/10 px-6 py-5">
                 <div className="mb-4 flex items-center justify-between text-sm">
-                  <span className="text-ink/60">Subtotal</span>
-                  <span className="font-semibold">{formatPrice(subtotal)}</span>
+                  <span className="text-ink/60">Sample Batch Total</span>
+                  <span className="font-semibold">{items.reduce((acc, i) => acc + i.quantity, 0)} {items.reduce((acc, i) => acc + i.quantity, 0) === 1 ? 'Object' : 'Objects'}</span>
                 </div>
                 <Link
-                  href="/checkout"
+                  href="/commissions"
                   onClick={() => setIsCartOpen(false)}
                   className="block rounded-full bg-ink px-5 py-3 text-center font-medium text-paper transition hover:scale-[1.01]"
                 >
-                  Checkout Safely
+                  Inquire Studio Batch
                 </Link>
               </div>
             )}

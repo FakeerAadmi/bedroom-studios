@@ -170,7 +170,7 @@ export default function ProductPurchaseCard({ product }) {
         >
           <ShoppingBag className="h-4 w-4 shrink-0" />
           <span className="whitespace-nowrap">
-            {product.stock <= 0 ? 'Currently sold out' : product.price === null || product.price === undefined ? 'Coming soon' : 'Add to cart'}
+            {isUnavailable ? 'Preview / Unavailable' : 'Request Studio Sample'}
           </span>
         </button>
         <Link

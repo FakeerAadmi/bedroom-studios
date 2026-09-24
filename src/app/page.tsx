@@ -71,13 +71,13 @@ export default function HomePage() {
               cement pieces that are essentially handmade, small-batch, and full of more point of
               view than mass-produced setups usually bother with.
             </p>
-            <Link
-              href="/shop"
-              className="mt-8 inline-flex items-center gap-3 rounded-full bg-accent px-6 py-3 font-medium text-white transition hover:scale-[1.01]"
+            <a
+              href="#showcase"
+              className="mt-8 inline-flex items-center gap-3 rounded-full bg-accent px-6 py-3 font-medium text-white transition hover:scale-[1.02] cursor-pointer"
             >
               Explore the Stash
               <ArrowRight className="h-4 w-4" />
-            </Link>
+            </a>
           </div>
 
           <HomeHeroMotion />
@@ -186,7 +186,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 pb-14 md:px-8 md:pb-24">
+      <section id="showcase" className="mx-auto max-w-7xl px-4 pb-14 md:px-8 md:pb-24 scroll-mt-24">
         <div className="flex items-end justify-between gap-6 mb-12">
           <div className="max-w-2xl">
             <p className="text-sm uppercase tracking-[0.25em] text-ink/50">Curated Showcase</p>
