@@ -4,6 +4,7 @@ import Link from 'next/link';
 import PageShell from '@/components/PageShell';
 import HomeHeroMotion from '@/components/home/HomeHeroMotion';
 import DropCountdown from '@/components/home/DropCountdown';
+import ProductCard from '@/components/ProductCard';
 import { productCategories, fandomCollections } from '@/data/catalog';
 import { Metadata } from 'next';
 
@@ -186,34 +187,35 @@ export default function HomePage() {
       </section>
 
       <section className="mx-auto max-w-7xl px-4 pb-14 md:px-8 md:pb-24">
-        <div className="flex items-end justify-between gap-6">
+        <div className="flex items-end justify-between gap-6 mb-12">
           <div className="max-w-2xl">
-            <p className="text-sm uppercase tracking-[0.25em] text-ink/50">Browse by category</p>
+            <p className="text-sm uppercase tracking-[0.25em] text-ink/50">Curated Showcase</p>
             <h2 className="mt-4 font-editorial text-4xl leading-tight md:text-5xl">
-              Built in families, not just random product tiles.
+              Desk lamps &amp; workspace objects.
             </h2>
           </div>
           <Link href="/shop" className="hidden rounded-full border border-ink px-5 py-3 text-sm font-medium md:inline-flex">
-            See all categories
+            View full shop
           </Link>
         </div>
 
-        <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {liveCategories.map((category, index) => (
-            <Link
-              key={category.id}
-              href={`/shop#${category.id}`}
-              className={`block rounded-[2.2rem] border border-ink/15 p-6 transition hover:-translate-y-1 hover:shadow-card ${
-                index % 3 === 0 ? 'bg-[#f4f1ea]' : index % 3 === 1 ? 'bg-[#edf4ff]' : 'bg-paper'
-              }`}
-            >
-              <p className="text-sm uppercase tracking-[0.25em] text-ink/45">{category.eyebrow}</p>
-              <h3 className="mt-3 font-editorial text-3xl leading-tight">{category.name}</h3>
-              <p className="mt-4 text-ink/70">{category.description}</p>
-              <p className="mt-5 rounded-[1.4rem] border border-ink/10 bg-white/70 p-4 text-sm text-ink/65">
-                {category.note}
-              </p>
-            </Link>
+        <div className="space-y-16">
+          {liveCategories.map((category) => (
+            <div key={category.id} id={category.id} className="space-y-6">
+              <div className="flex flex-col md:flex-row md:items-baseline justify-between border-b border-ink/15 pb-4 gap-2">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.25em] text-ink/45">{category.eyebrow}</p>
+                  <h3 className="text-3xl font-editorial font-bold text-ink mt-1">{category.name}</h3>
+                </div>
+                <p className="text-sm text-ink/60 max-w-md">{category.description}</p>
+              </div>
+
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {category.products?.map((product, pIndex) => (
+                  <ProductCard key={product.id} product={product} index={pIndex} />
+                ))}
+              </div>
+            </div>
           ))}
         </div>
       </section>

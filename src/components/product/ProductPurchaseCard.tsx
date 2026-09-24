@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { Heart, ShoppingBag, Share2 } from 'lucide-react';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
-import { formatPrice } from '@/utils';
 import DropCountdown from '@/components/home/DropCountdown';
 
 export default function ProductPurchaseCard({ product }) {
@@ -56,11 +55,11 @@ export default function ProductPurchaseCard({ product }) {
     <div className="order-5 lg:order-none rounded-[2rem] border border-ink/15 bg-white/65 p-6 shadow-card">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="font-display text-3xl font-bold">{formatPrice(product.price)}</p>
+          <h2 className="font-display text-3xl font-bold">{product.name}</h2>
           <p className="mt-2 text-sm text-ink/60">{product.description}</p>
           <div className="mt-4 flex flex-wrap gap-2 text-[11px] uppercase tracking-[0.18em] text-ink/55">
             <span className="rounded-full border border-ink/10 px-3 py-1">{product.family}</span>
-            <span className="rounded-full border border-ink/10 px-3 py-1">{product.stock <= 0 ? 'Out of stock' : `${product.stock} ready to ship`}</span>
+            <span className="rounded-full border border-ink/10 px-3 py-1">{isUnavailable ? 'Preview / Unavailable' : 'Made to Order'}</span>
           </div>
         </div>
         <div className="flex gap-2 shrink-0">

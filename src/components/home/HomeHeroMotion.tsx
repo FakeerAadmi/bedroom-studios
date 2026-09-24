@@ -18,8 +18,8 @@ export default function HomeHeroMotion() {
         <div className="flex justify-end">
           <div className="relative h-72 w-full max-w-[320px] bg-transparent">
             <Image
-              src="/images/brutalist-cement-desk-lamp.png"
-              alt="Brutalist Cement Desk Lamp"
+              src="/images/lamps/modern-ribbed-led-lamp.png"
+              alt="Modern Ribbed LED Lamp"
               fill
               className="object-contain object-right-top mix-blend-multiply"
               priority
@@ -27,9 +27,9 @@ export default function HomeHeroMotion() {
           </div>
         </div>
         <div>
-          <p className="text-sm uppercase tracking-[0.25em] text-ink/55">Flagship weirdness</p>
+          <p className="text-sm uppercase tracking-[0.25em] text-ink/55">Desk Lighting</p>
           <p className="mt-3 max-w-sm font-editorial text-3xl">
-            The lamp that says, &quot;Yes, I do own a mood board.&quot;
+            Modern Ribbed LED Lamp with soothing ambient halo.
           </p>
         </div>
       </div>
