@@ -8,27 +8,49 @@ import { motion } from 'framer-motion';
 import { ArrowUpRight, Heart } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { useCart } from '../context/CartContext';
 
 export default function ProductCard({ product, index }) {
   const router = useRouter();
   const { addItem, toggleWishlist, wishlistIds } = useCart();
+  const [isThudding, setIsThudding] = useState(false);
   const isWishlisted = wishlistIds.includes(product.id);
   const isUnavailable = product.price === null || product.price === undefined || product.adminStatus !== 'active' || product.stock <= 0;
   const tiltAngle = index % 2 === 0 ? -1.8 : 1.8;
 
+  const badgePrimaryVariants = {
+    initial: { rotate: 0 },
+    hover: {
+      rotate: [0, -tiltAngle * 2.8, tiltAngle * 1.8, -tiltAngle * 0.8, 0],
+      transition: { duration: 0.5, ease: "easeOut" as const, delay: 0.03 }
+    }
+  };
+
+  const badgeSecondaryVariants = {
+    initial: { rotate: 0 },
+    hover: {
+      rotate: [0, tiltAngle * 2.2, -tiltAngle * 1.4, 0],
+      transition: { duration: 0.55, ease: "easeOut" as const, delay: 0.08 }
+    }
+  };
+
   return (
     <motion.article
       initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{
-        opacity: { duration: 0.3, delay: index * 0.03 },
-        y: { duration: 0.3, delay: index * 0.03 },
-        rotate: { type: 'spring', stiffness: 520, damping: 24, mass: 0.4 },
-        scale: { type: 'spring', stiffness: 520, damping: 24, mass: 0.4 },
-      }}
-      whileHover={isUnavailable ? {} : { rotate: tiltAngle, scale: 1.012 }}
-      whileTap={isUnavailable ? {} : { rotate: tiltAngle * 1.5, scale: 0.985 }}
+      animate={isThudding ? { y: [0, 8, -2, 0], scale: [1, 0.982, 1.006, 1] } : { opacity: 1, y: 0 }}
+      transition={
+        isThudding
+          ? { duration: 0.28, ease: "easeOut" }
+          : {
+              opacity: { duration: 0.3, delay: index * 0.03 },
+              y: { duration: 0.3, delay: index * 0.03 },
+              rotate: { type: 'spring', stiffness: 520, damping: 24, mass: 0.4 },
+              scale: { type: 'spring', stiffness: 520, damping: 24, mass: 0.4 },
+            }
+      }
+      whileHover={isUnavailable || isThudding ? {} : { rotate: tiltAngle, scale: 1.012 }}
+      whileTap={isUnavailable || isThudding ? {} : { rotate: tiltAngle * 1.5, scale: 0.985 }}
       onClick={() => !isUnavailable && router.push(`/product/${product.slug}`)}
       className={`group relative overflow-hidden rounded-[2rem] border border-ink/15 bg-paper shadow-card origin-center flex flex-col h-full ${product.textureClass} ${isUnavailable ? 'cursor-default' : 'cursor-pointer'}`}
     >
@@ -78,12 +100,18 @@ export default function ProductCard({ product, index }) {
         <div className="relative flex h-full items-end justify-between z-[2]">
           <div>
             <div className="flex flex-wrap gap-2">
-              <span className={`rounded-full border px-3 py-1 text-xs uppercase tracking-[0.2em] font-medium ${product.image ? 'bg-black/60 text-white border-white/20 backdrop-blur-sm' : 'bg-white/80 text-ink border-ink/15'}`}>
+              <motion.span
+                variants={badgePrimaryVariants}
+                className={`rounded-full border px-3 py-1 text-xs uppercase tracking-[0.2em] font-medium origin-top-left inline-block select-none ${product.image ? 'bg-black/60 text-white border-white/20 backdrop-blur-sm' : 'bg-white/80 text-ink border-ink/15'}`}
+              >
                 {product.label}
-              </span>
-              <span className={`rounded-full border px-3 py-1 text-[10px] uppercase tracking-[0.18em] ${product.image ? 'bg-black/40 text-white/80 border-white/10 backdrop-blur-sm' : 'bg-white/70 text-ink/65 border-ink/10'}`}>
+              </motion.span>
+              <motion.span
+                variants={badgeSecondaryVariants}
+                className={`rounded-full border px-3 py-1 text-[10px] uppercase tracking-[0.18em] origin-top-left inline-block select-none ${product.image ? 'bg-black/40 text-white/80 border-white/10 backdrop-blur-sm' : 'bg-white/70 text-ink/65 border-ink/10'}`}
+              >
                 {product.family}
-              </span>
+              </motion.span>
             </div>
             {!product.image && (
               <p className="mt-4 max-w-[14rem] text-sm text-ink/80 font-medium transition duration-300 group-hover:translate-y-1">
@@ -111,23 +139,35 @@ export default function ProductCard({ product, index }) {
         </div>
 
         <div className="mt-6 grid gap-3 sm:grid-cols-[1fr_auto]">
-          <button
+          <motion.button
             type="button"
             disabled={isUnavailable}
+            whileHover={isUnavailable ? {} : { scale: 1.02 }}
+            whileTap={isUnavailable ? {} : { 
+              scale: 0.94, 
+              y: 4, 
+              transition: { type: "spring", stiffness: 700, damping: 15 } 
+            }}
             onClick={(event) => {
               event.stopPropagation();
-              addItem(product);
+              if (!isUnavailable) {
+                setIsThudding(true);
+                setTimeout(() => setIsThudding(false), 300);
+                addItem(product);
+              }
             }}
-            className={`rounded-full border px-5 py-3 text-sm font-medium transition ${
+            className={`rounded-full border px-5 py-3 text-sm font-medium transition-colors ${
               isUnavailable
                 ? 'border-ink/10 bg-ink/5 text-ink/30 cursor-not-allowed'
-                : 'border-ink bg-ink text-paper hover:scale-[1.01] hover:bg-accent'
+                : 'border-ink bg-ink text-paper hover:bg-accent'
             }`}
           >
             {isUnavailable ? 'Coming soon' : 'Request Sample'}
-          </button>
-          <button
+          </motion.button>
+          <motion.button
             type="button"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.96 }}
             onClick={(event) => {
               event.stopPropagation();
               router.push(`/product/${product.slug}`);
@@ -135,7 +175,7 @@ export default function ProductCard({ product, index }) {
             className="rounded-full border border-ink px-5 py-3 text-sm font-medium transition hover:border-accent hover:text-accent"
           >
             Details
-          </button>
+          </motion.button>
         </div>
       </div>
       </div>
