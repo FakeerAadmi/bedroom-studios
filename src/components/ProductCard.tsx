@@ -9,14 +9,13 @@ import { ArrowUpRight, Heart } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useCart } from '../context/CartContext';
-import { formatPrice } from '../utils';
 
 export default function ProductCard({ product, index }) {
   const router = useRouter();
   const { addItem, toggleWishlist, wishlistIds } = useCart();
   const isWishlisted = wishlistIds.includes(product.id);
   const isUnavailable = product.price === null || product.price === undefined || product.adminStatus !== 'active' || product.stock <= 0;
-  const stockLabel = product.stock <= 0 ? 'Out of stock' : product.stock <= 5 ? `Low stock · ${product.stock} left` : `${product.stock} in stock`;
+
 
   return (
     <motion.article
@@ -96,10 +95,6 @@ export default function ProductCard({ product, index }) {
         <div className="flex items-start justify-between gap-4">
           <div>
             <h3 className="font-display text-2xl font-bold leading-tight">{product.name}</h3>
-            <p className="mt-2 text-sm text-ink/60">{isUnavailable && product.price === null ? '—' : formatPrice(product.price)}</p>
-            <p className={`mt-2 text-xs uppercase tracking-[0.18em] ${product.stock <= 5 ? 'text-[#9a4f1e]' : 'text-ink/45'}`}>
-              {isUnavailable && product.adminStatus === 'draft' ? 'Coming soon' : stockLabel}
-            </p>
           </div>
           <ArrowUpRight className="mt-1 h-5 w-5 text-ink/40 transition group-hover:text-ink" />
         </div>
