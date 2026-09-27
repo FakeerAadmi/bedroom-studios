@@ -6,17 +6,22 @@ import Navbar from '../Navbar';
 import ScrollToTop from '../ScrollToTop';
 import Toast from '../Toast';
 import { useStoreState } from '../../context/StoreContext';
+import { useLampState } from '../../context/LampContext';
 import { usePathname } from 'next/navigation';
 
 export default function StoreLayoutClientWrapper({ children }) {
   const { settings } = useStoreState();
+  const { isLit } = useLampState();
   const pathname = usePathname();
 
   const isHQ = pathname?.startsWith('/hq');
-  // Auth pages are full-screen splits — no navbar or footer needed
   const isAuthPage = pathname === '/account/login' || pathname === '/account/signup' || pathname === '/account/reset-password';
   const isChrome = isHQ || isAuthPage;
   const showMaintenance = settings?.maintenanceMode && !isChrome;
+
+  // On the home page, hide the header until the lamp is switched on
+  const isHomePage = pathname === '/';
+  const hideHeader = isHomePage && !isLit;
 
   if (showMaintenance) {
     return (
@@ -30,13 +35,27 @@ export default function StoreLayoutClientWrapper({ children }) {
   return (
     <>
       {settings?.announcementBanner && !isChrome && (
-        <div className="bg-ink text-paper py-2 px-4 text-center text-[10px] font-bold uppercase tracking-widest relative z-50">
+        <div
+          className={`bg-ink text-paper py-2 px-4 text-center text-[10px] font-bold uppercase tracking-widest relative z-50 transition-all duration-1000 ease-out ${
+            hideHeader ? 'opacity-0 -translate-y-full pointer-events-none' : 'opacity-100 translate-y-0'
+          }`}
+        >
           {settings.announcementBanner}
         </div>
       )}
 
       <ScrollToTop />
-      {!isChrome && <Navbar />}
+      {!isChrome && (
+        <div
+          className={`transition-all duration-1000 ease-out ${
+            hideHeader
+              ? 'opacity-0 -translate-y-full pointer-events-none absolute top-0 left-0 right-0'
+              : 'opacity-100 translate-y-0'
+          }`}
+        >
+          <Navbar />
+        </div>
+      )}
       <CartDrawer />
       <Toast />
       <main>{children}</main>

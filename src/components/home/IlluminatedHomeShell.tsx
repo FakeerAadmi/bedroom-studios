@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { ChevronRight, ArrowRight } from 'lucide-react';
 import PullChainLampHero from './PullChainLampHero';
+import { useLampState } from '../../context/LampContext';
 import StudioWorkbench from './StudioWorkbench';
 import ProductCard from '@/components/ProductCard';
 import {
@@ -128,9 +129,10 @@ const testimonials = [
 ];
 
 export default function IlluminatedHomeShell({ allProducts }: { allProducts: any[] }) {
-  // Starts strictly turned OFF
-  const [isLit, setIsLit] = useState(false);
+  // Lamp state from context (shared with layout for header visibility)
+  const { isLit, setIsLit } = useLampState();
   const [hasUnlockedScroll, setHasUnlockedScroll] = useState(false);
+  const activateLampRef = useRef<(() => void) | null>(null);
 
   const deskLamps = allProducts.filter((p) => p.categoryId === 'desk-lamps');
   const cementware = allProducts.filter((p) => p.categoryId === 'cementware');
@@ -178,6 +180,45 @@ export default function IlluminatedHomeShell({ allProducts }: { allProducts: any
     }
   }, [isLit]);
 
+  // 4-second inactivity auto-activation when lamp is still OFF
+  useEffect(() => {
+    if (isLit) return; // Already lit, no timer needed
+
+    let timeoutId: NodeJS.Timeout;
+
+    const startTimer = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        // Trigger the same activation as manual chain pull
+        if (activateLampRef.current) {
+          activateLampRef.current();
+        } else {
+          setIsLit(true);
+        }
+      }, 4000);
+    };
+
+    const resetTimer = () => {
+      clearTimeout(timeoutId);
+      startTimer();
+    };
+
+    // Start initial timer
+    startTimer();
+
+    // Activity events that reset the timer
+    const events: (keyof WindowEventMap)[] = [
+      'mousemove', 'pointermove', 'pointerdown',
+      'touchstart', 'touchmove', 'keydown', 'scroll',
+    ];
+    events.forEach((evt) => window.addEventListener(evt, resetTimer, { passive: true }));
+
+    return () => {
+      clearTimeout(timeoutId);
+      events.forEach((evt) => window.removeEventListener(evt, resetTimer));
+    };
+  }, [isLit, setIsLit]);
+
   return (
     <div className="min-h-screen bg-[#090a0f] text-white/90">
       {/* ── 1. PULL CHAIN LAMP HERO (Solid black background, zero text, only lamp and downward light) ── */}
@@ -185,6 +226,7 @@ export default function IlluminatedHomeShell({ allProducts }: { allProducts: any
         isLit={isLit}
         setIsLit={setIsLit}
         onLitComplete={() => setHasUnlockedScroll(true)}
+        activateLampRef={activateLampRef}
       />
 
       {/* ── 2. ILLUMINATED WEBSITE CONTENT (Lit up by the downward light) ── */}
