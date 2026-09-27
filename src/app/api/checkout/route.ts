@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/db';
-import { orders, orderItems, payments } from '@/db/schema';
-import { PaymentService } from '@/lib/payments/razorpay';
+import { orders, orderItems } from '@/db/schema';
 import { allProductsById, allProducts } from '@/data/catalog';
 import { sendOrderNotification } from '@/lib/discord';
 import { v4 as uuidv4 } from 'uuid';
@@ -9,7 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { customerName, email, cartItems } = body;
+    const { customerName, email, phone, address, pincode, state, orderNotes, cartItems } = body;
 
     if (!cartItems || !Array.isArray(cartItems) || cartItems.length === 0) {
       return NextResponse.json({ success: false, message: 'Cart is empty' }, { status: 400 });
@@ -18,7 +17,7 @@ export async function POST(request: Request) {
     // Generate unique 6-digit order ID prefixed with BS-
     const orderId = `BS-${Math.floor(100000 + Math.random() * 900000)}`;
 
-    // Calculate verified total on the server to prevent price tampering
+    // Calculate verified total on the server
     let calculatedTotal = 0;
     const validatedCartItems = cartItems.map((item: any) => {
       const catalogProduct = allProductsById[item.id] || allProducts.find((p: any) => p.id === Number(item.id) || p.slug === item.slug);
@@ -34,67 +33,60 @@ export async function POST(request: Request) {
 
     const orderTotal = calculatedTotal;
 
+    const fullAddress = typeof address === 'string'
+      ? [address, pincode, state].filter(Boolean).join(', ')
+      : address;
+
     // Create DB Order
-    const dbOrder = await db.insert(orders).values({
-      id: uuidv4(),
-      orderNumber: orderId,
-      profileId: null, // Guest checkout for now
-      email: email || 'guest@example.com',
-      shippingAddress: { name: customerName || 'Guest' },
-      subtotal: Math.round(orderTotal).toString(),
-      shippingFee: '0',
-      total: Math.round(orderTotal).toString(),
-      status: 'pending',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    }).returning({ id: orders.id });
-    
-    const dbOrderId = dbOrder[0].id;
-
-    // Insert order items
-    for (const item of validatedCartItems) {
-      await db.insert(orderItems).values({
-        id: uuidv4(),
-        orderId: dbOrderId,
-        productVariantId: item.id || uuidv4(),
-        quantity: item.quantity,
-        priceAtTime: item.price.toString(),
-        createdAt: new Date(),
-      });
-    }
-
-    // Create Razorpay Order
-    let razorpayOrderId: string | null = null;
+    let dbOrderId: string | null = null;
     try {
-      const rpOrder = await PaymentService.createOrder(orderTotal, orderId);
-      razorpayOrderId = rpOrder.id;
+      const dbOrder = await db.insert(orders).values({
+        id: uuidv4(),
+        orderNumber: orderId,
+        profileId: null, // Guest or authenticated checkout
+        email: email || 'guest@example.com',
+        shippingAddress: {
+          name: customerName || 'Guest Client',
+          phone: phone || '',
+          street: address || '',
+          pincode: pincode || '',
+          state: state || '',
+        },
+        subtotal: Math.round(orderTotal).toString(),
+        shippingFee: '0',
+        total: Math.round(orderTotal).toString(),
+        status: 'pending',
+        notes: orderNotes || '',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }).returning({ id: orders.id });
       
-      // Update payment record with razorpay ID
-      try {
-        await db.insert(payments).values({
-          id: uuidv4(),
-          orderId: dbOrderId,
-          razorpayOrderId: razorpayOrderId,
-          amount: Math.round(orderTotal).toString(),
-          method: 'upi',
-          status: 'pending',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        });
-      } catch (dbError) {
-        console.warn('Could not insert Razorpay payment into DB. Continuing with mock flow.', dbError);
+      dbOrderId = dbOrder[0]?.id || null;
+
+      // Insert order items
+      if (dbOrderId) {
+        for (const item of validatedCartItems) {
+          await db.insert(orderItems).values({
+            id: uuidv4(),
+            orderId: dbOrderId,
+            productVariantId: item.id || uuidv4(),
+            quantity: item.quantity,
+            priceAtTime: item.price.toString(),
+            createdAt: new Date(),
+          });
+        }
       }
-    } catch (e) {
-      console.warn('Could not create Razorpay order, continuing with mock flow.', e);
+    } catch (dbErr) {
+      console.warn('Database order insert skipped or failed:', dbErr);
     }
 
-    // Notify Discord Orders channel
+    // Notify Discord Orders webhook
     try {
       await sendOrderNotification({
         orderId,
-        customerName: customerName || 'Guest Client',
-        email: email || 'guest@bedroomstudios.store',
-        phone: body.phone,
+        customerName: customerName || 'Studio Client',
+        email: email || 'client@bedroomstudios.store',
+        phone: phone || '',
         items: validatedCartItems.map((item: any) => ({
           name: item.name || 'Studio Object',
           quantity: item.quantity,
@@ -103,8 +95,8 @@ export async function POST(request: Request) {
           material: item.selectedMaterial,
         })),
         total: orderTotal,
-        address: body.shippingAddress || body.address,
-        notes: body.notes,
+        address: fullAddress,
+        notes: orderNotes,
       });
     } catch (discordErr) {
       console.warn('Discord order alert failed:', discordErr);
@@ -113,11 +105,11 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       orderCode: orderId,
-      razorpayOrderId: razorpayOrderId,
-      total: orderTotal
+      total: orderTotal,
+      message: 'Made-to-order request received successfully'
     });
   } catch (error) {
-    console.error('Checkout error (falling back to mock):', error);
+    console.error('Checkout error:', error);
     return NextResponse.json({ 
       success: true, 
       orderCode: `BS-${Math.floor(100000 + Math.random() * 900000)}`,

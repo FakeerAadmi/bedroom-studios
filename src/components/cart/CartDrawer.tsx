@@ -134,11 +134,11 @@ export default function CartDrawer() {
                   <span className="font-semibold">{items.reduce((acc, i) => acc + i.quantity, 0)} {items.reduce((acc, i) => acc + i.quantity, 0) === 1 ? 'Object' : 'Objects'}</span>
                 </div>
                 <Link
-                  href="/commissions"
+                  href="/checkout"
                   onClick={() => setIsCartOpen(false)}
-                  className="block rounded-full bg-ink px-5 py-3 text-center font-medium text-paper transition hover:scale-[1.01]"
+                  className="block rounded-full bg-ink px-5 py-3 text-center font-medium text-paper transition hover:bg-accent hover:scale-[1.01]"
                 >
-                  Inquire Studio Batch
+                  Proceed to Request Order
                 </Link>
               </div>
             )}

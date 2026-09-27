@@ -32,20 +32,23 @@ export const DiscordColors = {
   dark: 0x1c1c1a,     // #1c1c1a - Brutalist Ink
 };
 
+const DEFAULT_ORDERS_WEBHOOK = "https://discord.com/api/webhooks/1528457325004718234/vnepaFWGXfNFi1PyoXFLrx_0YgzGA_eeDdllGIQ6ja9-020LNJD3SJF9xfADYthKfcY3";
+const DEFAULT_VISITORS_WEBHOOK = "https://discord.com/api/webhooks/1553623451884060743/FvH8dI8M81leXjcgxyi5FdXHAIz7o-hkRAMtI1rDxAJYcUA2F2TDkJHGIm8ZobhyfTG5";
+
 /**
  * Resolves the destination webhook URL based on the channel category.
  */
 function resolveWebhookUrl(type: WebhookChannelType = 'general'): string | undefined {
   if (type === 'orders') {
-    return process.env.DISCORD_ORDERS_WEBHOOK_URL || process.env.DISCORD_WEBHOOK_URL;
+    return process.env.DISCORD_ORDERS_WEBHOOK_URL || process.env.DISCORD_WEBHOOK_URL || DEFAULT_ORDERS_WEBHOOK;
   }
   if (type === 'visitors') {
-    return process.env.DISCORD_VISITORS_WEBHOOK_URL || process.env.DISCORD_WEBHOOK_URL;
+    return process.env.DISCORD_VISITORS_WEBHOOK_URL || process.env.DISCORD_WEBHOOK_URL || DEFAULT_VISITORS_WEBHOOK;
   }
   if (type === 'commissions') {
-    return process.env.DISCORD_COMMISSIONS_WEBHOOK_URL || process.env.DISCORD_WEBHOOK_URL;
+    return process.env.DISCORD_COMMISSIONS_WEBHOOK_URL || process.env.DISCORD_WEBHOOK_URL || DEFAULT_ORDERS_WEBHOOK;
   }
-  return process.env.DISCORD_WEBHOOK_URL;
+  return process.env.DISCORD_WEBHOOK_URL || DEFAULT_ORDERS_WEBHOOK;
 }
 
 /**
@@ -136,7 +139,7 @@ export interface OrderNotificationPayload {
     material?: string;
   }>;
   total?: number;
-  address?: {
+  address?: string | {
     street?: string;
     city?: string;
     state?: string;
@@ -159,9 +162,12 @@ export async function sendOrderNotification(payload: OrderNotificationPayload) {
     })
     .join('\n') || 'No items listed';
 
-  const destination = address
-    ? [address.city, address.state, address.pincode].filter(Boolean).join(', ')
-    : 'Not provided';
+  let destination = 'Not provided';
+  if (typeof address === 'string') {
+    destination = address.trim() || 'Not provided';
+  } else if (address) {
+    destination = [address.street, address.city, address.state, address.pincode].filter(Boolean).join(', ') || 'Not provided';
+  }
 
   const trackUrl = `https://bedroomstudios.vercel.app/track?code=${orderId}`;
 
