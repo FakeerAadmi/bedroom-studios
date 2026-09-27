@@ -4,6 +4,7 @@ import Image from 'next/image';
 import PageShell from '@/components/PageShell';
 import ProductCard from '@/components/ProductCard';
 import ProductPurchaseCard from '@/components/product/ProductPurchaseCard';
+import ProductVisualViewer from '@/components/product/ProductVisualViewer';
 import { productCategories, fandomCollections } from '@/data/catalog';
 import { Metadata } from 'next';
 
@@ -166,79 +167,26 @@ export default async function ProductPage({ params }) {
 
   return (
     <PageShell className="mx-auto max-w-7xl px-4 py-10 md:px-8 md:py-16">
-      {/* ── Hero: gallery + product info ── */}
+      {/* ── Hero: vector schematic & photo dropdown + product info ── */}
       <section className="flex flex-col gap-6 lg:grid lg:grid-cols-[1.05fr_0.95fr] lg:gap-8">
-        {/* Left — gallery */}
-        <div className="contents lg:block lg:space-y-5">
-          <div className="order-1 flex flex-wrap gap-4 lg:order-none">
-            <span className="rounded-full border border-ink px-4 py-2 text-xs uppercase tracking-[0.25em]">
+        {/* Left — Minimal Vector Schematic & Collapsible Photo Dropdown */}
+        <div className="space-y-4">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="rounded-full border border-ink/20 bg-white/80 px-4 py-1.5 font-mono text-xs uppercase tracking-[0.25em] text-ink">
               {product!.categoryName}
             </span>
+            <span className="rounded-full border border-ink/15 bg-white/60 px-3 py-1.5 font-mono text-xs uppercase tracking-wider text-ink/60">
+              SKU: {product.sku || `BS-OBJ-${product.id}`}
+            </span>
             {product.limitedDrop ? (
-              <span className="collectible-pill rounded-full px-4 py-2 text-xs uppercase tracking-[0.25em]">
-                Limited drop
+              <span className="rounded-full bg-[#d4ff00] border border-ink px-4 py-1.5 font-mono text-xs uppercase tracking-[0.25em] text-ink font-semibold">
+                Batch Run
               </span>
             ) : null}
           </div>
 
-          <div className="order-2 lg:order-none">
-            <div className={`rounded-[2.8rem] border border-ink/15 p-6 ${product.panelClass}`}>
-              <div className={`relative min-h-[25rem] overflow-hidden rounded-[2.2rem] bg-gradient-to-br ${product.color} p-6 ${product.textureClass}`}>
-                {product.image ? (
-                  <Image 
-                    src={product.image} 
-                    alt={product!.name} 
-                    priority
-                    fill
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                    className="object-cover" 
-                  />
-                ) : (
-                  <>
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.75),transparent_45%)]" />
-                    <div className="relative flex h-full items-end">
-                      <div className="max-w-sm rounded-[1.6rem] border border-white/30 bg-white/65 p-4">
-                        <p className="text-xs uppercase tracking-[0.25em] text-ink/45">Hero placeholder</p>
-                        <p className="mt-2 text-sm text-ink/70">
-                          Drop your main product photo here later. The block is already doing the spacing job.
-                        </p>
-                      </div>
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div className="order-4 lg:order-none">
-            <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 lg:grid lg:overflow-x-visible lg:pb-0 scrollbar-hide">
-              {(product.gallery?.slice(1) ?? []).map((frame) => (
-                <div key={frame.label} className={`min-w-[85vw] snap-center lg:min-w-0 rounded-[2rem] border border-ink/15 p-4 relative overflow-hidden ${frame.className}`}>
-                  {frame.image ? (
-                    <>
-                      <Image 
-                        src={frame.image} 
-                        alt={frame.label} 
-                        fill
-                        sizes="(max-width: 1024px) 85vw, 33vw"
-                        className="object-cover" 
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-paper/90 via-paper/10 to-transparent z-[1]" />
-                      <div className="relative flex min-h-[12rem] flex-col justify-between rounded-[1.6rem] border border-white/20 bg-white/45 p-4 z-[2]">
-                        <div className="text-xs uppercase tracking-[0.25em] text-ink font-bold">{frame.label}</div>
-                        <p className="max-w-xs text-sm text-ink/90 font-medium leading-relaxed">{frame.caption}</p>
-                      </div>
-                    </>
-                  ) : (
-                    <div className="flex min-h-[12rem] flex-col justify-between rounded-[1.6rem] border border-white/30 bg-white/45 p-4">
-                      <div className="text-xs uppercase tracking-[0.25em] text-ink/45">{frame.label}</div>
-                      <p className="max-w-xs text-sm text-ink/70">{frame.caption}</p>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
+          {/* Interactive Vector Blueprint Viewer with Collapsible Photo Tray */}
+          <ProductVisualViewer product={product} />
         </div>
 
         {/* Right — product info + controls */}

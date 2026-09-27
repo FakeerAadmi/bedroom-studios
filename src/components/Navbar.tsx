@@ -133,6 +133,14 @@ export default function Navbar() {
               </span>
             </motion.button>
 
+            {/* Neon Chartreuse CTA */}
+            <Link
+              href="/checkout"
+              className="hidden md:inline-flex items-center gap-1.5 rounded-full border border-ink bg-[#d4ff00] px-4 py-2 font-mono text-xs font-bold uppercase tracking-wider text-ink shadow-sm transition hover:bg-ink hover:text-[#d4ff00]"
+            >
+              Request Order
+            </Link>
+
             {/* Animated hamburger */}
             <motion.button
               type="button"
