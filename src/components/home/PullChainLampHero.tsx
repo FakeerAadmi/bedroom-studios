@@ -119,15 +119,6 @@ export default function PullChainLampHero({ isLit, setIsLit, onLitComplete }: Pu
             />
           </div>
 
-          {/* Ambient Warm Glow Aura surrounding the shade when ON */}
-          <div
-            className={`absolute top-[6%] left-1/2 -translate-x-1/2 w-[90%] h-[55%] rounded-full pointer-events-none transition-opacity duration-1000 ${
-              isLit
-                ? 'opacity-85 bg-[radial-gradient(ellipse_at_center,rgba(255,200,100,0.5)_0%,rgba(235,130,80,0.3)_45%,transparent_75%)] blur-3xl'
-                : 'opacity-0'
-            }`}
-          />
-
           {/* ── 2. INTERACTIVE PHYSICAL PULL CHAIN WITH PENDULUM OSCILLATION ── */}
           {/* Positioned directly over the beaded chain from the generated artwork */}
           <div

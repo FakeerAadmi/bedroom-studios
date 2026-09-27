@@ -179,22 +179,18 @@ export default function IlluminatedHomeShell({ allProducts }: { allProducts: any
   }, [isLit]);
 
   return (
-    <div
-      className={`min-h-screen transition-colors duration-1000 ${
-        isLit ? 'bg-[#faf9f5] text-ink' : 'bg-[#090a0f] text-white/90'
-      }`}
-    >
-      {/* ── 1. PULL CHAIN LAMP HERO (Zero text prompt, strict lamp string interaction) ── */}
+    <div className="min-h-screen bg-[#090a0f] text-white/90">
+      {/* ── 1. PULL CHAIN LAMP HERO (Solid black background, zero text, only lamp and downward light) ── */}
       <PullChainLampHero
         isLit={isLit}
         setIsLit={setIsLit}
         onLitComplete={() => setHasUnlockedScroll(true)}
       />
 
-      {/* ── 2. ILLUMINATED WEBSITE CONTENT (Revealed by the downward light) ── */}
+      {/* ── 2. ILLUMINATED WEBSITE CONTENT (Lit up by the downward light) ── */}
       <div
         id="illuminated-content"
-        className={`relative transition-all duration-1000 ${
+        className={`relative transition-all duration-1000 bg-[#faf9f5] text-ink ${
           isLit
             ? 'opacity-100 filter-none pointer-events-auto'
             : 'opacity-0 filter-none pointer-events-none'
