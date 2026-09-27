@@ -43,15 +43,15 @@ export async function GET(request: Request) {
 
     if (type === 'visitor' || type === 'all') {
       await sendVisitorTelemetry({
-        path: '/product/modern-ribbed-led-lamp',
-        title: 'Modern Ribbed LED Lamp | Bedroom Studios',
+        path: '/product/modern-shoji-lamp',
+        title: 'Modern Shoji Lamp | Bedroom Studios',
         referrer: 'https://twitter.com',
         city: 'Mumbai',
         country: 'IN',
         region: 'MH',
         userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         intentAction: 'request_sample_intent',
-        productName: 'Modern Ribbed LED Lamp',
+        productName: 'Modern Shoji Lamp',
       });
       results.visitorTest = 'Dispatched visitor telemetry ping to Discord';
     }

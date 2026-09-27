@@ -127,28 +127,28 @@ export default function HomePage() {
           <div>
             <p className="text-sm uppercase tracking-[0.25em] text-ink/50">Featured study</p>
             <h2 className="mt-4 font-editorial text-4xl leading-tight md:text-5xl">
-              Modern Ribbed LED Lamp
+              Modern Shoji Lamp
             </h2>
           </div>
           <div className="grid gap-6 md:grid-cols-[1.1fr_0.9fr]">
             <div className="rounded-[2.3rem] border border-ink/15 bg-[#f4efe8] p-6 shadow-card">
-              <div className="flex h-full min-h-[22rem] flex-col justify-between rounded-[1.8rem] bg-[linear-gradient(180deg,rgba(255,255,255,0.4),rgba(255,180,80,0.12))] p-6">
+              <div className="flex h-full min-h-[22rem] flex-col justify-between rounded-[1.8rem] bg-[linear-gradient(180deg,rgba(255,255,255,0.4),rgba(255,210,140,0.18))] p-6">
                 <span className="w-fit rounded-full bg-paper/90 px-3 py-1 text-xs uppercase tracking-[0.25em]">
                   Desk Lighting
                 </span>
                 <p className="max-w-sm font-editorial text-3xl leading-tight">
-                  Vertical fluted ribs engineered to eliminate glare and cast soothing ambient warmth.
+                  Architectural timber lattice holding micro-textured washi diffusion panels around a dimmable LED core.
                 </p>
               </div>
             </div>
             <div className="flex flex-col justify-between rounded-[2.3rem] border border-ink/15 p-8">
               <p className="text-lg leading-relaxed text-ink/70">
-                Precision-printed with translucent diffusion PLA and powered by a low-voltage 5V USB
-                LED module. Built to sit quietly by your monitor or notebook, turning late-night focus sessions into a calm ritual.
+                Precision-printed with translucent washi-texture diffusion PETG and powered by a low-voltage 5V USB
+                LED module. Built to sit quietly by your workstation, turning late-night focus sessions into a calm ritual.
               </p>
               <div className="mt-8 flex items-center justify-between border-t border-ink/10 pt-5">
                 <span className="text-sm uppercase tracking-[0.25em] text-ink/55">Active Release</span>
-                <Link href="/product/modern-ribbed-led-lamp" className="font-display text-xl font-bold hover:text-accent transition">
+                <Link href="/product/modern-shoji-lamp" className="font-display text-xl font-bold hover:text-accent transition">
                   View →
                 </Link>
               </div>

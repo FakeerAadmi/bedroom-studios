@@ -107,49 +107,6 @@ const categoryDefinitions: CategoryDefinition[] = [
 const rawProducts: Record<string, Partial<Product>[]> = {
   'desk-lamps': [
     {
-      id: 1,
-      slug: 'modern-ribbed-led-lamp',
-      name: 'Modern Ribbed LED Lamp',
-      sku: 'BS-LMP-001',
-      family: 'Desk Lamps',
-      price: 1499,
-      image: '/images/lamps/modern-ribbed-led-lamp.png',
-      gallery: [
-        {
-          label: 'Warm Desk Glow',
-          caption: 'Vertical fluted fins transforming direct LED output into a soothing, gentle halo.',
-          className: 'bg-[linear-gradient(140deg,rgba(255,214,143,0.22),rgba(255,255,255,0.85))] texture-lines',
-          image: '/images/lamps/modern-ribbed-led-lamp.png',
-        },
-      ],
-      label: 'Desk Lamp',
-      description: 'A contemporary cylindrical table lamp featuring precision vertical fluted ribs that gently diffuse light from within, creating a warm, focused workspace glow without harsh hotspots.',
-      color: 'from-[#fef3dd] via-[#fff9ec] to-[#ffffff]',
-      materials: ['Translucent Diffusion PLA', 'Weighted Base Plinth', 'LED Lamp Kit-001 (5V USB)'],
-      dimensions: '110 mm diameter × 165 mm height',
-      care: 'Powered by a 5V USB LED module (Kit-001). Dust exterior fluted fins with a soft dry cloth. Do not expose to direct moisture.',
-      goodFor: ['Desk reading & deep work', 'Bedside ambient glow', 'Minimalist workstations'],
-      story: 'Optimized around the Bambu Lab LED Lamp Kit-001, the vertical fluting eliminates harsh point-source glare and casts a soft, rhythmic ambient luminance across the desk.',
-      comparison: [
-        ['Lighting Source', '5V USB Warm White LED Module'],
-        ['Shade Geometry', 'Precision Vertical Fluted Cylinder'],
-        ['Best Use', 'Monitor-side focus and nighttime reading'],
-      ],
-      releaseDate: '2026-09-01T18:00:00+05:30',
-      limitedDrop: false,
-      colors: ['Soft Warm White', 'Chalk Matte', 'Stone Mist'],
-      materialOptions: ['Diffusion PLA', 'Matte PETG'],
-      stock: 14,
-      adminStatus: 'active',
-      reviews: [
-        {
-          quote: 'The fluted ribs throw the softest, warmest light across my desk. Zero eye strain during late night coding.',
-          author: 'Vikram, Bengaluru',
-        },
-        ...defaultReviews,
-      ],
-    },
-    {
       id: 2,
       slug: 'road-lamp-v1',
       name: 'Road Lamp V1',

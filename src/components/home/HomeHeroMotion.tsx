@@ -18,8 +18,8 @@ export default function HomeHeroMotion() {
         <div className="flex justify-end">
           <div className="relative h-72 w-full max-w-[320px] bg-transparent">
             <Image
-              src="/images/lamps/modern-ribbed-led-lamp.png"
-              alt="Modern Ribbed LED Lamp"
+              src="/images/lamps/modern-shoji-lamp.png"
+              alt="Modern Shoji Lamp"
               fill
               className="object-contain object-right-top mix-blend-multiply"
               priority
@@ -29,7 +29,7 @@ export default function HomeHeroMotion() {
         <div>
           <p className="text-sm uppercase tracking-[0.25em] text-ink/55">Desk Lighting</p>
           <p className="mt-3 max-w-sm font-editorial text-3xl">
-            Modern Ribbed LED Lamp with soothing ambient halo.
+            Modern Shoji Lamp with soothing architectural washi glow.
           </p>
         </div>
       </div>
