@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, type MutableRefObject } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { motion, useAnimation, AnimatePresence } from 'framer-motion';
+import { motion, useAnimation } from 'framer-motion';
 
 /* ─────────────────────────── TYPES ─────────────────────────── */
 
@@ -14,164 +14,25 @@ interface PullChainLampHeroProps {
   activateLampRef?: MutableRefObject<(() => void) | null>;
 }
 
-/* ─────────────── SHELF OBJECTS (SVG + Navigation) ─────────── */
-
-interface ShelfObjectProps {
+interface ShelfObjectConfig {
+  id: string;
   href: string;
   label: string;
-  isLit: boolean;
-  children: React.ReactNode;
-  className?: string;
-  ariaLabel?: string;
+  ariaLabel: string;
+  imageSrc: string;
+  width: number;
+  height: number;
+  className: string;
+  distanceFromLamp: number; // 1 (closest) to 3 (farthest) for realistic light falloff
+  mobileVisible: boolean;
 }
 
-function ShelfObject({ href, label, isLit, children, className = '', ariaLabel }: ShelfObjectProps) {
-  return (
-    <Link
-      href={href}
-      aria-label={ariaLabel || label}
-      className={`group relative flex flex-col items-center transition-all duration-700 outline-none focus-visible:ring-2 focus-visible:ring-amber-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0b10] rounded-sm ${className}`}
-      tabIndex={isLit ? 0 : -1}
-    >
-      {/* Object container with lighting response */}
-      <div
-        className={`relative transition-all duration-700 ease-out ${
-          isLit
-            ? 'brightness-100 saturate-100 group-hover:brightness-125 group-hover:scale-[1.06]'
-            : 'brightness-[0.18] saturate-0'
-        }`}
-        style={{
-          filter: isLit
-            ? undefined
-            : 'brightness(0.18) saturate(0)',
-        }}
-      >
-        {children}
-      </div>
-
-      {/* Contact shadow */}
-      <div
-        className={`absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full pointer-events-none transition-all duration-700 ${
-          isLit ? 'opacity-50' : 'opacity-15'
-        }`}
-        style={{
-          width: '80%',
-          height: '4px',
-          background: 'radial-gradient(ellipse, rgba(0,0,0,0.6) 0%, transparent 70%)',
-        }}
-      />
-
-      {/* Hover warm glow */}
-      <div
-        className={`absolute inset-0 -inset-x-2 -inset-y-1 rounded-lg pointer-events-none transition-opacity duration-300 ${
-          isLit ? 'opacity-0 group-hover:opacity-100' : 'opacity-0'
-        }`}
-        style={{
-          background: 'radial-gradient(ellipse, rgba(255,200,100,0.12) 0%, transparent 70%)',
-        }}
-      />
-
-      {/* Label tooltip on hover */}
-      <div
-        className={`absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap transition-all duration-300 pointer-events-none ${
-          isLit
-            ? 'opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0'
-            : 'opacity-0'
-        }`}
-      >
-        <span className="font-mono text-[8px] sm:text-[9px] uppercase tracking-[0.25em] text-amber-200/70 bg-black/40 backdrop-blur-sm px-2 py-0.5 rounded-full">
-          {label}
-        </span>
-      </div>
-    </Link>
-  );
-}
-
-/* ─────────── INDIVIDUAL OBJECT SVGs ─────────── */
-
-function CementCube() {
-  return (
-    <svg width="48" height="44" viewBox="0 0 48 44" fill="none" xmlns="http://www.w3.org/2000/svg">
-      {/* Top face */}
-      <polygon points="8,14 24,6 40,14 24,22" fill="#6b6560" />
-      {/* Left face */}
-      <polygon points="8,14 24,22 24,40 8,32" fill="#4a4540" />
-      {/* Right face */}
-      <polygon points="40,14 24,22 24,40 40,32" fill="#3a3530" />
-      {/* Subtle edge highlight */}
-      <line x1="24" y1="6" x2="24" y2="22" stroke="#7a756e" strokeWidth="0.5" opacity="0.4" />
-    </svg>
-  );
-}
-
-function BookStack() {
-  return (
-    <svg width="42" height="38" viewBox="0 0 42 38" fill="none" xmlns="http://www.w3.org/2000/svg">
-      {/* Bottom book - dark burgundy */}
-      <rect x="3" y="24" width="38" height="10" rx="1" fill="#3a2025" />
-      <rect x="3" y="24" width="3" height="10" rx="0.5" fill="#4a2830" />
-      {/* Middle book - dark navy */}
-      <rect x="1" y="14" width="36" height="10" rx="1" fill="#1e2535" />
-      <rect x="1" y="14" width="3" height="10" rx="0.5" fill="#283040" />
-      {/* Top book - dark sage */}
-      <rect x="5" y="4" width="34" height="10" rx="1" fill="#2a3028" />
-      <rect x="5" y="4" width="3" height="10" rx="0.5" fill="#354035" />
-    </svg>
-  );
-}
-
-function BrassTray() {
-  return (
-    <svg width="56" height="18" viewBox="0 0 56 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-      {/* Tray body */}
-      <ellipse cx="28" cy="12" rx="26" ry="5" fill="#4a3820" />
-      <ellipse cx="28" cy="11" rx="24" ry="4" fill="#5a4828" />
-      {/* Inner surface */}
-      <ellipse cx="28" cy="10.5" rx="21" ry="3" fill="#3a2c18" />
-      {/* Rim highlight */}
-      <ellipse cx="28" cy="9" rx="22" ry="2.5" fill="none" stroke="#6a5830" strokeWidth="0.5" opacity="0.6" />
-      {/* Small incense stick */}
-      <line x1="20" y1="10" x2="38" y2="9" stroke="#5a4530" strokeWidth="1" strokeLinecap="round" />
-      {/* Smoke wisp */}
-      <path d="M38 9 Q39 6 37.5 3 Q36 0 37 -2" stroke="#8a8580" strokeWidth="0.4" fill="none" opacity="0.3" />
-    </svg>
-  );
-}
-
-function SmallFrame() {
-  return (
-    <svg width="32" height="42" viewBox="0 0 32 42" fill="none" xmlns="http://www.w3.org/2000/svg">
-      {/* Frame outer */}
-      <rect x="2" y="2" width="28" height="38" rx="1" fill="#3a3020" stroke="#5a4830" strokeWidth="0.8" />
-      {/* Mat / inner border */}
-      <rect x="5" y="5" width="22" height="32" rx="0.5" fill="#1a1810" />
-      {/* Abstract artwork inside - simple mountain/landscape */}
-      <path d="M5 30 L12 18 L16 22 L22 12 L27 20 L27 37 L5 37 Z" fill="#252018" />
-      <circle cx="22" cy="10" r="2" fill="#302818" />
-    </svg>
-  );
-}
-
-function GeometricBrass() {
-  return (
-    <svg width="36" height="48" viewBox="0 0 36 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-      {/* Tetrahedron / obelisk shape */}
-      {/* Left face */}
-      <polygon points="18,2 4,44 18,38" fill="#4a3820" />
-      {/* Right face */}
-      <polygon points="18,2 32,44 18,38" fill="#5a4828" />
-      {/* Base face */}
-      <polygon points="4,44 32,44 18,38" fill="#3a2c18" />
-      {/* Edge highlights */}
-      <line x1="18" y1="2" x2="4" y2="44" stroke="#6a5830" strokeWidth="0.4" opacity="0.5" />
-      <line x1="18" y1="2" x2="32" y2="44" stroke="#7a6838" strokeWidth="0.4" opacity="0.5" />
-    </svg>
-  );
-}
-
-/* ─────────────────────────── MAIN COMPONENT ─────────────────────────── */
-
-export default function PullChainLampHero({ isLit, setIsLit, onLitComplete, activateLampRef }: PullChainLampHeroProps) {
+export default function PullChainLampHero({
+  isLit,
+  setIsLit,
+  onLitComplete,
+  activateLampRef,
+}: PullChainLampHeroProps) {
   const chainControls = useAnimation();
   const lampControls = useAnimation();
   const autoScrollTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -204,7 +65,7 @@ export default function PullChainLampHero({ isLit, setIsLit, onLitComplete, acti
   };
 
   const handlePullChain = () => {
-    if (isLit) return; // Only activate, never toggle off
+    if (isLit) return; // Only activate once
 
     // 1. Mechanical switch click sound
     playClickSound(false);
@@ -235,7 +96,7 @@ export default function PullChainLampHero({ isLit, setIsLit, onLitComplete, acti
     setTimeout(() => {
       setIsLit(true);
 
-      // After 2.4s, trigger smooth scroll into illuminated content
+      // After 2.4s, smoothly scroll down into illuminated content
       if (autoScrollTimerRef.current) clearTimeout(autoScrollTimerRef.current);
       autoScrollTimerRef.current = setTimeout(() => {
         onLitComplete?.();
@@ -262,123 +123,248 @@ export default function PullChainLampHero({ isLit, setIsLit, onLitComplete, acti
     };
   }, []);
 
-  /* ─── Shelf Navigation Objects ─── */
-  const shelfObjects = [
-    { id: 'books',     href: '/about',       label: 'OUR STORY',    component: <BookStack />,      ariaLabel: 'Our Story',    mobile: true },
-    { id: 'tray',      href: '/shop',        label: 'SHOP',         component: <BrassTray />,      ariaLabel: 'Shop All',     mobile: false },
-    // Lamp is center — not in this array
-    { id: 'frame',     href: '/commissions', label: 'COMMISSIONS',  component: <SmallFrame />,     ariaLabel: 'Commissions',  mobile: true },
-    { id: 'geometric', href: '/fandoms',     label: 'BEDROOM LABS', component: <GeometricBrass />, ariaLabel: 'Bedroom Labs', mobile: false },
+  /* ─── 5 Curated Physical Objects Config ─── */
+  const leftShelfObjects: ShelfObjectConfig[] = [
+    {
+      id: 'framed-art',
+      href: '/about',
+      label: 'OUR STORY',
+      ariaLabel: 'Our Story — Architect relief study',
+      imageSrc: '/images/shelf-framed-art.png',
+      width: 175,
+      height: 158,
+      className: 'w-[125px] h-[113px] sm:w-[150px] sm:h-[135px] md:w-[175px] md:h-[158px]',
+      distanceFromLamp: 2.2, // farther left
+      mobileVisible: false,
+    },
+    {
+      id: 'arch-sculpture',
+      href: '/fandoms',
+      label: 'BEDROOM LABS',
+      ariaLabel: 'Bedroom Labs — Cast brutalist architecture sculpture',
+      imageSrc: '/images/shelf-arch-sculpture.png',
+      width: 150,
+      height: 170,
+      className: 'w-[110px] h-[125px] sm:w-[130px] sm:h-[148px] md:w-[150px] md:h-[170px]',
+      distanceFromLamp: 1.0, // immediately beside lamp on left
+      mobileVisible: true,
+    },
   ];
 
-  const leftObjects = shelfObjects.slice(0, 2);
-  const rightObjects = shelfObjects.slice(2);
+  const rightShelfObjects: ShelfObjectConfig[] = [
+    {
+      id: 'cement-incense',
+      href: '/shop',
+      label: 'CEMENTWARE',
+      ariaLabel: 'Cementware — Stepped brutalist incense pedestal',
+      imageSrc: '/images/shelf-cement-incense.png',
+      width: 125,
+      height: 160,
+      className: 'w-[95px] h-[122px] sm:w-[110px] sm:h-[142px] md:w-[125px] md:h-[160px]',
+      distanceFromLamp: 1.0, // immediately beside lamp on right
+      mobileVisible: true,
+    },
+    {
+      id: 'organizer-tray',
+      href: '/shop',
+      label: 'ORGANIZATION',
+      ariaLabel: 'Shop Organization — Mineral cast catch-all tray',
+      imageSrc: '/images/shelf-organizer-tray.png',
+      width: 170,
+      height: 103,
+      className: 'w-[120px] h-[73px] sm:w-[145px] sm:h-[88px] md:w-[170px] md:h-[103px]',
+      distanceFromLamp: 1.8, // mid-right
+      mobileVisible: false,
+    },
+    {
+      id: 'commission-model',
+      href: '/commissions',
+      label: 'COMMISSIONS',
+      ariaLabel: 'Commissions — Precision timber and brass joint prototype',
+      imageSrc: '/images/shelf-commission-model.png',
+      width: 165,
+      height: 145,
+      className: 'w-[115px] h-[101px] sm:w-[140px] sm:h-[123px] md:w-[165px] md:h-[145px]',
+      distanceFromLamp: 2.6, // far right
+      mobileVisible: false,
+    },
+  ];
 
   return (
-    <div className="relative min-h-screen w-full flex flex-col items-end justify-center overflow-hidden select-none bg-[#08090d] pb-[8vh]">
-
+    <div className="relative min-h-screen w-full flex flex-col justify-end overflow-hidden select-none bg-[#07080b]">
+      
       {/* ═══════════ LAYER 1: ATMOSPHERIC DARK ROOM BACKGROUND ═══════════ */}
       <div className="absolute inset-0 pointer-events-none">
-        {/* Deep room atmosphere */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_40%,_rgba(18,16,14,0.7)_0%,_rgba(8,9,13,1)_85%)]" />
-        {/* Ceiling shadow */}
-        <div className="absolute top-0 inset-x-0 h-48 bg-gradient-to-b from-[#040506] to-transparent opacity-90" />
-        {/* Subtle wall texture — dark plaster grain */}
-        <div className="absolute inset-0 opacity-[0.03]" style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")`,
-          backgroundSize: '200px 200px',
-        }} />
+        {/* Deep ambient dark room falloff */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_90%_70%_at_50%_45%,_rgba(16,15,14,0.85)_0%,_rgba(6,7,10,1)_90%)]" />
+        {/* Subtle architectural wall plaster texture */}
+        <div
+          className="absolute inset-0 opacity-[0.035]"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")`,
+            backgroundSize: '180px 180px',
+          }}
+        />
+        {/* Upper room shadow */}
+        <div className="absolute top-0 inset-x-0 h-40 bg-gradient-to-b from-[#030406] to-transparent opacity-95" />
       </div>
 
-      {/* ═══════════ LAYER 2: PROJECTED LIGHT ═══════════ */}
+      {/* ═══════════ LAYER 2: REALISTIC PHYSICAL LIGHTING (NO POLYGONS) ═══════════ */}
+      {/* 
+        Physically originates from the bulb inside the lampshade (~44% lamp height).
+        Radiates downward onto the shelf and objects with soft, organic Gaussian falloff.
+      */}
       <div
         className={`absolute inset-0 pointer-events-none transition-opacity duration-1000 ease-out z-10 ${
           isLit ? 'opacity-100' : 'opacity-0'
         }`}
       >
-        {/* Downward Expanding Conical Light Beam */}
+        {/* A. Small warm glow immediately inside/underneath the lampshade interior */}
         <div
-          className="absolute inset-x-0 bottom-0 transition-all duration-1000 ease-out"
+          className="absolute left-1/2 -translate-x-1/2 w-[280px] sm:w-[360px] h-[160px] rounded-full blur-2xl opacity-90"
           style={{
-            top: 'calc(50% - 6vh)',
-            transformOrigin: 'top center',
-            transform: isLit ? 'scaleY(1)' : 'scaleY(0.7)',
-            clipPath: 'polygon(calc(50% - 180px) 0%, calc(50% + 180px) 0%, 100% 100%, 0% 100%)',
-            background: 'linear-gradient(180deg, rgba(255, 228, 150, 0.65) 0%, rgba(255, 190, 85, 0.4) 20%, rgba(255, 160, 50, 0.2) 50%, rgba(250, 246, 238, 0.8) 88%, rgba(250, 246, 238, 1) 100%)',
+            bottom: 'calc(140px + 220px)', // directly aligned under lampshade rim
+            background: 'radial-gradient(ellipse at 50% 30%, rgba(255, 235, 170, 0.95) 0%, rgba(255, 185, 75, 0.7) 45%, rgba(230, 120, 30, 0.25) 75%, transparent 90%)',
           }}
         />
 
-        {/* Soft Ambient Glow at the light source */}
+        {/* B. Soft downward warm light cone spreading over the shelf (extremely soft blurred falloff) */}
         <div
-          className="absolute left-1/2 -translate-x-1/2 w-[420px] sm:w-[540px] h-[280px] rounded-full pointer-events-none blur-3xl opacity-70"
+          className="absolute left-1/2 -translate-x-1/2 w-[600px] sm:w-[820px] md:w-[980px] h-[380px] rounded-b-full blur-3xl opacity-75 transition-all duration-1000"
           style={{
-            top: 'calc(50% - 8vh)',
-            background: 'radial-gradient(ellipse at 50% 20%, rgba(255, 215, 120, 0.55) 0%, rgba(255, 170, 60, 0.2) 50%, transparent 80%)',
+            bottom: '120px',
+            background: 'radial-gradient(ellipse 65% 85% at 50% 10%, rgba(255, 220, 140, 0.6) 0%, rgba(255, 175, 70, 0.35) 45%, rgba(210, 120, 35, 0.12) 70%, transparent 85%)',
           }}
         />
 
-        {/* Warm light pooling on the shelf surface */}
+        {/* C. Diffuse warm illumination pooling directly on the shelf surface around the lamp base */}
         <div
-          className="absolute left-1/2 -translate-x-1/2 w-[700px] sm:w-[900px] h-[80px] rounded-full pointer-events-none blur-xl opacity-50"
+          className="absolute left-1/2 -translate-x-1/2 w-[520px] sm:w-[740px] md:w-[860px] h-[90px] rounded-full blur-xl opacity-70"
           style={{
-            bottom: 'calc(8vh + 50px)',
-            background: 'radial-gradient(ellipse, rgba(255, 210, 130, 0.5) 0%, rgba(255, 170, 60, 0.15) 60%, transparent 85%)',
+            bottom: '125px', // exactly on the shelf plane
+            background: 'radial-gradient(ellipse 70% 100% at 50% 30%, rgba(255, 225, 145, 0.8) 0%, rgba(255, 180, 80, 0.4) 40%, rgba(200, 110, 30, 0.15) 70%, transparent 85%)',
+          }}
+        />
+
+        {/* D. Ambient gentle fill illuminating the wall behind the shelf */}
+        <div
+          className="absolute left-1/2 -translate-x-1/2 w-[700px] sm:w-[960px] h-[480px] rounded-full blur-3xl opacity-40"
+          style={{
+            bottom: '80px',
+            background: 'radial-gradient(ellipse at 50% 40%, rgba(255, 195, 95, 0.3) 0%, rgba(235, 140, 45, 0.12) 50%, transparent 80%)',
           }}
         />
       </div>
 
-      {/* ═══════════ LAYER 2.5: SHELF ENVIRONMENT ═══════════ */}
-      {/* The physical shelf surface extends full-width behind the lamp */}
-      <div className="relative z-[12] w-full flex flex-col items-center">
+      {/* ═══════════ LAYER 3: SHELF SCENE (LAMP + 5 PHOTOGRAPHIC OBJECTS) ═══════════ */}
+      <div className="relative z-20 w-full flex flex-col items-center">
 
-        {/* ── Scene Container: Lamp + Objects on Shelf ── */}
-        <div className="relative flex items-end justify-center w-full max-w-[900px] px-4">
+        {/* ── All objects and lamp sit on the exact same baseline (shelf top plane) ── */}
+        <div className="relative flex items-end justify-center w-full max-w-[1240px] px-3 sm:px-6">
 
-          {/* Left shelf objects */}
-          <div className="hidden sm:flex items-end gap-6 sm:gap-8 mb-1 mr-4 sm:mr-8">
-            {leftObjects.map((obj) => (
-              <ShelfObject
-                key={obj.id}
-                href={obj.href}
-                label={obj.label}
-                isLit={isLit}
-                ariaLabel={obj.ariaLabel}
-              >
-                {obj.component}
-              </ShelfObject>
-            ))}
+          {/* ── LEFT OBJECTS ── */}
+          <div className="flex items-end justify-end gap-4 sm:gap-7 md:gap-9 mr-3 sm:mr-6 md:mr-8 mb-[2px]">
+            {leftShelfObjects.map((obj) => {
+              // Closer objects receive more light; farther objects remain moodier
+              const litBrightness = obj.distanceFromLamp === 1.0 ? 1.05 : 0.82;
+              const litContrast = obj.distanceFromLamp === 1.0 ? 1.02 : 1.0;
+
+              return (
+                <Link
+                  key={obj.id}
+                  href={obj.href}
+                  aria-label={obj.ariaLabel}
+                  tabIndex={isLit ? 0 : -1}
+                  className={`group relative flex flex-col items-center outline-none focus-visible:ring-2 focus-visible:ring-amber-400/60 rounded ${
+                    obj.mobileVisible ? 'flex' : 'hidden sm:flex'
+                  }`}
+                >
+                  {/* Object container with physical lighting response */}
+                  <div
+                    className={`relative ${obj.className} transition-all duration-1000 ease-out group-hover:scale-[1.04] group-hover:-translate-y-1`}
+                    style={{
+                      filter: isLit
+                        ? `brightness(${litBrightness}) contrast(${litContrast})`
+                        : 'brightness(0.12) contrast(1.15) saturate(0.2)',
+                    }}
+                  >
+                    <Image
+                      src={obj.imageSrc}
+                      alt={obj.label}
+                      fill
+                      sizes="(max-width: 640px) 130px, (max-width: 768px) 150px, 180px"
+                      className="object-contain object-bottom drop-shadow-md"
+                    />
+
+                    {/* Subtle warm bounce light highlight on side facing lamp (active when lit) */}
+                    <div
+                      className={`absolute inset-0 pointer-events-none transition-opacity duration-1000 ${
+                        isLit ? 'opacity-40 group-hover:opacity-60' : 'opacity-0'
+                      }`}
+                      style={{
+                        background: 'linear-gradient(90deg, transparent 40%, rgba(255, 210, 120, 0.25) 100%)',
+                        mixBlendMode: 'color-dodge',
+                      }}
+                    />
+                  </div>
+
+                  {/* Physical contact shadow directly on shelf wood */}
+                  <div
+                    className={`absolute -bottom-1 left-1/2 -translate-x-1/2 w-[85%] h-[6px] rounded-full pointer-events-none transition-all duration-700 ${
+                      isLit ? 'opacity-70' : 'opacity-25'
+                    }`}
+                    style={{
+                      background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 55%, transparent 75%)',
+                    }}
+                  />
+
+                  {/* Understated hover label tooltip */}
+                  <div
+                    className={`absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap transition-all duration-300 pointer-events-none z-30 ${
+                      isLit
+                        ? 'opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0'
+                        : 'opacity-0'
+                    }`}
+                  >
+                    <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-amber-200/90 bg-[#120e0a]/85 border border-amber-900/40 backdrop-blur-md px-2.5 py-1 rounded shadow-lg">
+                      {obj.label}
+                    </span>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
 
-          {/* ═══════════ LAYER 3: ISOLATED PHYSICAL LAMP ═══════════ */}
+          {/* ═══════════ CENTER FOCAL POINT: TIFFANY LAMP ═══════════ */}
           <motion.div
             animate={lampControls}
-            className="relative z-20 flex-shrink-0 pointer-events-none"
+            className="relative z-30 flex-shrink-0 pointer-events-none mb-[2px]"
           >
-            {/* Lamp Frame — 638:959 aspect ratio */}
-            <div className="relative w-[220px] h-[330px] sm:w-[280px] sm:h-[420px] md:w-[320px] md:h-[480px] pointer-events-auto">
+            {/* Lamp container: dominant ~40% viewport scale, 638:959 aspect ratio */}
+            <div className="relative w-[240px] h-[360px] sm:w-[280px] sm:h-[420px] md:w-[320px] md:h-[480px] pointer-events-auto">
 
-              {/* Internal bulb glow behind glass (only when lit) */}
+              {/* Internal bulb radiance behind stained glass panels */}
               <div
-                className={`absolute top-[12%] left-1/2 -translate-x-1/2 w-[72%] h-[38%] rounded-full pointer-events-none transition-opacity duration-700 blur-xl ${
-                  isLit ? 'opacity-80' : 'opacity-0'
+                className={`absolute top-[12%] left-1/2 -translate-x-1/2 w-[74%] h-[38%] rounded-full pointer-events-none transition-opacity duration-700 blur-xl ${
+                  isLit ? 'opacity-85' : 'opacity-0'
                 }`}
                 style={{
-                  background: 'radial-gradient(circle, rgba(255, 220, 130, 0.7) 0%, rgba(255, 140, 40, 0.3) 60%, transparent 85%)',
+                  background: 'radial-gradient(circle, rgba(255, 230, 140, 0.8) 0%, rgba(255, 150, 45, 0.35) 60%, transparent 85%)',
                 }}
               />
 
-              {/* OFF STATE LAMP (transparent PNG) */}
+              {/* OFF STATE LAMP (authentic isolated transparent PNG, no background) */}
               <div className="absolute inset-0 transition-opacity duration-700">
                 <Image
                   src="/images/lamp-isolated-off.png"
                   alt="Handcrafted Tiffany stained glass lamp"
                   fill
                   priority
-                  className="object-contain"
+                  className="object-contain object-bottom"
                 />
               </div>
 
-              {/* ON STATE LAMP (transparent PNG) */}
+              {/* ON STATE LAMP (vibrant glowing stained glass & warm brass reflection) */}
               <div
                 className={`absolute inset-0 transition-opacity duration-700 ${
                   isLit ? 'opacity-100' : 'opacity-0'
@@ -389,13 +375,13 @@ export default function PullChainLampHero({ isLit, setIsLit, onLitComplete, acti
                   alt="Tiffany stained glass lamp illuminated"
                   fill
                   priority
-                  className="object-contain"
+                  className="object-contain object-bottom"
                 />
               </div>
 
-              {/* ═══════════ LAYER 4: INTERACTIVE PULL CHAIN ═══════════ */}
+              {/* ── LAYER 4: INTERACTIVE PHYSICAL PULL CHAIN ── */}
               <div
-                className="absolute z-30 cursor-grab active:cursor-grabbing"
+                className="absolute z-40 cursor-grab active:cursor-grabbing"
                 style={{ top: '43.2%', left: '66.8%' }}
               >
                 <motion.div
@@ -420,10 +406,10 @@ export default function PullChainLampHero({ isLit, setIsLit, onLitComplete, acti
                   style={{ transformOrigin: 'top center' }}
                   title="Pull chain to illuminate"
                 >
-                  {/* Hit area */}
+                  {/* Invisible hit area */}
                   <div className="absolute -inset-x-4 -inset-y-3 cursor-grab active:cursor-grabbing" />
 
-                  {/* Beaded chain links */}
+                  {/* Golden beaded chain links */}
                   <div className="flex flex-col items-center gap-[2px]">
                     {Array.from({ length: 14 }).map((_, i) => (
                       <div
@@ -433,25 +419,25 @@ export default function PullChainLampHero({ isLit, setIsLit, onLitComplete, acti
                     ))}
                   </div>
 
-                  {/* Weighted brass fob */}
+                  {/* Weighted brass teardrop fob */}
                   <div className="mt-0.5 flex flex-col items-center">
                     <div className="h-6 w-3 sm:h-7 sm:w-3.5 rounded-b-full rounded-t-sm border border-[#231306] bg-gradient-to-b from-[#ffe5a8] via-[#cf903b] to-[#734316] shadow-md group-hover:scale-115 transition-transform" />
                   </div>
                 </motion.div>
               </div>
 
-              {/* Lamp contact shadow on the shelf */}
+              {/* Lamp contact shadow directly under the brass foot on the shelf */}
               <div
-                className={`absolute -bottom-2 left-1/2 -translate-x-1/2 w-[60%] h-[6px] rounded-full pointer-events-none transition-opacity duration-700 ${
-                  isLit ? 'opacity-60' : 'opacity-30'
+                className={`absolute -bottom-1 left-1/2 -translate-x-1/2 w-[70%] h-[7px] rounded-full pointer-events-none transition-opacity duration-700 ${
+                  isLit ? 'opacity-85' : 'opacity-40'
                 }`}
                 style={{
-                  background: 'radial-gradient(ellipse, rgba(0,0,0,0.7) 0%, transparent 70%)',
+                  background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 50%, transparent 75%)',
                 }}
               />
             </div>
 
-            {/* Lamp → Lighting shop link (active when lit) */}
+            {/* Lamp navigation link to Lighting catalog when lit */}
             {isLit && (
               <Link
                 href="/shop"
@@ -463,96 +449,184 @@ export default function PullChainLampHero({ isLit, setIsLit, onLitComplete, acti
               </Link>
             )}
 
-            {/* Lamp hover label */}
+            {/* Understated hover label for lamp */}
             <div
-              className={`absolute -bottom-7 left-1/2 -translate-x-1/2 whitespace-nowrap transition-all duration-300 pointer-events-none z-30 ${
+              className={`absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap transition-all duration-300 pointer-events-none z-30 ${
                 isLit ? 'opacity-0 group-hover:opacity-100' : 'opacity-0'
               }`}
             >
-              <span className="font-mono text-[8px] sm:text-[9px] uppercase tracking-[0.25em] text-amber-200/70 bg-black/40 backdrop-blur-sm px-2 py-0.5 rounded-full">
+              <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-amber-200/90 bg-[#120e0a]/85 border border-amber-900/40 backdrop-blur-md px-2.5 py-1 rounded shadow-lg">
                 LIGHTING
               </span>
             </div>
           </motion.div>
 
-          {/* Right shelf objects */}
-          <div className="hidden sm:flex items-end gap-6 sm:gap-8 mb-1 ml-4 sm:ml-8">
-            {rightObjects.map((obj) => (
-              <ShelfObject
-                key={obj.id}
-                href={obj.href}
-                label={obj.label}
-                isLit={isLit}
-                ariaLabel={obj.ariaLabel}
-              >
-                {obj.component}
-              </ShelfObject>
-            ))}
+          {/* ── RIGHT OBJECTS ── */}
+          <div className="flex items-end justify-start gap-4 sm:gap-7 md:gap-9 ml-3 sm:ml-6 md:mr-0 md:ml-8 mb-[2px]">
+            {rightShelfObjects.map((obj) => {
+              const litBrightness = obj.distanceFromLamp === 1.0 ? 1.05 : obj.distanceFromLamp < 2.0 ? 0.92 : 0.8;
+              const litContrast = obj.distanceFromLamp === 1.0 ? 1.02 : 1.0;
+
+              return (
+                <Link
+                  key={obj.id}
+                  href={obj.href}
+                  aria-label={obj.ariaLabel}
+                  tabIndex={isLit ? 0 : -1}
+                  className={`group relative flex flex-col items-center outline-none focus-visible:ring-2 focus-visible:ring-amber-400/60 rounded ${
+                    obj.mobileVisible ? 'flex' : 'hidden sm:flex'
+                  }`}
+                >
+                  {/* Object container with physical lighting response */}
+                  <div
+                    className={`relative ${obj.className} transition-all duration-1000 ease-out group-hover:scale-[1.04] group-hover:-translate-y-1`}
+                    style={{
+                      filter: isLit
+                        ? `brightness(${litBrightness}) contrast(${litContrast})`
+                        : 'brightness(0.12) contrast(1.15) saturate(0.2)',
+                    }}
+                  >
+                    <Image
+                      src={obj.imageSrc}
+                      alt={obj.label}
+                      fill
+                      sizes="(max-width: 640px) 130px, (max-width: 768px) 150px, 180px"
+                      className="object-contain object-bottom drop-shadow-md"
+                    />
+
+                    {/* Subtle warm bounce light highlight on side facing lamp (active when lit) */}
+                    <div
+                      className={`absolute inset-0 pointer-events-none transition-opacity duration-1000 ${
+                        isLit ? 'opacity-40 group-hover:opacity-60' : 'opacity-0'
+                      }`}
+                      style={{
+                        background: 'linear-gradient(270deg, transparent 40%, rgba(255, 210, 120, 0.25) 100%)',
+                        mixBlendMode: 'color-dodge',
+                      }}
+                    />
+                  </div>
+
+                  {/* Physical contact shadow directly on shelf wood */}
+                  <div
+                    className={`absolute -bottom-1 left-1/2 -translate-x-1/2 w-[85%] h-[6px] rounded-full pointer-events-none transition-all duration-700 ${
+                      isLit ? 'opacity-70' : 'opacity-25'
+                    }`}
+                    style={{
+                      background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 55%, transparent 75%)',
+                    }}
+                  />
+
+                  {/* Understated hover label tooltip */}
+                  <div
+                    className={`absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap transition-all duration-300 pointer-events-none z-30 ${
+                      isLit
+                        ? 'opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0'
+                        : 'opacity-0'
+                    }`}
+                  >
+                    <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-amber-200/90 bg-[#120e0a]/85 border border-amber-900/40 backdrop-blur-md px-2.5 py-1 rounded shadow-lg">
+                      {obj.label}
+                    </span>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
+
         </div>
 
-        {/* Mobile shelf objects (shown below the lamp on small screens) */}
-        <div className="flex sm:hidden items-end justify-center gap-6 mt-2 mb-1">
-          {shelfObjects
-            .filter((obj) => obj.mobile)
-            .map((obj) => (
-              <ShelfObject
-                key={obj.id}
-                href={obj.href}
-                label={obj.label}
-                isLit={isLit}
-                ariaLabel={obj.ariaLabel}
-              >
-                {obj.component}
-              </ShelfObject>
-            ))}
-        </div>
-
-        {/* ── SHELF SURFACE ── */}
-        <div className="relative w-full">
-          {/* Shelf top surface — warm dark walnut */}
+        {/* ═══════════ REALISTIC PHYSICAL FURNITURE SHELF ═══════════ */}
+        {/*
+          Constructed with true perspective depth:
+          1. Receding top surface plane with dark oiled walnut wood grain & specular light pool
+          2. Front beveled edge/lip with golden specular reflection
+          3. Solid vertical front apron slab
+          4. Deep drop shadow falling down the wall below
+        */}
+        <div className="relative w-full z-20">
+          
+          {/* 1. Shelf Top Surface Plane (Receding Depth) */}
           <div
-            className={`relative h-[10px] sm:h-[14px] transition-all duration-700 ${
+            className={`relative h-[22px] sm:h-[28px] transition-all duration-1000 ${
+              isLit ? 'brightness-100' : 'brightness-[0.22]'
+            }`}
+            style={{
+              background: 'linear-gradient(180deg, #3d2c1c 0%, #2e2014 55%, #20150b 100%)',
+              borderTop: '1px solid rgba(135, 95, 50, 0.35)',
+            }}
+          >
+            {/* Fine longitudinal wood grain lines */}
+            <div
+              className="absolute inset-0 opacity-[0.08]"
+              style={{
+                backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 12px, rgba(255,255,255,0.06) 12px, rgba(255,255,255,0.06) 14px)',
+              }}
+            />
+
+            {/* Warm specular light pool directly on wood under lamp when lit */}
+            <div
+              className={`absolute inset-0 pointer-events-none transition-opacity duration-1000 ${
+                isLit ? 'opacity-85' : 'opacity-0'
+              }`}
+              style={{
+                background: 'radial-gradient(ellipse 65% 100% at 50% 0%, rgba(255, 215, 125, 0.55) 0%, rgba(255, 160, 50, 0.2) 45%, transparent 75%)',
+              }}
+            />
+          </div>
+
+          {/* 2. Front Beveled Lip / Chamfer Edge */}
+          <div
+            className={`relative h-[3px] transition-all duration-1000 ${
               isLit ? 'brightness-100' : 'brightness-[0.3]'
             }`}
             style={{
-              background: 'linear-gradient(180deg, #4a3822 0%, #3a2c1a 40%, #2e2214 100%)',
-              borderTop: '1px solid rgba(120, 90, 50, 0.25)',
+              background: isLit
+                ? 'linear-gradient(90deg, #3a2818 10%, rgba(255, 230, 160, 0.8) 50%, #3a2818 90%)'
+                : 'linear-gradient(90deg, #24180d 0%, #3a2818 50%, #24180d 100%)',
             }}
           />
 
-          {/* Shelf front face / edge — darker with wood grain depth */}
+          {/* 3. Solid Front Apron Slab */}
           <div
-            className={`relative h-[18px] sm:h-[24px] transition-all duration-700 ${
-              isLit ? 'brightness-90' : 'brightness-[0.2]'
+            className={`relative h-[30px] sm:h-[38px] transition-all duration-1000 ${
+              isLit ? 'brightness-90' : 'brightness-[0.18]'
             }`}
             style={{
-              background: 'linear-gradient(180deg, #2e2214 0%, #221a0e 50%, #1a1208 100%)',
-              borderTop: '1px solid rgba(80, 60, 30, 0.15)',
+              background: 'linear-gradient(180deg, #24190f 0%, #1a1108 55%, #100a04 100%)',
+              borderBottom: '1px solid rgba(0, 0, 0, 0.8)',
             }}
           >
-            {/* Subtle wood grain lines */}
-            <div className="absolute inset-0 opacity-[0.06]" style={{
-              backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(255,255,255,0.15) 3px, rgba(255,255,255,0.15) 4px)',
-            }} />
+            {/* Subtle vertical grain texture */}
+            <div
+              className="absolute inset-0 opacity-[0.05]"
+              style={{
+                backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 4px, rgba(255,255,255,0.12) 4px, rgba(255,255,255,0.12) 5px)',
+              }}
+            />
+
+            {/* Soft downward light gradient spilled on front face from lamp */}
+            <div
+              className={`absolute inset-0 pointer-events-none transition-opacity duration-1000 ${
+                isLit ? 'opacity-70' : 'opacity-0'
+              }`}
+              style={{
+                background: 'radial-gradient(ellipse 55% 100% at 50% 0%, rgba(255, 205, 110, 0.3) 0%, transparent 70%)',
+              }}
+            />
           </div>
 
-          {/* Shadow cast beneath the shelf */}
-          <div className="h-[40px] sm:h-[60px]" style={{
-            background: 'linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.15) 40%, transparent 100%)',
-          }} />
+          {/* 4. Deep Drop Shadow Cast on Wall Below */}
+          <div
+            className="h-[65px] sm:h-[85px] pointer-events-none"
+            style={{
+              background: 'linear-gradient(180deg, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.45) 35%, rgba(0,0,0,0.12) 70%, transparent 100%)',
+            }}
+          />
+
         </div>
 
-        {/* Wall behind shelf — subtle dark wainscoting panel */}
-        <div
-          className={`absolute top-0 inset-x-0 -z-10 h-full pointer-events-none transition-all duration-700 ${
-            isLit ? 'opacity-30' : 'opacity-10'
-          }`}
-          style={{
-            background: 'linear-gradient(180deg, rgba(25,20,15,0) 0%, rgba(25,20,15,0.4) 70%, rgba(25,20,15,0.6) 100%)',
-          }}
-        />
       </div>
+
     </div>
   );
 }
