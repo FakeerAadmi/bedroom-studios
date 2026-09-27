@@ -3,6 +3,7 @@ import { db } from '@/db';
 import { orders, orderItems, payments } from '@/db/schema';
 import { PaymentService } from '@/lib/payments/razorpay';
 import { allProductsById, allProducts } from '@/data/catalog';
+import { sendOrderNotification } from '@/lib/discord';
 import { v4 as uuidv4 } from 'uuid';
 
 export async function POST(request: Request) {
@@ -84,7 +85,29 @@ export async function POST(request: Request) {
         console.warn('Could not insert Razorpay payment into DB. Continuing with mock flow.', dbError);
       }
     } catch (e) {
-      console.warn('Could not create Razorpay order, continuing with mock order.', e);
+      console.warn('Could not create Razorpay order, continuing with mock flow.', e);
+    }
+
+    // Notify Discord Orders channel
+    try {
+      await sendOrderNotification({
+        orderId,
+        customerName: customerName || 'Guest Client',
+        email: email || 'guest@bedroomstudios.store',
+        phone: body.phone,
+        items: validatedCartItems.map((item: any) => ({
+          name: item.name || 'Studio Object',
+          quantity: item.quantity,
+          price: item.price,
+          color: item.selectedColor,
+          material: item.selectedMaterial,
+        })),
+        total: orderTotal,
+        address: body.shippingAddress || body.address,
+        notes: body.notes,
+      });
+    } catch (discordErr) {
+      console.warn('Discord order alert failed:', discordErr);
     }
 
     return NextResponse.json({

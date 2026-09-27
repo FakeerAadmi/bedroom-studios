@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/db';
 import { orders as ordersTable } from '@/db/schema';
-import { sendDiscordAlert, DiscordColors } from '@/lib/discord';
+import { sendDiscordAlert, sendStatusUpdateNotification, DiscordColors } from '@/lib/discord';
 import { eq } from 'drizzle-orm';
 import { verifyAdminRequest } from '@/lib/auth/admin';
 
@@ -103,6 +103,15 @@ export async function PUT(request: Request) {
           updatedAt: new Date(),
         })
         .where(eq(ordersTable.id, orderId));
+
+      // Notify Discord Orders channel of stage advancement
+      sendStatusUpdateNotification({
+        orderId: orderData.orderNumber || orderId,
+        customerName: orderData.customerName,
+        newStatus,
+        stageNumber: orderData.currentStage,
+        note: orderData.comments?.[orderData.comments.length - 1]?.text,
+      }).catch((e) => console.warn('Discord status notification error:', e));
     }
     
     return NextResponse.json({ success: true });

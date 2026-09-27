@@ -4,6 +4,7 @@ import Script from "next/script";
 import { DM_Sans, Newsreader, Space_Grotesk } from "next/font/google";
 import { Providers } from "./providers";
 import Layout from "@/components/Layout";
+import VisitorRadar from "@/components/telemetry/VisitorRadar";
 import "./globals.css";
 import "../env";
 
@@ -75,6 +76,7 @@ export default function RootLayout({
     >
       <body className="font-body bg-paper text-ink">
         <Providers>
+          <VisitorRadar />
           <Layout>
             {children}
           </Layout>
