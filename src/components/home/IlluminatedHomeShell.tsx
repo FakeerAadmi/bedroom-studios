@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, ChevronRight, Sparkles, Terminal, CheckCircle2, Shield, Layers, Sun, Moon } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { ChevronRight, ArrowRight } from 'lucide-react';
 import PullChainLampHero from './PullChainLampHero';
 import StudioWorkbench from './StudioWorkbench';
 import ProductCard from '@/components/ProductCard';
@@ -129,42 +128,90 @@ const testimonials = [
 ];
 
 export default function IlluminatedHomeShell({ allProducts }: { allProducts: any[] }) {
-  // Starts turned OFF as requested
+  // Starts strictly turned OFF
   const [isLit, setIsLit] = useState(false);
+  const [hasUnlockedScroll, setHasUnlockedScroll] = useState(false);
 
   const deskLamps = allProducts.filter((p) => p.categoryId === 'desk-lamps');
   const cementware = allProducts.filter((p) => p.categoryId === 'cementware');
 
+  // Strict scroll lock when lamp is off: prevents wheel, touch, and keys
+  useEffect(() => {
+    if (!hasUnlockedScroll) {
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+
+      const preventDefaultAction = (e: Event) => {
+        e.preventDefault();
+      };
+
+      const preventScrollKeys = (e: KeyboardEvent) => {
+        if (['Space', 'ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End'].includes(e.code)) {
+          e.preventDefault();
+        }
+      };
+
+      window.addEventListener('wheel', preventDefaultAction, { passive: false });
+      window.addEventListener('touchmove', preventDefaultAction, { passive: false });
+      window.addEventListener('keydown', preventScrollKeys);
+
+      return () => {
+        document.body.style.overflow = '';
+        document.documentElement.style.overflow = '';
+        window.removeEventListener('wheel', preventDefaultAction);
+        window.removeEventListener('touchmove', preventDefaultAction);
+        window.removeEventListener('keydown', preventScrollKeys);
+      };
+    } else {
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+    }
+  }, [hasUnlockedScroll]);
+
+  // When lamp turns lit, unlock scroll after delay
+  useEffect(() => {
+    if (isLit) {
+      const timer = setTimeout(() => {
+        setHasUnlockedScroll(true);
+      }, 2400);
+      return () => clearTimeout(timer);
+    }
+  }, [isLit]);
+
   return (
     <div
       className={`min-h-screen transition-colors duration-1000 ${
-        isLit ? 'bg-[#faf9f5] text-ink' : 'bg-[#0b0c11] text-white/90'
+        isLit ? 'bg-[#faf9f5] text-ink' : 'bg-[#090a0f] text-white/90'
       }`}
     >
-      {/* ── 1. PULL CHAIN LAMP HERO (STARTS OFF) ── */}
-      <PullChainLampHero isLit={isLit} setIsLit={setIsLit} />
+      {/* ── 1. PULL CHAIN LAMP HERO (Zero text prompt, strict lamp string interaction) ── */}
+      <PullChainLampHero
+        isLit={isLit}
+        setIsLit={setIsLit}
+        onLitComplete={() => setHasUnlockedScroll(true)}
+      />
 
-      {/* ── 2. ILLUMINATED CONTENT CONTAINER ── */}
+      {/* ── 2. ILLUMINATED WEBSITE CONTENT (Revealed by the downward light) ── */}
       <div
         id="illuminated-content"
         className={`relative transition-all duration-1000 ${
           isLit
-            ? 'opacity-100 filter-none'
-            : 'opacity-25 blur-[1px] pointer-events-none'
+            ? 'opacity-100 filter-none pointer-events-auto'
+            : 'opacity-0 filter-none pointer-events-none'
         }`}
       >
-        {/* Ambient illumination glow from above */}
+        {/* Warm downward light halo spilling over the top */}
         <div
           className={`absolute -top-32 left-1/2 -translate-x-1/2 w-full max-w-6xl h-64 pointer-events-none transition-opacity duration-1000 ${
             isLit ? 'opacity-100' : 'opacity-0'
           }`}
           style={{
-            background: 'radial-gradient(ellipse at top, rgba(255, 225, 160, 0.45) 0%, rgba(250, 249, 245, 0) 70%)',
+            background: 'radial-gradient(ellipse at top, rgba(255, 215, 140, 0.45) 0%, rgba(250, 249, 245, 0) 70%)',
           }}
         />
 
         {/* ── TICKER STRIP ── */}
-        <div className={`overflow-hidden border-y border-ink/10 py-2.5 font-mono text-[10px] tracking-[0.25em] transition-colors duration-700 ${isLit ? 'bg-[#f4f2ec] text-ink/65' : 'bg-black/50 text-white/40'}`}>
+        <div className="overflow-hidden border-y border-ink/10 py-2.5 font-mono text-[10px] tracking-[0.25em] bg-[#f4f2ec] text-ink/65">
           <div className="ticker-track flex items-center min-w-max gap-8 px-6 uppercase">
             {[...tickerItems, ...tickerItems, ...tickerItems].map((item, index) => (
               <div key={`${item}-${index}`} className="flex items-center gap-6">
@@ -176,36 +223,36 @@ export default function IlluminatedHomeShell({ allProducts }: { allProducts: any
         </div>
 
         {/* ── 001, 002, 003, 004 TECHNICAL INDEX STRIP ── */}
-        <section className={`border-b border-ink/10 transition-colors duration-700 ${isLit ? 'bg-[#f6f4ed]' : 'bg-[#10121a]'}`}>
+        <section className="border-b border-ink/10 bg-[#f6f4ed]">
           <div className="mx-auto max-w-7xl">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-ink/10">
               {indexItems.map((item) => (
                 <Link
                   key={item.num}
                   href={item.href}
-                  className={`group p-8 transition-colors duration-300 flex flex-col justify-between ${isLit ? 'hover:bg-white' : 'hover:bg-white/5'}`}
+                  className="group p-8 transition-colors duration-300 hover:bg-white flex flex-col justify-between"
                 >
                   <div>
-                    <div className="flex items-center justify-between font-mono text-xs opacity-60">
-                      <span className="font-bold">{item.num}</span>
-                      <span className="text-[10px] uppercase tracking-wider">
+                    <div className="flex items-center justify-between font-mono text-xs text-ink/50">
+                      <span className="font-bold text-ink/70">{item.num}</span>
+                      <span className="text-[10px] uppercase tracking-wider text-ink/40 group-hover:text-accent">
                         {item.tag}
                       </span>
                     </div>
 
-                    <div className="my-6 transition-transform duration-300 group-hover:scale-110">
+                    <div className="my-6 text-ink transition-transform duration-300 group-hover:scale-110">
                       {item.icon}
                     </div>
 
-                    <h3 className="font-display text-lg font-bold">
+                    <h3 className="font-display text-lg font-bold text-ink group-hover:text-accent transition-colors">
                       {item.name}
                     </h3>
-                    <p className="mt-2 text-xs leading-relaxed opacity-70 font-sans">
+                    <p className="mt-2 text-xs leading-relaxed text-ink/65 font-sans">
                       {item.desc}
                     </p>
                   </div>
 
-                  <div className="mt-6 flex items-center gap-1 font-mono text-[11px] font-semibold uppercase tracking-wider opacity-60 group-hover:opacity-100">
+                  <div className="mt-6 flex items-center gap-1 font-mono text-[11px] font-semibold uppercase tracking-wider text-ink/50 group-hover:text-ink">
                     <span>Explore Blueprint</span>
                     <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
                   </div>
@@ -221,16 +268,16 @@ export default function IlluminatedHomeShell({ allProducts }: { allProducts: any
         </div>
 
         {/* ── ARCHITECTURAL UNIFIED STANDARD ── */}
-        <section className={`border-y border-ink/10 py-16 md:py-24 transition-colors duration-700 ${isLit ? 'bg-[#faf9f5]' : 'bg-[#0f1118]'}`}>
+        <section className="border-y border-ink/10 py-16 md:py-24 bg-[#faf9f5]">
           <div className="mx-auto max-w-7xl px-4 md:px-8">
             <div className="mb-14 text-center max-w-3xl mx-auto">
-              <span className="font-mono text-xs uppercase tracking-[0.28em] opacity-60">
+              <span className="font-mono text-xs uppercase tracking-[0.28em] text-ink/50">
                 Architecture & Craft
               </span>
-              <h2 className="mt-3 font-display text-3xl font-bold tracking-tight md:text-5xl">
+              <h2 className="mt-3 font-display text-3xl font-bold tracking-tight md:text-5xl text-ink">
                 A single, unified Studio Build Standard
               </h2>
-              <p className="mt-4 text-sm md:text-base opacity-75 leading-relaxed">
+              <p className="mt-4 text-sm md:text-base text-ink/70 leading-relaxed">
                 Every piece is manufactured to order. Zero mass-production waste, custom fluted diffusion geometry, and hand-cast minerals.
               </p>
             </div>
@@ -241,17 +288,15 @@ export default function IlluminatedHomeShell({ allProducts }: { allProducts: any
                 {studioSteps.map((step, idx) => (
                   <div
                     key={step.title}
-                    className={`rounded-2xl border p-5 transition shadow-sm ${
-                      isLit ? 'border-ink/10 bg-white hover:border-ink' : 'border-white/10 bg-white/5 hover:border-white/30'
-                    }`}
+                    className="rounded-2xl border border-ink/10 bg-white p-5 transition shadow-sm hover:border-ink"
                   >
                     <div className="flex items-center gap-3">
                       <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#d4ff00] border border-ink font-mono text-[10px] font-bold text-ink">
                         {idx + 1}
                       </span>
-                      <h3 className="font-display text-base font-bold">{step.title}</h3>
+                      <h3 className="font-display text-base font-bold text-ink">{step.title}</h3>
                     </div>
-                    <p className="mt-2 text-xs md:text-sm opacity-70 leading-relaxed pl-9">
+                    <p className="mt-2 text-xs md:text-sm text-ink/65 leading-relaxed pl-9">
                       {step.desc}
                     </p>
                   </div>
@@ -259,9 +304,7 @@ export default function IlluminatedHomeShell({ allProducts }: { allProducts: any
               </div>
 
               {/* Exploded Diagram Box */}
-              <div className={`relative rounded-[2.5rem] border p-8 md:p-12 shadow-card overflow-hidden ${
-                isLit ? 'border-ink/15 bg-[#f5f2ea]' : 'border-white/10 bg-white/5'
-              }`}>
+              <div className="relative rounded-[2.5rem] border border-ink/15 bg-[#f5f2ea] p-8 md:p-12 shadow-card overflow-hidden">
                 <div className="absolute inset-0 opacity-[0.06] bg-[linear-gradient(to_right,#000_1px,transparent_1px),linear-gradient(to_bottom,#000_1px,transparent_1px)] bg-[size:24px_24px]" />
 
                 <div className="relative z-10 flex flex-col items-center justify-center space-y-4 py-6">
@@ -316,14 +359,14 @@ export default function IlluminatedHomeShell({ allProducts }: { allProducts: any
         <section id="showcase" className="mx-auto max-w-7xl px-4 py-16 md:px-8 md:py-24">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-ink/10 pb-6 mb-10">
             <div>
-              <span className="font-mono text-xs uppercase tracking-[0.28em] opacity-60">
+              <span className="font-mono text-xs uppercase tracking-[0.28em] text-ink/50">
                 Studio Catalog // All Objects
               </span>
-              <h2 className="mt-2 font-display text-3xl font-bold tracking-tight md:text-5xl">
+              <h2 className="mt-2 font-display text-3xl font-bold tracking-tight md:text-5xl text-ink">
                 Architectural Desktop Collection
               </h2>
             </div>
-            <p className="max-w-md text-sm opacity-70 leading-relaxed">
+            <p className="max-w-md text-sm text-ink/65 leading-relaxed">
               Click any vector blueprint to inspect details or queue a made-to-order run directly with our studio.
             </p>
           </div>
@@ -332,7 +375,7 @@ export default function IlluminatedHomeShell({ allProducts }: { allProducts: any
           <div className="mb-14">
             <div className="flex items-center gap-3 mb-6">
               <span className="h-2 w-2 rounded-full bg-[#d4ff00] border border-ink" />
-              <h3 className="font-mono text-sm font-bold uppercase tracking-wider">
+              <h3 className="font-mono text-sm font-bold uppercase tracking-wider text-ink">
                 Series 01 · Desk Luminaires ({deskLamps.length})
               </h3>
             </div>
@@ -347,7 +390,7 @@ export default function IlluminatedHomeShell({ allProducts }: { allProducts: any
           <div>
             <div className="flex items-center gap-3 mb-6">
               <span className="h-2 w-2 rounded-full bg-ink/30 border border-ink/40" />
-              <h3 className="font-mono text-sm font-bold uppercase tracking-wider">
+              <h3 className="font-mono text-sm font-bold uppercase tracking-wider text-ink">
                 Series 02 · Mineral Cementware ({cementware.length})
               </h3>
             </div>
@@ -360,35 +403,33 @@ export default function IlluminatedHomeShell({ allProducts }: { allProducts: any
         </section>
 
         {/* ── 3-TRACK JOURNEY ── */}
-        <section className={`border-t border-ink/10 py-16 md:py-24 transition-colors duration-700 ${isLit ? 'bg-[#f6f4ed]' : 'bg-[#10121a]'}`}>
+        <section className="border-t border-ink/10 py-16 md:py-24 bg-[#f6f4ed]">
           <div className="mx-auto max-w-7xl px-4 md:px-8">
             <div className="mb-12 text-center max-w-2xl mx-auto">
-              <span className="font-mono text-xs uppercase tracking-[0.28em] opacity-60">
+              <span className="font-mono text-xs uppercase tracking-[0.28em] text-ink/50">
                 Studio Tracks
               </span>
-              <h2 className="mt-2 font-display text-3xl font-bold tracking-tight md:text-5xl">
+              <h2 className="mt-2 font-display text-3xl font-bold tracking-tight md:text-5xl text-ink">
                 Choose your Studio Journey
               </h2>
             </div>
 
             <div className="grid gap-6 md:grid-cols-3">
               {/* Path 1 */}
-              <div className={`rounded-[2.2rem] border p-8 flex flex-col justify-between shadow-sm transition hover:shadow-card hover:-translate-y-1 ${
-                isLit ? 'border-ink/15 bg-white' : 'border-white/10 bg-white/5'
-              }`}>
+              <div className="rounded-[2.2rem] border border-ink/15 bg-white p-8 flex flex-col justify-between shadow-sm transition hover:shadow-card hover:-translate-y-1">
                 <div>
-                  <span className="font-mono text-xs opacity-50 uppercase tracking-widest">PATH 01</span>
-                  <div className="my-6">
+                  <span className="font-mono text-xs text-ink/50 uppercase tracking-widest">PATH 01</span>
+                  <div className="my-6 text-ink">
                     <ModernShojiIcon size={52} />
                   </div>
-                  <h3 className="font-display text-2xl font-bold">Desk Luminaires</h3>
-                  <p className="mt-3 text-sm opacity-70 leading-relaxed">
+                  <h3 className="font-display text-2xl font-bold text-ink">Desk Luminaires</h3>
+                  <p className="mt-3 text-sm text-ink/65 leading-relaxed">
                     Sculptural ambient lighting engineered with micro-diffusers and low-heat LED cores.
                   </p>
                 </div>
                 <Link
                   href="/shop"
-                  className="mt-8 inline-flex items-center justify-between rounded-full border border-ink/20 px-5 py-3 font-mono text-xs uppercase tracking-wider transition hover:bg-ink hover:text-[#d4ff00] font-semibold"
+                  className="mt-8 inline-flex items-center justify-between rounded-full border border-ink/20 px-5 py-3 font-mono text-xs uppercase tracking-wider text-ink transition hover:bg-ink hover:text-[#d4ff00] font-semibold"
                 >
                   <span>Browse Luminaires</span>
                   <ArrowRight className="h-4 w-4" />
@@ -396,22 +437,20 @@ export default function IlluminatedHomeShell({ allProducts }: { allProducts: any
               </div>
 
               {/* Path 2 */}
-              <div className={`rounded-[2.2rem] border p-8 flex flex-col justify-between shadow-sm transition hover:shadow-card hover:-translate-y-1 ${
-                isLit ? 'border-ink/15 bg-white' : 'border-white/10 bg-white/5'
-              }`}>
+              <div className="rounded-[2.2rem] border border-ink/15 bg-white p-8 flex flex-col justify-between shadow-sm transition hover:shadow-card hover:-translate-y-1">
                 <div>
-                  <span className="font-mono text-xs opacity-50 uppercase tracking-widest">PATH 02</span>
-                  <div className="my-6">
+                  <span className="font-mono text-xs text-ink/50 uppercase tracking-widest">PATH 02</span>
+                  <div className="my-6 text-ink">
                     <CementPlinthIcon size={52} />
                   </div>
-                  <h3 className="font-display text-2xl font-bold">Mineral Cementware</h3>
-                  <p className="mt-3 text-sm opacity-70 leading-relaxed">
+                  <h3 className="font-display text-2xl font-bold text-ink">Mineral Cementware</h3>
+                  <p className="mt-3 text-sm text-ink/65 leading-relaxed">
                     Raw Portland cement objects cured 48 hours in silicone forms. Heavy, tactile anchors.
                   </p>
                 </div>
                 <Link
                   href="/shop"
-                  className="mt-8 inline-flex items-center justify-between rounded-full border border-ink/20 px-5 py-3 font-mono text-xs uppercase tracking-wider transition hover:bg-ink hover:text-[#d4ff00] font-semibold"
+                  className="mt-8 inline-flex items-center justify-between rounded-full border border-ink/20 px-5 py-3 font-mono text-xs uppercase tracking-wider text-ink transition hover:bg-ink hover:text-[#d4ff00] font-semibold"
                 >
                   <span>Browse Cementware</span>
                   <ArrowRight className="h-4 w-4" />
@@ -419,22 +458,20 @@ export default function IlluminatedHomeShell({ allProducts }: { allProducts: any
               </div>
 
               {/* Path 3 */}
-              <div className={`rounded-[2.2rem] border p-8 flex flex-col justify-between shadow-sm transition hover:shadow-card hover:-translate-y-1 ${
-                isLit ? 'border-ink/15 bg-white' : 'border-white/10 bg-white/5'
-              }`}>
+              <div className="rounded-[2.2rem] border border-ink/15 bg-white p-8 flex flex-col justify-between shadow-sm transition hover:shadow-card hover:-translate-y-1">
                 <div>
-                  <span className="font-mono text-xs opacity-50 uppercase tracking-widest">PATH 03</span>
-                  <div className="my-6">
+                  <span className="font-mono text-xs text-ink/50 uppercase tracking-widest">PATH 03</span>
+                  <div className="my-6 text-ink">
                     <HotAirBalloonIcon size={52} />
                   </div>
-                  <h3 className="font-display text-2xl font-bold">Custom Commissions</h3>
-                  <p className="mt-3 text-sm opacity-70 leading-relaxed">
+                  <h3 className="font-display text-2xl font-bold text-ink">Custom Commissions</h3>
+                  <p className="mt-3 text-sm text-ink/65 leading-relaxed">
                     Custom dimension requests, bespoke shades, or setup integration. We iterate runs with you.
                   </p>
                 </div>
                 <Link
                   href="/commissions"
-                  className="mt-8 inline-flex items-center justify-between rounded-full border border-ink/20 px-5 py-3 font-mono text-xs uppercase tracking-wider transition hover:bg-ink hover:text-[#d4ff00] font-semibold"
+                  className="mt-8 inline-flex items-center justify-between rounded-full border border-ink/20 px-5 py-3 font-mono text-xs uppercase tracking-wider text-ink transition hover:bg-ink hover:text-[#d4ff00] font-semibold"
                 >
                   <span>Inquire Commission</span>
                   <ArrowRight className="h-4 w-4" />
@@ -445,13 +482,13 @@ export default function IlluminatedHomeShell({ allProducts }: { allProducts: any
         </section>
 
         {/* ── TESTIMONIALS ── */}
-        <section className={`border-t border-ink/10 py-16 md:py-24 transition-colors duration-700 ${isLit ? 'bg-[#faf9f5]' : 'bg-[#0f1118]'}`}>
+        <section className="border-t border-ink/10 py-16 md:py-24 bg-[#faf9f5]">
           <div className="mx-auto max-w-7xl px-4 md:px-8">
             <div className="mb-12 text-center max-w-2xl mx-auto">
-              <span className="font-mono text-xs uppercase tracking-[0.28em] opacity-60">
+              <span className="font-mono text-xs uppercase tracking-[0.28em] text-ink/50">
                 Verified Workstations
               </span>
-              <h2 className="mt-2 font-display text-3xl font-bold tracking-tight md:text-5xl">
+              <h2 className="mt-2 font-display text-3xl font-bold tracking-tight md:text-5xl text-ink">
                 Trusted by creators and workspaces
               </h2>
             </div>
@@ -460,24 +497,20 @@ export default function IlluminatedHomeShell({ allProducts }: { allProducts: any
               {testimonials.map((t) => (
                 <div
                   key={t.id}
-                  className={`rounded-[2rem] border p-6 flex flex-col justify-between shadow-sm ${
-                    isLit ? 'border-ink/10 bg-white' : 'border-white/10 bg-white/5'
-                  }`}
+                  className="rounded-[2rem] border border-ink/10 bg-white p-6 flex flex-col justify-between shadow-sm"
                 >
                   <div>
-                    <span className="font-mono text-xs font-bold opacity-40">{t.id}</span>
-                    <p className="mt-4 text-sm leading-relaxed opacity-85 italic font-sans">
+                    <span className="font-mono text-xs font-bold text-ink/40">{t.id}</span>
+                    <p className="mt-4 text-sm leading-relaxed text-ink/80 italic font-sans">
                       &ldquo;{t.quote}&rdquo;
                     </p>
                   </div>
                   <div className="mt-6 pt-4 border-t border-ink/10 flex items-center justify-between">
                     <div>
-                      <p className="font-display text-xs font-bold">{t.author}</p>
-                      <p className="text-[11px] font-mono opacity-50">{t.role}</p>
+                      <p className="font-display text-xs font-bold text-ink">{t.author}</p>
+                      <p className="text-[11px] font-mono text-ink/50">{t.role}</p>
                     </div>
-                    <span className={`font-mono text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-md ${
-                      isLit ? 'bg-[#f4f2eb] text-ink/60' : 'bg-white/10 text-white/60'
-                    }`}>
+                    <span className="font-mono text-[10px] uppercase tracking-wider bg-[#f4f2eb] text-ink/60 px-2.5 py-1 rounded-md">
                       {t.city}
                     </span>
                   </div>
@@ -488,15 +521,15 @@ export default function IlluminatedHomeShell({ allProducts }: { allProducts: any
         </section>
 
         {/* ── BOTTOM CTA ── */}
-        <section className={`border-t border-ink/10 py-20 text-center transition-colors duration-700 ${isLit ? 'bg-[#f4f1ea]' : 'bg-[#10121a]'}`}>
+        <section className="border-t border-ink/10 py-20 text-center bg-[#f4f1ea]">
           <div className="mx-auto max-w-4xl px-4 md:px-8 space-y-6">
-            <span className="font-mono text-xs uppercase tracking-[0.28em] opacity-60">
+            <span className="font-mono text-xs uppercase tracking-[0.28em] text-ink/50">
               Batch Production Queue
             </span>
-            <h2 className="font-display text-4xl font-bold tracking-tight md:text-6xl">
+            <h2 className="font-display text-4xl font-bold tracking-tight md:text-6xl text-ink">
               Unlock studio-grade desktop objects
             </h2>
-            <p className="mx-auto max-w-xl text-base opacity-75 leading-relaxed font-sans">
+            <p className="mx-auto max-w-xl text-base text-ink/75 leading-relaxed font-sans">
               Build your ideal workspace ambiance. Submit a made-to-order request today with zero upfront payment.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
@@ -509,7 +542,7 @@ export default function IlluminatedHomeShell({ allProducts }: { allProducts: any
               </Link>
               <Link
                 href="/shop"
-                className="inline-flex items-center gap-2 rounded-full border border-ink/20 px-7 py-4 font-mono text-xs font-medium uppercase tracking-wider transition hover:border-ink hover:bg-ink hover:text-white"
+                className="inline-flex items-center gap-2 rounded-full border border-ink/20 bg-white px-7 py-4 font-mono text-xs font-medium uppercase tracking-wider text-ink transition hover:border-ink hover:bg-ink hover:text-white"
               >
                 <span>View Full Catalog</span>
               </Link>
